@@ -198,6 +198,9 @@
   <data name="UpdatedSuccessfully" xml:space="preserve">
     <value>Updated Successfully</value>
   </data>
+  <data name="Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
   <data name="NoDataFound" xml:space="preserve">
     <value>No Data Found</value>
   </data>

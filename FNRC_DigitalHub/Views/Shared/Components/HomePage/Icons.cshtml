@@ -21,7 +21,8 @@
         mod = Model.FirstOrDefault(x => x.OrderNo == i);
         name = isAr ? mod.NameAr : mod.NameEn;
         desc = isAr ? mod.DescriptionAr : mod.DescriptionEn;
-        imgURL = mod.IconConfigurationAttachments.FirstOrDefault().AttachmentTransaction.FilePath;
+        imgURL = mod.IconConfigurationAttachments.Count>0? 
+        mod.IconConfigurationAttachments.FirstOrDefault().AttachmentTransaction.FilePath :"/img/icons/icon1.svg";
         url = mod.URL;
         <div class="icon-item" data-name="@name" data-desc="@desc" data-url="@url">
             <a class="icon-btn">
@@ -43,7 +44,8 @@
         mod = Model.FirstOrDefault(x => x.OrderNo == i);
         name = isAr ? mod.NameAr : mod.NameEn;
         desc = isAr ? mod.DescriptionAr : mod.DescriptionEn;
-        imgURL = mod.IconConfigurationAttachments.FirstOrDefault().AttachmentTransaction.FilePath;
+        imgURL = mod.IconConfigurationAttachments.Count > 0 ?
+        mod.IconConfigurationAttachments.FirstOrDefault().AttachmentTransaction.FilePath : "/img/icons/icon1.svg";
         url = mod.URL;
 
         <div id="@mod.Id" class="icon-item" data-name="@name" data-desc="@desc" data-url="@url">
@@ -72,7 +74,7 @@
         </div>
     </div>
 </div>
-
+<div class="description-modal" id="descModal"></div>
 <script>
    
         // Get modal elements
@@ -167,5 +169,30 @@
     } else {
         console.error('Modal element not found. Make sure modal HTML is added to the page.');
     }
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+        const iconItems = document.querySelectorAll('.icon-item');
+        const modal = document.getElementById('descModal');
+
+        if (modal) {
+            const modalContent = document.createElement('div');
+            modalContent.className = 'description-modal-content';
+            modal.appendChild(modalContent);
+
+            // Single event handler for all icons
+            iconItems.forEach(item => {
+                item.addEventListener('mouseenter', function() {
+                    const fullDescription = this.getAttribute('data-desc');
+                    modalContent.textContent = fullDescription;
+                    modal.classList.add('active');
+                });
+
+                item.addEventListener('mouseleave', function() {
+                    modal.classList.remove('active');
+                });
+            });
+        }
+    });
 
 </script>

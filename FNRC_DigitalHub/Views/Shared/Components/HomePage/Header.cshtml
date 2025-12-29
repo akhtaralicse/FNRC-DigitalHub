@@ -1,13 +1,13 @@
 ﻿@model List<IconConfigurationDTO>
-
 @{
     var lang = loc.localizer["lang"];   
     var isAr = lang == "ar";
     var (showAr, showEn) = (isAr ? "display" : "none", !isAr ? "display" : "none");
-    var mod = Model.FirstOrDefault(x => x.OrderNo == 1);
+    var mod = Model.FirstOrDefault(x => x.OrderNo == 1) ?? new ();
     var name = isAr ? mod.NameAr : mod.NameEn;
     var desc = isAr ? mod.DescriptionAr : mod.DescriptionEn;
-    var imgURL = mod.IconConfigurationAttachments.FirstOrDefault().AttachmentTransaction.FilePath;
+    var imgURL = mod.IconConfigurationAttachments.Count>0?
+    mod.IconConfigurationAttachments?.FirstOrDefault().AttachmentTransaction.FilePath:"/img/icons/icon1.svg";
     var url = mod.URL;
 }
 <div class="top-strip">

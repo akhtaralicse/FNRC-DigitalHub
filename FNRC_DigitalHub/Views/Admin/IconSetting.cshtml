@@ -6,7 +6,6 @@
 <div class="container gallery">
     <div class="row">
 
-
         <form id="galleryForm" method="post" enctype="multipart/form-data" asp-antiforgery="true">
             <div class="container">
                 <div class="card shadow mb-4">
@@ -15,7 +14,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row">
-                            <!-- File Upload Section -->
+                         
                             <div class="col-lg-4 mb-4">
                                 <div class="card border-left-primary shadow h-100 py-2">
                                     <div class="card-body">
@@ -30,20 +29,20 @@
                                             <button type="button" class="btn btn-primary attach-btn">
                                                 <i class="fas fa-upload mr-2 mx-2"></i>@(loc.localizer["ChooseFile"])
                                             </button>
+                                            <div id="fileListUpdate"></div>
                                             <div id="fileList" class="mt-3"></div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-
-                            <!-- Form Fields Section -->
+                            </div> 
+                           
                             <div class="col-lg-8 mb-4">
                                 <div class="card border-left-success shadow h-100 py-2">
                                     <div class="card-body">
                                         <div class="text-xs font-weight-bold text-success text-uppercase mb-3">
                                             @(loc.localizer["IconDetails"])
                                         </div>
-
+                                        <input type="hidden" name="Id" id="Id" value="" />
                                         <div class="row">
                                             <div class="col-md-6 mb-3">
                                                 <label for="NameEn" class="form-label">@(loc.localizer["NameEn"])</label>
@@ -88,7 +87,8 @@
                             <div class="col-12 text-center mt-4">
                                 <div class="d-flex justify-content-center">
                                     <button type="button" id="submitDiv" class="btn btn-success btn-lg px-5">
-                                        <i class="fas fa-save mr-2 mx-2"></i>@(loc.localizer["Save"])
+                                        <i class="fas fa-save mr-2 mx-2"></i>
+                                        <span class="AddNew1">@(loc.localizer["Save"])</span>
                                     </button>
                                 </div>
                             </div>
@@ -128,20 +128,19 @@
                             </tr>
                         </thead>
                         <tbody id="iconsTableBody">
-
                             @foreach (var item in Model)
                             {
                                 <tr>
                                     <td>
-                                        <img width="50" src="@item.IconConfigurationAttachments.First().AttachmentTransaction.ThumbPath" alt="" class="icon-preview" />
+                                        <img width="50" src="@(item.IconConfigurationAttachments.Count>0? item.IconConfigurationAttachments.First().AttachmentTransaction.ThumbPath:"")" alt="" class="icon-preview" />
                                     </td>
                                     <td>
                                         <div>@item.NameEn</div>
                                         <small class="text-muted">@item.NameAr</small>
                                     </td>
-                                    <td>
-                                        <div>@item.DescriptionEn</div>
-                                        <small class="text-muted">@item.DescriptionAr</small>
+                                    <td width="40%">
+                                        <div style="font-size:11px">@item.DescriptionEn</div>
+                                        <small class="text-muted" style="font-size:11px">@item.DescriptionAr</small>
                                     </td>
                                     <td>
                                         <a href="@item.URL" target="_blank" class="text-truncate d-block" style="max-width: 150px;">
@@ -152,10 +151,11 @@
 
                                     <td>
                                         <div class="action-buttons">
-                                            <button class="btn btn-sm btn-outline-primary" onclick="openEditModal('@item.Id')">
+
+                                            <button class="btn btn-sm btn-outline-primary" onclick="LoadUpdateRecord('@(item.Id)')">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button class="btn btn-sm btn-outline-danger" onclick="openDeleteModal('@item.Id')">
+                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteRecord('@(item.Id)')">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </div>
@@ -179,61 +179,6 @@
 
 </div>
 
-<!-- Edit Modal -->
-<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="editModalLabel">Edit Icon</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="editForm">
-                    <input type="hidden" id="editId">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="editNameEn" class="form-label">Name (English)</label>
-                            <input type="text" class="form-control" id="editNameEn" required>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="editNameAr" class="form-label">Name (Arabic)</label>
-                            <input type="text" class="form-control" id="editNameAr" required>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="editURL" class="form-label">URL</label>
-                            <input type="url" class="form-control" id="editURL">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="editOrderNo" class="form-label">Order</label>
-                            <input type="number" class="form-control" id="editOrderNo" min="0" required>
-                        </div>
-
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="editDescriptionEn" class="form-label">Description (English)</label>
-                            <textarea class="form-control" id="editDescriptionEn" rows="3"></textarea>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="editDescriptionAr" class="form-label">Description (Arabic)</label>
-                            <textarea class="form-control" id="editDescriptionAr" rows="3"></textarea>
-                        </div>
-                    </div>
-
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="saveChanges">Save Changes</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
 
 @section scripts {
     <script>
@@ -246,8 +191,9 @@
         };
         document.getElementById('submitDiv').addEventListener('click', function (e) {
             e.preventDefault();
+            var isUpdate = $('#galleryForm').find('input[name="Id"]').val() != "";
 
-            if (selectedFiles.length === 0) {
+            if (selectedFiles.length === 0 && !isUpdate) {
                 Swal.fire("warning", "Please select at least one file.", "warning");
                 return;
             }
@@ -257,8 +203,10 @@
             for (var i = 0; i < selectedFiles.length; i++) {
                 formData.append('files', selectedFiles[i]);
             }
+
+             var url = isUpdate ? '/admin/UpdateIcons' : '/admin/AddIcons';
             $.ajax({
-                url: '/admin/AddIcons',
+                url: url,
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -276,6 +224,90 @@
                 }
             });
         });
+
+         function LoadUpdateRecord(id) {
+       
+           $.ajax({
+            url: '/admin/GetIconById?id='+id,
+            type: 'get',
+            data: {},
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.success) {
+                    var msg = response.message[0];
+                        //console.log(response.message);
+                        $('#galleryForm').find('input[name="NameAr"]').val(msg.NameAr);
+                        $('#galleryForm').find('input[name="NameEn"]').val(msg.NameEn);
+                        $('#galleryForm').find('textarea[name="DescriptionAr"]').val(msg.DescriptionAr);
+                        $('#galleryForm').find('textarea[name="DescriptionEn"]').val(msg.DescriptionEn);
+                        $('#galleryForm').find('textarea[name="URL"]').val(msg.URL);
+                        $('#galleryForm').find('textarea[name="OrderNo"]').val(msg.OrderNo);
+                        $('#galleryForm').find('input[name="Id"]').val(msg.Id);
+                        $('#submitDiv').html('@loc.localizer["Update"]')
+                        $('.AddNew1').html('@loc.localizer["Update"]')
+                        var html ='';
+                            msg.IconConfigurationAttachments.forEach(x =>
+                            {
+                                html += `<a class=""  id="image_${x.Id}" style="position: relative;"  href="javascript:void(0)" onclick="deleteImage_Js('${x.Id}')">
+                                            <span><i class="fa fa-times delete-icon"></i></span>
+                                            <img width="60px" src="${x.AttachmentTransaction.ThumbPath}" alt="fnrc">
+                                        </a>`;
+
+                            })
+                            $('#fileListUpdate').html(html);
+                            window.scroll(0,0);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
+                    }
+                });
+        }
+           function deleteRecord(id) {
+            DeleteWithCallBack('@lang', () => {
+                $.ajax({
+                    url: '/admin/DeleteIcon?id=' + id,
+                    type: 'POST',
+                    data: {},
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.success) {
+                            SuccessWithCallBack('@(loc.localizer["Success"])', '@(loc.localizer["Success"])', '@lang', window.location.href)
+
+                        } else {
+                            Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
+                    }
+                });
+            })
+        }
+        function deleteImage_Js(id) {
+
+            DeleteWithCallBack('@lang', () => {
+                $.ajax({
+                    url: '/admin/DeleteImage?id=' + id,
+                    type: 'POST',
+                    data: {},
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.success) {
+                            $('#image_' + id).remove();
+                        } else {
+                            Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
+                    }
+                });
+            })
+        }
         document.getElementById('fileID').addEventListener('change', function () {
             if (!validateFileSize(this)) {
                 return false;
@@ -323,7 +355,7 @@
 
             DeleteWithCallBack('@lang', () => {
                 $.ajax({
-                    url: '/admin/DeleteGalleryImage?fileId=' + id,
+                    url: '/admin/DeleteImage?fileId=' + id,
                     type: 'POST',
                     data: {},
                     processData: false,

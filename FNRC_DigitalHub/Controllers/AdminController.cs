@@ -16,13 +16,16 @@ namespace FNRC_DigitalHub.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IIconConfigurationService iconConfigurationService;
         private readonly INotificationConfigurationService notificationConfigurationService;
+        private readonly IIconConfigurationAttachmentService iconConfigurationAttachmentService;
 
         public AdminController(ILogger<HomeController> logger, IIconConfigurationService iconConfigurationService
-            , INotificationConfigurationService notificationConfigurationService)
+            , INotificationConfigurationService notificationConfigurationService,
+            IIconConfigurationAttachmentService  iconConfigurationAttachmentService)
         {
             _logger = logger;
             this.iconConfigurationService = iconConfigurationService;
             this.notificationConfigurationService = notificationConfigurationService;
+            this.iconConfigurationAttachmentService = iconConfigurationAttachmentService;
         }
 
         public IActionResult Index()
@@ -51,11 +54,35 @@ namespace FNRC_DigitalHub.Controllers
 
             return Json(new { success = true, message = "Saved" });
         }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateIcons(IconConfigurationDTO mod)
         {
             var data = await iconConfigurationService.Update(mod);
 
             return Json(new { success = true, message = "Updated" });
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteIcon(int id)
+        {
+            var result = await iconConfigurationService.Delete(id);
+            var result2 = await iconConfigurationAttachmentService.DeleteAttachment(id);
+            return Json(new { success = result2, message = "Deleted" });
+
+        }
+        [HttpPost]
+        public async Task<IActionResult> DeleteImage(int id)
+        {
+            var result = await iconConfigurationAttachmentService.DeleteAttachment(id);
+            return Json(new { success = result, message = "Deleted" });
+
+        }
+        public async Task<IActionResult> GetIconById(int id)
+        {
+            var data = await iconConfigurationService.Get(id);
+
+            return Json(new { success = true, message = data });
         }
         public async Task<IActionResult> Announcement()
         {

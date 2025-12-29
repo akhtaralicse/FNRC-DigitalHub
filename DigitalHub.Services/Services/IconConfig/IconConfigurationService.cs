@@ -61,8 +61,22 @@ namespace DigitalHub.Services.Services.IconConfig
         }
         public async Task<bool> Update(IconConfigurationDTO mod)
         {
-            var result = await _repository.GetAllIncludingNoTracking().FirstOrDefaultAsync(x => x.Id == mod.Id);
-            var data = Mapper.Map<IconConfiguration>(result);
+            var result = await _repository.GetAllIncludingNoTracking(x => x.IconConfigurationAttachments).FirstOrDefaultAsync(x => x.Id == mod.Id);
+
+            if (mod.Files != null && mod.Files.Count > 0)
+            {
+                var attachmentList = await AttachmentService.UploadAttachment(mod.Files);
+
+                foreach (var attach in attachmentList)
+                {
+                    result.IconConfigurationAttachments.Add(new()
+                    {
+                        AttachmentId = attach.Id,
+                    });
+                }
+            }
+
+            //var data = Mapper.Map<IconConfiguration>(result);
             result.DescriptionEn = mod.DescriptionEn;
             result.DescriptionAr = mod.DescriptionAr;
             result.NameAr = mod.NameAr;
@@ -78,8 +92,8 @@ namespace DigitalHub.Services.Services.IconConfig
         public async Task<bool> Delete(int id)
         {
             var result = await _repository.GetAllIncludingNoTracking().FirstOrDefaultAsync(x => x.Id == id);
-            result.IsActive = false;
-            _repository.Update(result, true);
+
+            _repository.Delete(result, true);
 
             return true;
         }

@@ -33,7 +33,7 @@ namespace DigitalHub.Services.Shared
              services.AddScoped<IIconConfigurationService, IconConfigurationService>();
              services.AddScoped<IAttachmentService, AttachmentService>();
              services.AddScoped<INotificationConfigurationService, NotificationConfigurationService>();
-
+             services.AddScoped<IIconConfigurationAttachmentService, IconConfigurationAttachmentService>();
 
         }
 

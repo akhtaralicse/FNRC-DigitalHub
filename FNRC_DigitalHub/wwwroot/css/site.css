@@ -103,7 +103,7 @@ html, body {
     overflow: hidden;
     position: relative;
 }
-/*  .news-text {
+    /*  .news-text {
     direction: rtl;
 }*/
 
@@ -259,7 +259,6 @@ html[dir="rtl"] .news-text span {
     transition: transform 240ms cubic-bezier(.2,.9,.2,1), opacity 200ms;
     transform-origin: center;
     will-change: transform;
-    /* Use CSS variable for horizontal offset & rotation set by JS */
     transform: translateX(var(--tx,0)) rotate(var(--rot,0));
 }
 
@@ -295,12 +294,20 @@ html[dir="rtl"] .news-text span {
         height: 100%;
         object-fit: contain;
         display: block;
+        transition: transform 500ms cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        
     }
 
     .icon-btn:hover {
         transform: translateY(-6px) scale(1.06);
         background: rgba(255,255,255,0.06);
+        box-shadow: 0 12px 28px rgba(0,0,0,0.25);
     }
+
+        .icon-btn:hover img {
+            transform: rotate(360deg);
+        }
+
 
 /* label + description block */
 .icon-text {
@@ -325,7 +332,10 @@ html[dir="rtl"] .news-text span {
     font-size: 11px;
     color: var(--base-color);
     opacity: 0.95;
-    max-width: 150px;
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 /* Focus visible */
@@ -473,3 +483,65 @@ html[dir="rtl"] .news-text span {
             .modalBGTransperent .btn.open-url:hover {
                 background-color: #0056b3;
             }
+
+
+/* Modal styles */
+.description-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    background: rgb(253, 253, 253, 0.58);
+    color: var(--base-color);
+    padding: 25px 30px;
+    border-radius: 12px;
+    max-width: 600px;
+    width: auto;
+    min-width: 300px;
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    pointer-events: none;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+    .description-modal.active {
+        opacity: 1;
+        visibility: visible;
+        transform: translate(-50%, -50%) scale(1);
+        pointer-events: auto;
+    }
+
+.description-modal-content {
+    font-size: 16px;
+    line-height: 1.6;
+    white-space: normal;
+    word-wrap: break-word;
+    max-height: 70vh;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+/* Optional backdrop overlay */
+.description-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(2px);
+}
+
+    .description-modal-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }

@@ -198,6 +198,9 @@
   <data name="UpdatedSuccessfully" xml:space="preserve">
     <value>تم التحديث بنجاح</value>
   </data>
+  <data name="Save" xml:space="preserve">
+    <value>حفظ</value>
+  </data>
   <data name="NoDataFound" xml:space="preserve">
     <value>لم يتم العثور على بيانات</value>
   </data>
