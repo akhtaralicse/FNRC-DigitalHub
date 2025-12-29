@@ -1,0 +1,171 @@
+﻿@model List<IconConfigurationDTO>
+@{
+    var lang = loc.localizer["lang"];
+    var isAr = lang == "ar";
+    string name = string.Empty;
+    string desc = string.Empty;
+    string imgURL = string.Empty;
+    string url = string.Empty;
+    IconConfigurationDTO mod = new IconConfigurationDTO();
+
+   
+}
+ 
+ 
+ @await Html.PartialAsync("~/views/shared/components/homepage/header.cshtml",Model)
+
+<div class="icon-column left mt-2" id="leftColumn" aria-label="Left icon column">
+
+    @for (int i = 2; i <= 6; i++)
+    {
+        mod = Model.FirstOrDefault(x => x.OrderNo == i);
+        name = isAr ? mod.NameAr : mod.NameEn;
+        desc = isAr ? mod.DescriptionAr : mod.DescriptionEn;
+        imgURL = mod.IconConfigurationAttachments.FirstOrDefault().AttachmentTransaction.FilePath;
+        url = mod.URL;
+        <div class="icon-item" data-name="@name" data-desc="@desc" data-url="@url">
+            <a class="icon-btn">
+                <img src="@imgURL" alt="@name">
+            </a>
+            <div class="icon-text">
+                <div class="icon-title">@name</div>
+                <div class="icon-desc">@desc</div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="icon-column right mt-2" id="rightColumn" aria-label="Right icon column">
+
+
+    @for (int i = 7; i <= 11; i++)
+    {
+        mod = Model.FirstOrDefault(x => x.OrderNo == i);
+        name = isAr ? mod.NameAr : mod.NameEn;
+        desc = isAr ? mod.DescriptionAr : mod.DescriptionEn;
+        imgURL = mod.IconConfigurationAttachments.FirstOrDefault().AttachmentTransaction.FilePath;
+        url = mod.URL;
+
+        <div id="@mod.Id" class="icon-item" data-name="@name" data-desc="@desc" data-url="@url">
+            <button class="icon-btn" aria-label="@name">
+                <img src="@imgURL" alt="@name">
+            </button>
+            <div class="icon-text">
+                <div class="icon-title">@name</div>
+                <div class="icon-desc">@desc</div>
+            </div>
+        </div>
+    }
+
+
+</div>
+
+<div id="simpleModal" class="modalBGTransperent">
+    <div class="modal-content">
+        <div class="modal-body">
+            <h2 id="modalName"></h2>
+            <p id="modalDesc"></p>
+        </div>
+        <div class="modal-footer">
+            <button id="cancelBtn" class="btn cancel">Cancel</button>
+            <a id="externalLink" class="btn open-url" target="_blank">Open Site</a>
+        </div>
+    </div>
+</div>
+
+<script>
+   
+        // Get modal elements
+    const modal = document.getElementById('simpleModal');
+    const modalName = document.getElementById('modalName');
+    const modalDesc = document.getElementById('modalDesc');
+    const externalLink = document.getElementById('externalLink');
+    const cancelBtn = document.getElementById('cancelBtn');
+
+    // Check if modal exists
+    if (modal) {
+        // Function to open modal with specific data
+        function openModal(name, desc, url) {
+            modalName.textContent = name || 'No Name';
+            modalDesc.textContent = desc || 'No description available';
+            externalLink.href = url || '#';
+            externalLink.textContent = url ? `Open ${name}` : 'No Link Available';
+
+            // Disable button if no URL
+            if (!url) {
+                externalLink.classList.add('disabled');
+                externalLink.style.pointerEvents = 'none';
+                externalLink.style.opacity = '0.5';
+            } else {
+                externalLink.classList.remove('disabled');
+                externalLink.style.pointerEvents = 'auto';
+                externalLink.style.opacity = '1';
+            }
+
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // Prevent scrolling
+        }
+
+        // Function to close modal
+        function closeModal() {
+            modal.style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restore scrolling
+        }
+
+        // Add click event to all existing icon buttons
+        const iconButtons = document.querySelectorAll('.icon-btn');
+
+        if (iconButtons.length > 0) {
+            iconButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    // Get the parent icon-item
+                    const iconItem = this.closest('.icon-item');
+
+                    if (iconItem) {
+                        // Get data attributes with fallbacks
+                        const name = iconItem.getAttribute('data-name');
+                        const desc = iconItem.getAttribute('data-desc');
+                        const url = iconItem.getAttribute('data-url');
+
+                        // Open modal with the data
+                        openModal(name, desc, url);
+                    }
+                });
+            });
+
+            console.log(`Found ${iconButtons.length} icon items on the page`);
+        } else {
+            console.warn('No icon buttons found on the page');
+        }
+
+        // Close modal on cancel button click
+        cancelBtn.addEventListener('click', closeModal);
+
+        // Close modal when clicking outside the modal content
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && modal.style.display === 'flex') {
+                closeModal();
+            }
+        });
+
+        // Prevent modal from closing when clicking inside modal content
+        const modalContent = document.querySelector('.modal-content');
+        if (modalContent) {
+            modalContent.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+        }
+    } else {
+        console.error('Modal element not found. Make sure modal HTML is added to the page.');
+    }
+
+</script>

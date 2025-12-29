@@ -1,0 +1,66 @@
+﻿{
+  "Serilog": {
+    "Using": [
+      "Serilog.Enrichers.Environment",
+      "Serilog.Sinks.Async",
+      "Serilog.Sinks.Console",
+      "Serilog.Sinks.File"
+    ],
+    "MinimumLevel": {
+      "Default": "Debug",
+      "Override": {
+        "System": "Information",
+        "Microsoft": "Information",
+        "Microsoft.AspNetCore": "Information",
+        "Microsoft.EntityFrameworkCore": "Information",
+        "Microsoft.EntityFrameworkCore.Database.Command": "Information",
+        "Microsoft.Hosting.Lifetime": "Information",
+        "Microsoft.AspNetCore.Authentication": "Information",
+        "System.Net.Http.HttpClient": "Information"
+      }
+    },
+    "WriteTo": [
+      {
+        "Name": "Async",
+        "Args": {
+          "configure": [
+            {
+              "Name": "Console",
+              "Args": {
+                "theme": "Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console",
+                "outputTemplate": "[{Application}] [{Timestamp:HH:mm:ss} {Level:u4}] {Message:lj} {Exception}{NewLine}",
+                "restrictedToMinimumLevel": "Warning",
+                "buffered": true
+              }
+            },
+            {
+              "Name": "File",
+              "Args": {
+                "path": "logs/log_.json",
+                "formatter": "Serilog.Formatting.Compact.CompactJsonFormatter, Serilog.Formatting.Compact",
+                "rollingInterval": "Day",
+                "retainedFileCountLimit": 7
+              }
+            }
+          ]
+        }
+      },
+      {
+        "Name": "Seq",
+        "Args": {
+          "serverUrl": "http://localhost:5341",
+          "apiKey": "none",
+          "restrictedToMinimumLevel": "Information"
+        }
+      }
+    ],
+    "Enrich": [
+      "FromLogContext",
+      "WithMachineName",
+      "WithExceptionDetails"
+    ],
+    "Properties": {
+      "Application": "FNRC.Innovation.Project"
+    }
+  }
+}

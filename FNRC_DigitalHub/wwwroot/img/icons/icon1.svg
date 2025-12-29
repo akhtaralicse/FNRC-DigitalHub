@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 109.27 107.97">
+  <!-- Generator: Adobe Illustrator 29.8.3, SVG Export Plug-In . SVG Version: 2.1.1 Build 3)  -->
+  <defs>
+    <style>
+      .st0 {
+        fill: #4257a3;
+      }
+
+      .st1 {
+        opacity: .3;
+      }
+
+      .st2 {
+        fill: #fffeff;
+        filter: url(#drop-shadow-7);
+      }
+
+      .st3 {
+        fill: #522e2e;
+      }
+
+      .st4 {
+        fill: #89a73d;
+      }
+
+      .st5 {
+        fill: #f37a20;
+      }
+    </style>
+    <filter id="drop-shadow-7" x="6.4" y="5.78" width="110.4" height="110.4" filterUnits="userSpaceOnUse">
+      <feOffset dx="7" dy="7"/>
+      <feGaussianBlur result="blur" stdDeviation="5"/>
+      <feFlood flood-color="#0c0c0c" flood-opacity=".15"/>
+      <feComposite in2="blur" operator="in"/>
+      <feComposite in="SourceGraphic"/>
+    </filter>
+  </defs>
+  <rect class="st2" x="14.63" y="13.98" width="80.01" height="80.01" rx="5.79" ry="5.79"/>
+  <g>
+    <g>
+      <polygon class="st3" points="50.07 62.38 63.05 33.54 74.63 62.14 62.37 43.59 50.07 62.38"/>
+      <polygon class="st5" points="51.8 44.71 40.64 69.88 51.08 53.58 52.85 56.21 54.64 52.02 51.8 44.71"/>
+      <polygon class="st5" points="55.68 54.44 53.73 57.3 61.94 69.58 55.68 54.44"/>
+      <polygon class="st0" points="41.61 52.61 33.37 70.99 41.18 58.9 43.48 62.58 44.59 59.99 41.61 52.61"/>
+      <polygon class="st0" points="45.69 62.56 44.59 64.3 49.05 70.91 45.69 62.56"/>
+    </g>
+    <g class="st1">
+      <polygon class="st4" points="82.24 75.33 71.42 75.33 71.42 73.54 80.45 73.54 80.45 34.44 71.42 34.44 71.42 32.64 82.24 32.64 82.24 75.33"/>
+    </g>
+    <g class="st1">
+      <polygon class="st4" points="37.85 75.33 27.03 75.33 27.03 32.64 37.85 32.64 37.85 34.44 28.82 34.44 28.82 73.54 37.85 73.54 37.85 75.33"/>
+    </g>
+  </g>
+</svg>

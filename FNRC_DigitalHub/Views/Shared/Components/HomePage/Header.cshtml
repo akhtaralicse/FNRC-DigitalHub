@@ -1,0 +1,73 @@
+﻿@model List<IconConfigurationDTO>
+
+@{
+    var lang = loc.localizer["lang"];   
+    var isAr = lang == "ar";
+    var (showAr, showEn) = (isAr ? "display" : "none", !isAr ? "display" : "none");
+    var mod = Model.FirstOrDefault(x => x.OrderNo == 1);
+    var name = isAr ? mod.NameAr : mod.NameEn;
+    var desc = isAr ? mod.DescriptionAr : mod.DescriptionEn;
+    var imgURL = mod.IconConfigurationAttachments.FirstOrDefault().AttachmentTransaction.FilePath;
+    var url = mod.URL;
+}
+<div class="top-strip">
+    <div class="top-left">
+        <img src="img/icons/icon8.svg" alt="Menu" />
+    </div>
+
+    <div class="top-center">
+        <div class="icon-item" data-name="@name" data-desc="@desc" data-url="@url">
+            <a class="icon-btn">
+                <img src="@imgURL" alt="@name">
+            </a>
+            <div class="icon-text">
+                <div class="icon-title">@name</div>
+                <div class="icon-desc">@desc</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="top-right">
+        <span class="user-info">
+            @loc.localizer["Welcome"], <strong id="username">...</strong>
+        </span> 
+        <a class="lang-switch"
+           style="display:@showAr"
+           asp-controller="Home"
+           asp-action="SetLanguage"
+           asp-route-culture="en"
+           asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")"  >
+            <i class="fa fa-globe"> </i>
+            <span class="lang-code" style="vertical-align: top;">EN</span>
+        </a>
+        <a class="lang-switch"
+           style="display:@showEn"
+           asp-controller="Home"
+           asp-action="SetLanguage"
+           asp-route-culture="ar"
+           asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")"  >
+            <span class="lang-code" style="padding-bottom: 7px;">ع</span>
+            <i class="fa fa-globe"> </i>
+        </a>
+    </div>
+
+</div> 
+<script>
+     document.addEventListener("DOMContentLoaded", function () {
+        fetch("/WhoAmI/me")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to fetch user");
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById("username").textContent = decodeHtml(data.DisplayName);
+            })
+            .catch(error => {
+                console.error(error);
+                document.getElementById("username").textContent = '@Html.Raw(loc.localizer["Guest"])';
+            });
+    });
+   
+</script>

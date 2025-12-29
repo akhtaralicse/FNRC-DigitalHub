@@ -1,0 +1,69 @@
+﻿@model List<IconConfigurationDTO>
+@{
+    ViewData["Title"] = "DigitalHub";
+}
+
+<div class="video-container" tabindex="0">   
+
+    @await Html.PartialAsync("~/views/shared/components/homepage/BGVideo.cshtml", Model.Where(x => x.IconType == IconTypeEnum.BGVideo).ToList())
+
+    @await Html.PartialAsync("~/views/shared/components/homepage/Icons.cshtml", Model.Where(x => x.IconType == IconTypeEnum.Icon).ToList())
+     
+</div>
+
+<div>
+    @await Html.PartialAsync("~/views/shared/components/homepage/News.cshtml")
+</div>
+
+<script>
+        // The script calculates --tx and --rot CSS variables for each .icon-item based on index.
+      // Tweak amplitude and rotationFactor to change curve strength.
+
+       function applyCurve(columnSelector, side = 'left') {
+        const column = document.querySelector(columnSelector);
+        if (!column) return;
+
+        const items = Array.from(column.children);
+        const n = items.length;
+        const amplitude = Math.min(140, window.innerHeight * 0.10); // stronger curve
+        const rotationFactor = 12; // degrees
+        const center = (n - 1) / 2;
+
+        items.forEach((item, i) => {
+            // normalized -1 to +1
+            const t = (i - center) / center || 0;
+
+            // Smooth C curve shape (cosine curve)
+            const curve = -(1 - Math.cos(t * Math.PI)) / 2;
+            // curve is always negative (C → ), so we flip for right column
+
+            // Left column → C shape (inward)
+            // Right column → reverse C (inward)
+            const direction = (side === 'left') ? 1 : -1;
+
+            const tx = direction * (curve * amplitude);
+
+            // Rotation: tilt slightly inwards
+            const rot = direction * (t * rotationFactor);
+
+            item.style.setProperty('--tx', Math.round(tx) + 'px');
+            item.style.setProperty('--rot', 0 + 'deg');
+           // item.style.setProperty('--rot', rot.toFixed(2) + 'deg');
+        });
+    }
+
+
+    function applyAllCurves() {
+        applyCurve('#leftColumn', 'right');   // C shape
+        applyCurve('#rightColumn', 'left'); // reverse C shape
+    }
+
+    window.addEventListener('load', applyAllCurves);
+    window.addEventListener('resize', () => {
+        clearTimeout(window._curveResizeTimer);
+        window._curveResizeTimer = setTimeout(applyAllCurves, 120);
+    });
+
+
+     
+</script>

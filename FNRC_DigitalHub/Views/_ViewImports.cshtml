@@ -1,0 +1,13 @@
+﻿@using FNRC_DigitalHub
+@using FNRC_DigitalHub.Models
+@using FNRC_DigitalHub.Helper 
+@using DigitalHub.Domain.Enums
+@using DigitalHub.Services.DTO
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHttpContextAccessor HttpContextAccessor
+@inject IViewLocalizer Localizer
+@inject CommonLocalizationService loc
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers 
+@{
+    var lang = loc.localizer["lang"];
+}

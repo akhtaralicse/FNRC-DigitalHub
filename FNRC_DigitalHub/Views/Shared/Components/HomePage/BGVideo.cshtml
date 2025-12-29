@@ -1,0 +1,8 @@
+﻿@model List<IconConfigurationDTO>
+@{
+    var vd = Model.First().IconConfigurationAttachments.First().AttachmentTransaction.FilePath;
+}
+<video autoplay muted loop playsinline>
+    <source src="@vd" type="video/mp4">
+    Your browser does not support HTML5 video.
+</video>
