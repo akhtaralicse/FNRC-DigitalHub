@@ -2,8 +2,8 @@
 @{
     ViewData["Title"] = "Home Page";
     Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+    var lang = loc.localizer["lang"];
 }
-
 
 <div class="container">
     <div class="form-container">
@@ -11,9 +11,8 @@
             <i class="bi bi-bell-fill"></i> Announcement Configuration
         </h2>
 
-        <form id="notificationForm">
+        <form id="galleryForm" method="post" enctype="multipart/form-data" asp-antiforgery="true">
 
-            <!-- Basic Information Section -->
             <div class="form-section">
                 <h5><i class="bi bi-info-circle"></i> Basic Information</h5>
 
@@ -22,9 +21,9 @@
                         <label for="title" class="form-label required">Title Ar</label>
                         <input type="text"
                                class="form-control"
-                               id="title"
-                               name="title"
-                               placeholder="Enter notification title"
+                               id="TitleAr"
+                               name="TitleAr"
+                               placeholder="Title Ar"
                                required
                                maxlength="100">
 
@@ -33,9 +32,9 @@
                         <label for="title" class="form-label required">Title En</label>
                         <input type="text"
                                class="form-control"
-                               id="title"
-                               name="title"
-                               placeholder="Enter notification title"
+                               id="TitleEn"
+                               name="TitleEn"
+                               placeholder="Title En"
                                required
                                maxlength="100">
 
@@ -43,8 +42,8 @@
                     <div class="col-md-6 mb-3">
                         <label for="message" class="form-label required">Message Ar</label>
                         <textarea class="form-control"
-                                  id="message"
-                                  name="message"
+                                  id="MessageAr"
+                                  name="MessageAr"
                                   rows="3"
                                   placeholder=""
                                   required
@@ -53,8 +52,8 @@
                     <div class="col-md-6 mb-3">
                         <label for="message" class="form-label required">Message En</label>
                         <textarea class="form-control"
-                                  id="message"
-                                  name="message"
+                                  id="MessageEn"
+                                  name="MessageEn"
                                   rows="3"
                                   placeholder=""
                                   required
@@ -71,8 +70,8 @@
                             <label for="startDate" class="form-label">Start Date</label>
                             <input type="datetime-local"
                                    class="form-control"
-                                   id="startDate"
-                                   name="startDate">
+                                   id="StartDate"
+                                   name="StartDate">
 
                         </div>
                     </div>
@@ -81,33 +80,41 @@
                             <label for="endDate" class="form-label">End Date</label>
                             <input type="datetime-local"
                                    class="form-control"
-                                   id="endDate"
-                                   name="endDate">
+                                   id="EndDate"
+                                   name="EndDate">
                         </div>
                     </div>
                 </div>
-
             </div>
 
             <div class="form-section">
                 <div class="row">
-                <div class="mb-3 col-md-6">
-                    <label for="actionUrl" class="form-label">Action URL</label>
-                    <input type="url"
-                           class="form-control"
-                           id="actionUrl"
-                           name="actionUrl"
-                           placeholder="https://example.com/action">
-                </div>
+                    <div class="mb-3 col-md-4">
+                        <label for="actionUrl" class="form-label">Action URL</label>
+                        <input type="url"
+                               class="form-control"
+                               id="ActionUrl"
+                               name="ActionUrl"
+                               placeholder="https://example.com/action">
+                    </div>
 
-                <div class="mb-3 col-md-6">
-                    <label for="actionText" class="form-label">Action Button Text</label>
-                    <input type="text"
-                           class="form-control"
-                           id="actionText"
-                           name="actionText"
-                           placeholder="Learn More"
-                           maxlength="50">
+                    <div class="mb-3 col-md-4">
+                        <label for="actionText" class="form-label">Action Button Text Ar</label>
+                        <input type="text"
+                               class="form-control"
+                               id="ActionTextAr"
+                               name="ActionTextAr"
+                               placeholder="Learn More"
+                               maxlength="50">
+                    </div>
+                    <div class="mb-3 col-md-4">
+                        <label for="actionText" class="form-label">Action Button Text En</label>
+                        <input type="text"
+                               class="form-control"
+                               id="ActionTextEn"
+                               name="ActionTextEn"
+                               placeholder="Learn More"
+                               maxlength="50">
                     </div>
                 </div>
             </div>
@@ -115,7 +122,7 @@
             <div class="form-footer">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
-                        <button type="submit" class="btn btn-primary">
+                        <button type="button" id="submitDiv" class="btn btn-success">
                             <i class="bi bi-save"></i> Save Configuration
                         </button>
                     </div>
@@ -123,4 +130,183 @@
             </div>
         </form>
     </div>
+
 </div>
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="card">
+            <div class="card-body p-0">
+                @if (Model.Count > 0)
+                {
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>@loc.localizer["Name"]</th>
+                                    <th>@loc.localizer["Description"]</th>
+                                    <th>@loc.localizer["Date"]</th>
+                                    <th>@loc.localizer["URL"]</th>
+                                    <th>@loc.localizer["Actions"]</th>
+                                </tr>
+                            </thead>
+                            <tbody id="iconsTableBody">
+                                @foreach (var item in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div>@item.TitleEn</div>
+                                            <small class="text-muted">@item.TitleAr</small>
+                                        </td>
+                                        <td width="40%">
+                                            <div style="font-size:11px">@item.MessageEn</div>
+                                            <small class="text-muted" style="font-size:11px">@item.MessageAr</small>
+                                        </td>
+                                        <td>
+                                            <div>@item.StartDate</div>
+                                            <div>@item.EndDate</div>
+                                        </td>
+                                        <td>
+                                            <div>@item.ActionUrl</div>
+                                            <small class="text-muted">@item.ActionTextEn</small>
+                                            <small class="text-muted">@item.ActionTextAr</small>
+                                        </td>
+
+                                        <td>
+                                            @if (item.StartDate <= DateTime.Now && item.EndDate >= DateTime.Now)
+                                            {
+                                                <div class="action-buttons">
+                                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRecord('@(item.Id)')">
+                                                        <i class="fas fa-trash-alt"></i>
+                                                    </button>
+                                                </div>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                else
+                {
+                    <div id="emptyState" class="empty-state d-none">
+                        <i class="fas fa-folder-open"></i>
+                        <h4 class="mt-3">@loc.localizer["NoDataFound"]</h4>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    let selectedFiles = [];
+    const button = document.querySelector(".attach-btn");
+    const input  = document.querySelector(".attach-input");
+    let file;
+    // button.onclick = () => {
+    //     input.click();
+    // };
+    document.getElementById('submitDiv').addEventListener('click', function (e) {
+        e.preventDefault();
+        var isUpdate = $('#galleryForm').find('input[name="Id"]').val() != "";
+
+        if (selectedFiles.length === 0 && !isUpdate) {
+            Swal.fire("warning", "Please select at least one file.", "warning");
+            return;
+        }
+
+        var formData = new FormData($('#galleryForm')[0]);
+        formData.append('IconType', 'Icon');
+        for (var i = 0; i < selectedFiles.length; i++) {
+            formData.append('files', selectedFiles[i]);
+        }
+
+         var url = isUpdate ? '/admin/UpdateNotification' : '/admin/AddNotification';
+        $.ajax({
+            url: url,
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.success) {
+                    SuccessWithCallBack('@(loc.localizer["Success"])', '@(loc.localizer["Success"])', '@lang', window.location.href)
+
+                } else {
+                    Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
+                }
+            },
+            error: function (xhr, status, error) {
+                Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
+            }
+        });
+    });
+
+    // document.getElementById('fileID').addEventListener('change', function () {
+    //         if (!validateFileSize(this)) {
+    //             return false;
+    //         }
+
+    //         var files = this.files;
+    //         var fileNames = '';
+
+    //         for (var i = 0; i < files.length; i++) {
+    //             let file = files[i];
+    //             fileNames += files[i].name + '<br>';
+    //             if (file.name.length > 20) {
+    //                 const truncatedName = truncateFileName(file.name, 20);
+    //                 file = new File([file], truncatedName, { type: file.type });
+    //             }
+    //             selectedFiles.push(file);
+    //         }
+    //         updateFileList();
+    //     });
+        function updateFileList() {
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+
+            selectedFiles.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'fileItem';
+
+                const fileName = document.createElement('span');
+                fileName.textContent = file.name;
+
+                const deleteButton = document.createElement('button');
+                deleteButton.innerHTML = '<i class="fa fa-times"></i>';
+                deleteButton.type = 'button';
+                deleteButton.addEventListener('click', function () {
+                    selectedFiles.splice(index, 1);
+                    updateFileList();
+                });
+
+                fileItem.appendChild(fileName);
+                fileItem.appendChild(deleteButton);
+                fileList.appendChild(fileItem);
+            });
+        }
+        function deleteRecord(id) {
+            DeleteWithCallBack('@lang', () => {
+                $.ajax({
+                    url: '/admin/DeleteNotification?id=' + id,
+                    type: 'POST',
+                    data: {},
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.success) {
+                            SuccessWithCallBack('@(loc.localizer["Success"])', '@(loc.localizer["Success"])', '@lang', window.location.href)
+
+                        } else {
+                            Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
+                    }
+                });
+            })
+        }
+</script>

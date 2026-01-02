@@ -24,6 +24,7 @@ namespace DigitalHub.Domain.DBContext
         public virtual DbSet<AttachmentTransaction> AttachmentTransaction { get; set; }
         public virtual DbSet<LogsLkp> LogsLkp { get; set; }
         public virtual DbSet<NotificationConfiguration> NotificationConfiguration { get; set; }
+        public virtual DbSet<NotificationUser> NotificationUser { get; set; }
         public virtual DbSet<NotificationAttachment> NotificationAttachment { get; set; }
 
 

@@ -1,0 +1,186 @@
+﻿
+<style>
+
+    .notif-popover {
+        max-width: 30vw !important;
+        width: 30vw;
+    }
+
+    #notifications-container .title {
+        background-color: #f0f1f4;
+    }
+
+    .notifications-wrapper {
+        height: 280px;
+    }
+
+    #notifications-container .overflow-y {
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
+    }
+
+    #notifications-container .notification-item {
+        border-bottom: 2px solid #f4f5f7;
+        color: #6f747a;
+        display: block;
+        font-size: .85714em;
+    }
+
+    .notification-icon {
+        position: relative;
+        cursor: pointer;
+        font-size: 18px;
+        color: white;
+    }
+
+    .notification-badge {
+        position: absolute;
+        top: -9px;
+        right: -13px;
+        background-color: #f75353;
+        color: white;
+        font-size: 12px;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    html[dir=ltr] #notifications-container .notification-item {
+        text-align: left;
+        top: 0px;
+        right: 5px;
+    }
+
+    html[dir=rtl] #notifications-container .notification-item {
+        text-align: right;
+        top: 0px;
+        right: -5px;
+    }
+</style>
+<div class="dropdown mx-2 mt-1">
+    <div class="d-inline-block">
+        <a href="#" class="text-light" id="notificationIcon"
+           data-bs-toggle="dropdown"
+           aria-expanded="false">
+            <i class="fa fa-bell notification-icon"></i>
+            <span class="notification-badge" id="notificationCount">0</span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-end notif-popover"
+             aria-labelledby="notificationIcon">
+            <div class="" id="notificationText"></div>
+        </div>
+    </div>
+</div>
+@section scripts {
+    <script>
+            $(document).ready(function() {
+             $('#notificationIcon').on('show.bs.dropdown', function() {
+            fetchNotifications();
+        }); 
+        function fetchNotifications() {
+
+            try {
+                $.ajax({
+                    url: "/home/GetNotifications",
+                    method: "GET",
+                    success: function (data) {
+
+                        console.log(data);
+                        var countUnRead = data.message.filter(x => x.IsSeen == false).length;
+                        if (countUnRead == 0) {
+                            $('#notificationCount').hide();
+                        } else {
+                            $('#notificationCount').show();
+
+                        }
+                        $('#notificationCount').html(countUnRead);
+
+                        if (data.message.length == 0) {
+                            $('#notificationCount').hide();
+                            notificationHTML += `<div class="text-center mt-5 search-message" aria-hidden="false">
+                                                            <i class="fa fa-smile-o fa-3x"></i>
+                                                            <p class="mt-4"> @(loc.localizer["NONotification"]) </p>
+                                                </div>`
+                        }
+                        data.message.forEach(x => {
+                            var isRead = !x.IsSeen ? "fa-envelope-o" : "fa-envelope-open-o";
+                            notificationHTML += `<a rel="noreferrer" class="notification-item p-3">
+                                                                                    <div class="d-flex align-items-center"><i class="fa ${isRead}"></i><span class="mx-3">
+                                                                                    ${x.Text}
+                                                                                    </span >
+                                                                                    </div >
+                                                                                    <div class="small text-sm-end">${x.CreatedDate.split("T")[0]}</div>
+                                                                                </a>`;
+                        })
+
+                        var htmlFinal = `<div id="notifications-container">
+                                                                               <div class="title d-flex justify-content-between p-2">
+                                                                                      <span>@(loc.localizer["Notification"])</span>
+                                                                                      <div>
+                                                                                       <span class="markasread" onclick="markAsReadNotifications()">@(loc.localizer["MarkAsRead"])</span>
+                                                                                    </div>
+                                                                               </div>
+                                                                               <div class="notifications-wrapper overflow-y">
+                                                                                          ${notificationHTML}
+                                                                                </div>
+                                                                              </div>`;
+                        $('#notificationText').html(htmlFinal);
+
+                    },
+                    error: function () {
+                        $(".notifications-wrapper").html('loading error...');
+                    }
+                });
+            } catch (e) {
+                console.error("Error fetching notifications: ", e);
+            }
+        }
+        function markAsReadNotifications() {
+            $.ajax({
+                url: "/home/MarkAsReadNotifications",
+                method: "GET",
+                success: function (data) {
+                    console.log(data);
+
+                    if (data.success == true) {
+                        $('#notificationCount').hide();
+                    }
+                },
+                error: function () {
+                    $(".notifications-wrapper").html('loading error...');
+                }
+            });
+        }
+        function initPopover() {
+            var popover = new bootstrap.Popover(document.getElementById('notificationIcon'), {
+                trigger: 'click',
+                html: true,
+                placement: 'bottom',
+                content: function () {
+                    return `<div id="notifications-container">
+                                        <div class="title d-flex justify-content-between p-2">
+                                                    <span>@(loc.localizer["Notification"])</span>
+                                                    <div></div>
+                                        </div>
+                                        <div class="notifications-wrapper overflow-y">
+                                                    ${notificationHTML}
+                                        </div>
+                                     </div>`;
+                }
+            });
+        }
+        let timer = '';
+
+        fetchNotifications();
+
+        timer = setInterval(fetchNotifications, 60000);
+        // }
+        // else {
+        //     clearInterval(timer);
+        // }
+        });
+    </script>
+}

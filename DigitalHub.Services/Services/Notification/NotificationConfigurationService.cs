@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using DigitalHub.Domain.Domains; 
-using DigitalHub.Services.DTO; 
+using DigitalHub.Domain.Domains;
+using DigitalHub.Services.DTO;
 using DigitalHub.Services.Services.Attachment;
 using DigitalHub.Services.Shared;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +18,6 @@ namespace DigitalHub.Services.Services.IconConfig
 
         public async Task<bool> Add(NotificationConfigurationDTO model)
         {
-
             if (model.Files != null && model.Files.Count > 0)
             {
                 var attachmentList = await AttachmentService.UploadAttachment(model.Files);
@@ -37,17 +36,39 @@ namespace DigitalHub.Services.Services.IconConfig
 
             return true;
         }
-
-        public async Task<List<NotificationConfigurationDTO>> Get(int id = 0)
+        public async Task<bool> AddUserNotification(NotificationUserDTO model)
         {
-            var result = _repository.GetAllIncludingNoTracking(x => x.NotificationAttachment,
-                                    x => x.NotificationAttachment.Select(y => y.AttachmentTransaction)).Where(x => x.IsActive == true).AsQueryable();
-            if (id > 0)
+            var result = Mapper.Map<NotificationUser>(model);
+            result.IsRead = true;
+            var data = await _repository.GetAllIncludingNoTracking(x => x.NotificationUser).FirstOrDefaultAsync(x => x.Id == model.Id);
+            if (data != null)
             {
-                result = result.Where(x => x.Id == id);
+                data.NotificationUser.Add(result);
             }
 
-            return Mapper.Map<List<NotificationConfigurationDTO>>(await result.OrderBy(x => x.Id).ToListAsync());
+            await _repository.UpdateAsync(data, true);
+            return true;
+        }
+        public async Task<List<NotificationConfigurationDTO>> GetAll()
+        {
+            var result = _repository.GetAllIncludingNoTracking(x => x.NotificationAttachment,
+                                    x => x.NotificationAttachment.Select(y => y.AttachmentTransaction))
+                        .Where(x => x.IsActive == true).AsQueryable();
+
+            return Mapper.Map<List<NotificationConfigurationDTO>>(await result.OrderByDescending(x => x.StartDate).ToListAsync());
+        }
+        public async Task<List<NotificationConfigurationDTO>> Get(string username = null)
+        {
+            var result = _repository.GetAllIncludingNoTracking(x => x.NotificationUser, x => x.NotificationAttachment,
+                                    x => x.NotificationAttachment.Select(y => y.AttachmentTransaction))
+                .Where(x => x.IsActive == true && x.StartDate <= DateTime.Now && x.EndDate >= DateTime.Now).AsQueryable();
+            if (username != null)
+            {
+                result = result.Where(x => !x.NotificationUser.Any(x => x.Username == username && x.IsRead == true));
+            }
+
+
+            return Mapper.Map<List<NotificationConfigurationDTO>>(await result.OrderByDescending(x => x.StartDate).ToListAsync());
         }
 
         public async Task<bool> Update(NotificationConfigurationDTO mod)

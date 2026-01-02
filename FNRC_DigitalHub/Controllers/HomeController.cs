@@ -7,15 +7,18 @@ using System.Diagnostics;
 
 namespace FNRC_DigitalHub.Controllers
 {
-    public class HomeController : Controller
+    public class HomeController : BaseController
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IIconConfigurationService iconConfigurationService;
+        private readonly INotificationConfigurationService notificationConfigurationService;
 
-        public HomeController(ILogger<HomeController> logger,IIconConfigurationService iconConfigurationService)
+        public HomeController(ILogger<HomeController> logger,IIconConfigurationService iconConfigurationService,
+            INotificationConfigurationService notificationConfigurationService)
         {
             _logger = logger;
             this.iconConfigurationService = iconConfigurationService;
+            this.notificationConfigurationService = notificationConfigurationService;
         }
 
         public async Task<IActionResult> IndexAsync()
@@ -29,6 +32,20 @@ namespace FNRC_DigitalHub.Controllers
             return View();
         }
 
+    
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetNotifications()
+        {
+            var user = GetUser();
+            if (user != null)
+            {
+                var result = await notificationConfigurationService.Get(user.userName);
+                return Json(new { success = true, message = result });
+            }
+            return Json(new { success = true, message = "" });
+        }
 
         [HttpGet]
         public IActionResult SetLanguage(string culture, string returnUrl)

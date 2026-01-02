@@ -28,7 +28,6 @@ namespace DigitalHub.Services.DTO
     public class UserTypeDTO : BaseDomainEntityDTO
     {
         public int UserId { get; set; }
-        [ForeignKey(nameof(UserId))] public virtual UsersDTO Users { get; set; }
 
         public UserTypeEnum Type { get; set; }
 

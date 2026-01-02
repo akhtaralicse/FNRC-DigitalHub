@@ -1,6 +1,6 @@
 ﻿using DigitalHub.Domain.Enums;
 using DigitalHub.Domain.Shared;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http; 
 
 namespace DigitalHub.Services.DTO
 {
@@ -20,6 +20,7 @@ namespace DigitalHub.Services.DTO
         public string ActionTextEn { get; set; }
         public string ActionTextAr { get; set; }
         public ICollection<NotificationAttachmentDTO> NotificationAttachment { get; set; } = [];
+        public ICollection<NotificationUserDTO> NotificationUser { get; set; } = [];
 
 
     }

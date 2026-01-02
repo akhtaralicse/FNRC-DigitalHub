@@ -32,7 +32,9 @@ namespace FNRC_DigitalHub.Controllers
         {
             return View();
         }
+         
 
+        #region Icon and video--------------------
         public async Task<IActionResult> IconSetting()
         {
             var data = await iconConfigurationService.GetByType(IconTypeEnum.Icon);
@@ -45,7 +47,6 @@ namespace FNRC_DigitalHub.Controllers
 
             return View(data);
         }
-
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddIcons(IconConfigurationDTO mod)
@@ -84,13 +85,43 @@ namespace FNRC_DigitalHub.Controllers
 
             return Json(new { success = true, message = data });
         }
+        #endregion
+
+
+        #region Notification ------------------------------
         public async Task<IActionResult> Announcement()
         {
-            var data = await notificationConfigurationService.Get();
+            var data = await notificationConfigurationService.GetAll();
 
             return View(data);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddNotification(NotificationConfigurationDTO mod)
+        {
+            var data = await notificationConfigurationService.Add(mod);
+
+            return Json(new { success = true, message = "Saved" });
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateNotification(NotificationConfigurationDTO mod)
+        {
+            var data = await notificationConfigurationService.Add(mod);
+
+            return Json(new { success = true, message = "Saved" });
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteNotification(int id)
+        {
+            var data = await notificationConfigurationService.Delete(id);
+
+            return Json(new { success = true, message = "Saved" });
+        }
+        #endregion
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

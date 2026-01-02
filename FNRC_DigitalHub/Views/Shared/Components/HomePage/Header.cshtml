@@ -31,6 +31,7 @@
         <span class="user-info">
             @loc.localizer["Welcome"], <strong id="username">...</strong>
         </span> 
+      
         <a class="lang-switch"
            style="display:@showAr"
            asp-controller="Home"
@@ -49,6 +50,7 @@
             <span class="lang-code" style="padding-bottom: 7px;">ع</span>
             <i class="fa fa-globe"> </i>
         </a>
+        @await Html.PartialAsync("~/views/shared/components/homepage/notificationicon.cshtml", Model)
     </div>
 
 </div> 

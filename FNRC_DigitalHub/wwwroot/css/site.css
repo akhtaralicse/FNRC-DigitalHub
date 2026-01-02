@@ -438,7 +438,7 @@ html[dir="rtl"] .news-text span {
 
     .modalBGTransperent .modal-body {
         padding: 20px;
-        color: #666;
+        color: #131313;
         line-height: 1.5;
     }
 
@@ -545,3 +545,4 @@ html[dir="rtl"] .news-text span {
         opacity: 1;
         visibility: visible;
     }
+
