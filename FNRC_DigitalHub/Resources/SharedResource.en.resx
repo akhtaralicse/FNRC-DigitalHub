@@ -195,6 +195,9 @@
   <data name="Update" xml:space="preserve">
     <value>Update</value>
   </data>
+  <data name="MarkAsRead" xml:space="preserve">
+    <value>Mark as read</value>
+  </data>
   <data name="UpdatedSuccessfully" xml:space="preserve">
     <value>Updated Successfully</value>
   </data>

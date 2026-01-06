@@ -2,7 +2,7 @@
 
 namespace DigitalHub.Services.DTO
 {
-    public record UserSessionDTO(string userName,  string NameEn, string NameAr, int EmployeeID, ICollection<UserTypeDTO> Type
+    public record UserSessionDTO(string userName,  string NameEn, string NameAr, int EmployeeID, ICollection<UserTypeDTO> Type  
            , string MobileNo, string Email = "" );
 
     public class BaseDomainEntityDTO

@@ -1,13 +1,16 @@
 ﻿@model List<IconConfigurationDTO>
 @{
-    var lang = loc.localizer["lang"];   
+    var session = HttpContextAccessor.HttpContext.Session;
+    var user = session.Get<UserSessionDTO>("UserSession");
+    var isLogin = user?.userName != null;
+    var lang = loc.localizer["lang"];
     var isAr = lang == "ar";
     var (showAr, showEn) = (isAr ? "display" : "none", !isAr ? "display" : "none");
-    var mod = Model.FirstOrDefault(x => x.OrderNo == 1) ?? new ();
+    var mod = Model.FirstOrDefault(x => x.OrderNo == 1) ?? new();
     var name = isAr ? mod.NameAr : mod.NameEn;
     var desc = isAr ? mod.DescriptionAr : mod.DescriptionEn;
-    var imgURL = mod.IconConfigurationAttachments.Count>0?
-    mod.IconConfigurationAttachments?.FirstOrDefault().AttachmentTransaction.FilePath:"/img/icons/icon1.svg";
+    var imgURL = mod.IconConfigurationAttachments.Count > 0 ?
+    mod.IconConfigurationAttachments?.FirstOrDefault().AttachmentTransaction.FilePath : "/img/icons/icon1.svg";
     var url = mod.URL;
 }
 <div class="top-strip">
@@ -30,14 +33,18 @@
     <div class="top-right">
         <span class="user-info">
             @loc.localizer["Welcome"], <strong id="username">...</strong>
-        </span> 
-      
+        </span>
+
+        @if (isLogin)
+        {
+            @await Html.PartialAsync("~/views/shared/components/homepage/notificationicon.cshtml", Model)
+        }
         <a class="lang-switch"
            style="display:@showAr"
            asp-controller="Home"
            asp-action="SetLanguage"
            asp-route-culture="en"
-           asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")"  >
+           asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">
             <i class="fa fa-globe"> </i>
             <span class="lang-code" style="vertical-align: top;">EN</span>
         </a>
@@ -46,30 +53,258 @@
            asp-controller="Home"
            asp-action="SetLanguage"
            asp-route-culture="ar"
-           asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")"  >
+           asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">
             <span class="lang-code" style="padding-bottom: 7px;">ع</span>
             <i class="fa fa-globe"> </i>
         </a>
-        @await Html.PartialAsync("~/views/shared/components/homepage/notificationicon.cshtml", Model)
+
     </div>
 
-</div> 
+</div>
+
+<div id="notifyPopup" class="notify-popup" style="display: none;">
+    <div class="notification-content">
+        <button class="notify-close" onclick="closeNotify()" style="display: none;">×</button>
+        <h3 class="notify-title"></h3>
+        <p class="notify-message"></p>
+        <div class="notification-buttons">
+            <button class="notify-cancel-btn" onclick="closeNotify()">@loc.localizer["Cancel"]</button>
+            <button class="notify-action-btn"></button>
+        </div>
+    </div>
+</div>
 <script>
-     document.addEventListener("DOMContentLoaded", function () {
-        fetch("/WhoAmI/me")
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Failed to fetch user");
-                }
-                return response.json();
-            })
-            .then(data => {
-                document.getElementById("username").textContent = decodeHtml(data.DisplayName);
-            })
-            .catch(error => {
-                console.error(error);
-                document.getElementById("username").textContent = '@Html.Raw(loc.localizer["Guest"])';
-            });
-    });
+
+      document.addEventListener("DOMContentLoaded", function () {
+            let timer = '';
+
+            fetchUserDetail(); 
+
+            timer = setInterval(fetchNotifications, 120000);
+              
+            setTimeout(fetchNotificationToDisplay,5000);
+
+      });
+
+    function fetchUserDetail(){
+               fetch("/WhoAmI/me", {
+                    method: 'GET',
+                    credentials: 'include'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch user");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById("username").textContent = (data.DisplayName);
+                    fetchNotifications();
+                })
+                .catch(error => {
+                    console.error(error);
+                    document.getElementById("username").textContent = '@Html.Raw(loc.localizer["Guest"])';
+                });
+    }
+         function fetchNotifications() {
+             var notificationHTML = "";
+             try {
+                 $.ajax({
+                     url: "/home/GetNotifications",
+                     method: "GET",
+                     success: function (data) {
+
+                         console.log(data);
+                         if(data.message =='[]'){
+                             return;
+                         }
+                         var countUnRead = data.message.length;
+                         if (countUnRead == 0) {
+                             $('#notificationCount').hide();
+                         } else {
+                             $('#notificationCount').show();
+                         }
+                         $('#notificationCount').html(countUnRead);
+
+                         if (data.message.length == 0) {
+                             $('#notificationCount').hide();
+                             notificationHTML += `<div class="text-center mt-5 search-message" aria-hidden="false">
+                                                             <i class="fa fa-smile-o fa-3x"></i>
+                                                             <p class="mt-4"> @(loc.localizer["NONotification"]) </p>
+                                                 </div>`;
+                         }
+                         data.message.forEach(x => {                             
+                            var message = '@isAr' =='True'?x.MessageAr:x.MessageEn;
+                            const onclickCall = `NotificationData('${x.Id}', '${x.TitleAr}', '${x.TitleEn}', '${x.MessageAr}', '${x.MessageEn}',  '${x.ActionTextAr}',  '${x.ActionTextEn}','${x.ActionUrl}' )`;
+                            notificationHTML += `<a rel="noreferrer" class="notification-item p-3" onclick="${onclickCall}">
+                                                    <div class="d-flex align-items-center"><i class="fa fa-bell"></i><span class="mx-3">
+                                                    ${message}
+                                                    </span >
+                                                    </div >
+                                                    <div class="small text-sm-end"><i class="fa fa-calendar"></i> ${x.CreatedDate.split("T")[0]}</div>
+                                                </a>`;
+                         })
+
+                         var htmlFinal = `<div id="notifications-container">
+                                            <div class="title d-flex justify-content-between p-2">
+                                                    <span>@(loc.localizer["Notification"])</span>
+                                                    <div>                                                    
+                                                    </div>
+                                            </div>
+                                            <div class="notifications-wrapper overflow-y">
+                                                        ${notificationHTML}
+                                                </div>
+                                            </div>`;
+                         $('#notificationText').html(htmlFinal);
+
+                     },
+                     error: function () {
+                         $(".notifications-wrapper").html('loading error...');
+                     }
+                 });
+             } catch (e) {
+                 console.error("Error fetching notifications: ", e);
+             }
+         }
+
+     function fetchNotificationToDisplay(){
+         fetch("/home/GetNotificationsToDisplay", {
+                    method: 'GET'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch Notifications To Display");
+                    }
+                    return response.json();
+                })
+                .then(x => {
+                    console.log(x);
+                    if(x.message == '[]'){
+                        return;
+                    }
+                     NotificationData(
+                        x.message.Id,
+                        x.message.TitleAr,
+                        x.message.TitleEn,
+                        x.message.MessageAr,
+                        x.message.MessageEn,
+                        x.message.ActionTextAr,
+                        x.message.ActionTextEn,
+                        x.message.ActionUrl
+                    );
+                     playNotificationSound();
+                })
+                .catch(error => {
+                    console.error(error);
+                });
+    }
+
+     function NotificationData(id, titleAr,titleEn, messageAr,messageEn, btnTextAr,btnTextEn, btnURL) {
+        var actualTitle =  '@isAr' === 'True' ?titleAr : titleEn;
+        var actualMessage =  '@isAr' === 'True' ? messageAr : messageEn;
+        var actualBtnText =  '@isAr' === 'True' ? btnTextAr : btnTextEn;
+
+        if (!actualBtnText || !btnURL) {
+            showNotify(actualTitle, actualMessage, id);
+        } else {
+            showNotify(actualTitle, actualMessage, id, actualBtnText, btnURL);
+        }
+    }
+
+    function markNotificationAsRead(notificationId) {
+        fetch("/home/MarkNotificationAsRead", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: notificationId })
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.error("Failed to mark notification as read");
+            }
+        })
+        .catch(error => {
+            console.error(error);
+        });
+    }
+
+       function showNotify(title, message, id, btnText, btnURL) {
+        const popup = document.getElementById("notifyPopup");
+        popup.querySelector(".notify-title").textContent = title;
+        popup.querySelector(".notify-message").textContent = message;
+
+        // Get the button elements
+        const actionButton = popup.querySelector(".notify-action-btn");
+        const closeButton = popup.querySelector(".notify-cancel-btn");
+
+        // Set the ID as a data attribute on the close button
+        closeButton.setAttribute('data-id', id);
+
+        if (btnText && btnURL) {
+            // If button text and URL are provided, show action button
+            actionButton.textContent = btnText;
+            actionButton.style.display = "inline-block";
+            actionButton.onclick = function() {
+                //window.location.href = btnURL;
+                 window.open(btnURL, '_blank', 'noopener');
+                closeNotify();
+            };
+        } else {
+            // If no button text/URL, show OK button that just closes
+            actionButton.textContent = '@loc.localizer["OK"]';
+            actionButton.style.display = "inline-block";
+            actionButton.onclick = closeNotify;
+        }
+
+        popup.style.display = "block";
+    }
    
+    function closeNotify() {
+        const popup = document.getElementById("notifyPopup");
+        const closeButton = popup.querySelector(".notify-cancel-btn");
+        const notificationId = closeButton.getAttribute('data-id');
+         
+        if (notificationId) { 
+            markNotificationAsRead(notificationId);
+        }
+
+        popup.style.display = "none";
+    }
+     
+
+     function playNotificationSound() {
+        try {
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+            // Create multiple oscillators for richer sound
+            const osc1 = audioContext.createOscillator();
+            const osc2 = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+
+            osc1.connect(gainNode);
+            osc2.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+
+            // Bell-like frequencies
+            osc1.frequency.setValueAtTime(1046.50, audioContext.currentTime); // C6
+            osc2.frequency.setValueAtTime(1318.51, audioContext.currentTime); // E6
+
+            osc1.type = 'sine';
+            osc2.type = 'sine';
+
+            // Sharp attack, slow decay
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
+            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.0);
+
+            osc1.start();
+            osc2.start();
+            osc1.stop(audioContext.currentTime + 1.0);
+            osc2.stop(audioContext.currentTime + 1.0);
+
+        } catch (error) {
+            playFallbackSound();
+        }
+    }
 </script>

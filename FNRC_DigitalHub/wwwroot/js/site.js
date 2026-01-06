@@ -1,23 +1,23 @@
 ﻿$(function () {
-    $(document).ajaxStart(function (r) {
-        console.log(r);
-        //console.log("ajax start");
+    //$(document).ajaxStart(function (r) {
+    //   // console.log(r);
+    //    //console.log("ajax start");
        
-    });
-    $(document).ajaxSend(function (event, jqXHR, ajaxOptions) {
-        console.log("AJAX : ", ajaxOptions.url);
-        if (ajaxOptions.url.indexOf("GetNotifications") < 0) {
-            pleaseWait(true);
-        }
-        else {
+    //});
+    //$(document).ajaxSend(function (event, jqXHR, ajaxOptions) {
+    //   // console.log("AJAX : ", ajaxOptions.url);
+    //    if (ajaxOptions.url.indexOf("GetNotifications") < 0) {
+    //        pleaseWait(true);
+    //    }
+    //    else {
             
-        }
-    });
-    $(document).ajaxStop(function (r) {
-        // console.log("ajax stop");
-        console.log(r);
-        pleaseWait(false);
-    });
+    //    }
+    //});
+    //$(document).ajaxStop(function (r) {
+    //    // console.log("ajax stop");
+    //    console.log(r);
+    //    pleaseWait(false);
+    //});
 
     $('.owl-nav').hide();
 });

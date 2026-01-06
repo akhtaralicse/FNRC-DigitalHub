@@ -2,6 +2,7 @@ using DigitalHub.Domain.DBContext;
 using DigitalHub.Services.Shared;
 using FNRC_DigitalHub.Helper;
 using FNRC_DigitalHub.Middleware;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
@@ -36,6 +37,17 @@ builder.Services.AddControllers().AddJsonOptions(options =>
     options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     options.JsonSerializerOptions.PropertyNamingPolicy = null; // Keeps PascalCase
     options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+})
+.AddCookie(options =>
+{
+    options.LoginPath = xLoginPath;
+    options.Cookie.Name = "DSINTRANET";
+    options.Cookie.IsEssential = true;
 });
 
 builder.Services.ConfigureApplicationCookie(options =>
@@ -74,6 +86,12 @@ if (!app.Environment.IsDevelopment())
 app.UseRouting();
 app.UseAuthorization();
 app.UseSession();
+
+//app.UseCors(builder =>
+//    builder.WithOrigins("http://localhost:7280", "https://localhost:3000")
+//           .AllowCredentials()
+//           .AllowAnyMethod()
+//           .AllowAnyHeader());
 
 app.UseMiddleware<SessionTimeoutMiddleware>();
 app.UseMiddleware<GlobalErrorHandlingMiddleware>();

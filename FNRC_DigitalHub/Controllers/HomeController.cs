@@ -1,3 +1,4 @@
+using DigitalHub.Services.DTO;
 using DigitalHub.Services.Interface;
 using DigitalHub.Services.Services.IconConfig;
 using FNRC_DigitalHub.Models;
@@ -13,7 +14,7 @@ namespace FNRC_DigitalHub.Controllers
         private readonly IIconConfigurationService iconConfigurationService;
         private readonly INotificationConfigurationService notificationConfigurationService;
 
-        public HomeController(ILogger<HomeController> logger,IIconConfigurationService iconConfigurationService,
+        public HomeController(ILogger<HomeController> logger, IIconConfigurationService iconConfigurationService,
             INotificationConfigurationService notificationConfigurationService)
         {
             _logger = logger;
@@ -32,8 +33,28 @@ namespace FNRC_DigitalHub.Controllers
             return View();
         }
 
-    
+         
 
+        [HttpPost]
+        public async Task<IActionResult> MarkNotificationAsRead([FromBody] NotificationUserDTO mod)
+        {
+            mod.Username = GetUser().userName;
+            var result = await notificationConfigurationService.AddUserNotification( mod);
+            return Json(new { success = true, message = result });
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetNotificationsToDisplay()
+        {
+            var user = GetUser();
+            if (user != null)
+            {
+                var result = await notificationConfigurationService.GetNotificationToDisplay(user.userName);
+                return Json(new { success = true, message = result });
+            }
+            return Json(new { success = true, message = "[]" });
+        }
 
         [HttpGet]
         public async Task<IActionResult> GetNotifications()
@@ -44,7 +65,7 @@ namespace FNRC_DigitalHub.Controllers
                 var result = await notificationConfigurationService.Get(user.userName);
                 return Json(new { success = true, message = result });
             }
-            return Json(new { success = true, message = "" });
+            return Json(new { success = true, message = "[]" });
         }
 
         [HttpGet]
