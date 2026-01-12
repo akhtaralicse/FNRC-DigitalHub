@@ -5,32 +5,19 @@
     var isLogin = user?.userName != null;
     var lang = loc.localizer["lang"];
     var isAr = lang == "ar";
-    var (showAr, showEn) = (isAr ? "display" : "none", !isAr ? "display" : "none");
+    var (showAr, showEn) =  isAr ? ("display", "none") : ("none", "display"); 
     var mod = Model.FirstOrDefault(x => x.OrderNo == 1) ?? new();
     var name = isAr ? mod.NameAr : mod.NameEn;
     var desc = isAr ? mod.DescriptionAr : mod.DescriptionEn;
-    var imgURL = mod.IconConfigurationAttachments.Count > 0 ?
-    mod.IconConfigurationAttachments?.FirstOrDefault().AttachmentTransaction.FilePath : "/img/icons/icon1.svg";
-    var url = mod.URL;
+    var imgURL = "img/icons/fnrc.png";//mod.IconConfigurationAttachments.Count > 0 ?
+    //mod.IconConfigurationAttachments?.FirstOrDefault().AttachmentTransaction.FilePath : "/img/icons/icon1.svg";
+    var url = "https://fnrc.gov.ae/";
 }
 <div class="top-strip">
     <div class="top-left">
         <img src="img/icons/icon8.svg" alt="Menu" />
-    </div>
-
+    </div> 
     <div class="top-center">
-        <div class="icon-item" data-name="@name" data-desc="@desc" data-url="@url">
-            <a class="icon-btn">
-                <img src="@imgURL" alt="@name">
-            </a>
-            <div class="icon-text">
-                <div class="icon-title">@name</div>
-                <div class="icon-desc">@desc</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="top-right">
         <span class="user-info">
             @loc.localizer["Welcome"], <strong id="username">...</strong>
         </span>
@@ -56,10 +43,17 @@
            asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">
             <span class="lang-code" style="padding-bottom: 7px;">ع</span>
             <i class="fa fa-globe"> </i>
-        </a>
-
+        </a> 
     </div>
 
+    <div class="top-right">
+        <div class=" ">
+            <a class="" href="@url" target="_blank" width="80">
+                <img src="@imgURL" alt="@name" style="width: 75px;">
+            </a>
+
+        </div>
+    </div>
 </div>
 
 <div id="notifyPopup" class="notify-popup" style="display: none;">

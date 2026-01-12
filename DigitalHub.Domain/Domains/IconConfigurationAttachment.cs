@@ -11,5 +11,7 @@ namespace DigitalHub.Domain.Domains
         public int AttachmentId { get; set; }
         [ForeignKey(nameof(AttachmentId))] public virtual AttachmentTransaction AttachmentTransaction { get; set; }
 
+      
+
     }
 }

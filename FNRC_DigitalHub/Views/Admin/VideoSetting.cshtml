@@ -28,7 +28,8 @@
                                             <input type="file" class="attach-input" id="fileID" accept=".mp4" style="display: none;" required>
                                             <button type="button" class="btn btn-primary attach-btn">
                                                 <i class="fas fa-upload mr-2 mx-2"></i>@(loc.localizer["ChooseFile"])
-                                            </button>
+                                            </button> 
+                                            <div id="fileListUpdate"></div>
                                             <div id="fileList" class="mt-3"></div>
                                         </div>
                                     </div>
@@ -42,14 +43,16 @@
                                         <div class="text-xs font-weight-bold text-success text-uppercase mb-3">
                                            
                                         </div>
-
-                                        
-
+                                        <input type="hidden" name="Id" id="Id" value="" />
                                         <div class="row">
                                              
-                                            <div class="col-md-12 mb-3">
+                                            <div class="col-md-6 mb-3">
                                                 <label for="OrderNo" class="form-label">@(loc.localizer["OrderNo"])</label>
                                                 <input type="number" class="form-control" name="OrderNo" id="OrderNo" min="0" required>
+                                            </div>
+                                            <div class="col-md-6 mb-3">
+                                                <label for="VideoDisplaySec" class="form-label">@(loc.localizer["VideoDisplaySec"])</label>
+                                                <input type="number" class="form-control" name="VideoDisplaySec" id="VideoDisplaySec" min="0" required>
                                             </div>
                                         </div>
                                          
@@ -62,7 +65,7 @@
                             <div class="col-12 text-center mt-4">
                                 <div class="d-flex justify-content-center">
                                     <button type="button" id="submitDiv" class="btn btn-success btn-lg px-5">
-                                        <i class="fas fa-save mr-2 mx-2"></i>@(loc.localizer["Save"])
+                                        <i class="fas fa-save mr-2 mx-2"></i> <span class="AddNew1">@(loc.localizer["Save"])</span>
                                     </button>
                                 </div>
                             </div>
@@ -94,6 +97,7 @@
                             <tr>
                                 <th>@loc.localizer["URL"]</th> 
                                 <th>@loc.localizer["Order"]</th>
+                                <th>@loc.localizer["VideoDisplaySec"]</th>
                                 <th>@loc.localizer["Actions"]</th>
                             </tr>
                         </thead>
@@ -109,9 +113,13 @@
                                     </td>
                                      
                                     <td>@item.OrderNo</td>
+                                    <td>@item.VideoDisplaySec</td>
                                     <td>
                                         <div class="action-buttons">
-                                            <button class="btn btn-sm btn-outline-danger" onclick="openDeleteModal('@item.Id')">
+                                            <button class="btn btn-sm btn-outline-primary" onclick="LoadUpdateRecord('@(item.Id)')">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteRecord('@(item.Id)')">
                                                 <i class="fas fa-trash-alt"></i>
                                             </button>
                                         </div>
@@ -149,8 +157,8 @@
         };
         document.getElementById('submitDiv').addEventListener('click', function (e) {
             e.preventDefault();
-
-            if (selectedFiles.length === 0) {
+                        var isUpdate = $('#galleryForm').find('input[name="Id"]').val() != "";
+            if (selectedFiles.length === 0 && !isUpdate) {
                 Swal.fire("warning", "Please select at least one file.", "warning");
                 return;
             }
@@ -164,8 +172,9 @@
             for (var i = 0; i < selectedFiles.length; i++) {
                 formData.append('files', selectedFiles[i]);
             }
+             var url = isUpdate ? '/admin/UpdateIcons' : '/admin/AddIcons';
             $.ajax({
-                url: '/admin/AddIcons',
+                url: url,
                 type: 'POST',
                 data: formData,
                 processData: false,
@@ -183,11 +192,47 @@
                 }
             });
         });
+
+              function LoadUpdateRecord(id) {
+
+           $.ajax({
+            url: '/admin/GetIconById?id='+id,
+            type: 'get',
+            data: {},
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.success) {
+                    var msg = response.message[0];
+                        //console.log(response.message); 
+                        $('#galleryForm').find('input[name="OrderNo"]').val(msg.OrderNo);
+                        $('#galleryForm').find('input[name="VideoDisplaySec"]').val(msg.VideoDisplaySec);
+                        $('#galleryForm').find('input[name="Id"]').val(msg.Id);
+                        $('#submitDiv').html('@loc.localizer["Update"]')
+                        $('.AddNew1').html('@loc.localizer["Update"]')
+                        var html ='';
+                            msg.IconConfigurationAttachments.forEach(x =>
+                            {
+                                html += `<a class=""  id="image_${x.Id}" style="position: relative;"  href="javascript:void(0)" onclick="deleteImage_Js('${x.Id}')">
+                                            <span><i class="fa fa-times delete-icon"></i></span>
+                                            <img width="60px" src="/img/icons/v1.png" alt="fnrc">
+                                        </a>`;
+
+                            })
+                            $('#fileListUpdate').html(html);
+                            window.scroll(0,0);
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
+                    }
+                });
+        }
+
         document.getElementById('fileID').addEventListener('change', function () {
             if (!validateFileSize(this)) {
                 return false;
             }
-
             var files = this.files;
             var fileNames = '';
 
@@ -226,11 +271,10 @@
                 fileList.appendChild(fileItem);
             });
         }
-        function deleteImage(id) {
-
+        function deleteRecord(id) {
             DeleteWithCallBack('@lang', () => {
                 $.ajax({
-                    url: '/admin/DeleteGalleryImage?fileId=' + id,
+                    url: '/admin/DeleteIcon?id=' + id,
                     type: 'POST',
                     data: {},
                     processData: false,
@@ -239,6 +283,28 @@
                         if (response.success) {
                             SuccessWithCallBack('@(loc.localizer["Success"])', '@(loc.localizer["Success"])', '@lang', window.location.href)
 
+                        } else {
+                            Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
+                    }
+                });
+            })
+        }
+        function deleteImage_Js(id) {
+
+            DeleteWithCallBack('@lang', () => {
+                $.ajax({
+                    url: '/admin/DeleteImage?id=' + id,
+                    type: 'POST',
+                    data: {},
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        if (response.success) {
+                            $('#image_' + id).remove();
                         } else {
                             Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
                         }

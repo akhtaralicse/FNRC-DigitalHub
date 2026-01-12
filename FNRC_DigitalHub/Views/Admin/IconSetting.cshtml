@@ -74,15 +74,13 @@
                                                 <label for="DescriptionAr" class="form-label">@(loc.localizer["DescriptionAr"])</label>
                                                 <textarea class="form-control" name="DescriptionAr" id="DescriptionAr" rows="3"></textarea>
                                             </div>
-                                        </div>
-
+                                        </div> 
 
                                     </div>
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Submit Button -->
+                         
                         <div class="row">
                             <div class="col-12 text-center mt-4">
                                 <div class="d-flex justify-content-center">
@@ -351,29 +349,7 @@
                 fileList.appendChild(fileItem);
             });
         }
-        function deleteImage(id) {
-
-            DeleteWithCallBack('@lang', () => {
-                $.ajax({
-                    url: '/admin/DeleteImage?fileId=' + id,
-                    type: 'POST',
-                    data: {},
-                    processData: false,
-                    contentType: false,
-                    success: function (response) {
-                        if (response.success) {
-                            SuccessWithCallBack('@(loc.localizer["Success"])', '@(loc.localizer["Success"])', '@lang', window.location.href)
-
-                        } else {
-                            Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
-                        }
-                    },
-                    error: function (xhr, status, error) {
-                        Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
-                    }
-                });
-            })
-        }
+      
     </script>
 }
 

@@ -1,14 +1,74 @@
 ﻿@model List<IconConfigurationDTO>
 @{
-    var vd = Model.First().IconConfigurationAttachments.First().AttachmentTransaction.FilePath;
+    var videoItems = Model
+        .SelectMany(m => m.IconConfigurationAttachments)
+        .Select(a => new
+        {
+            src = a.AttachmentTransaction.FilePath,
+            duration = a.IconConfiguration.VideoDisplaySec
+        })
+        .ToList();
+
+    var a = videoItems;
+
 }
-<video autoplay muted loop playsinline id="BGVideo">
-    <source src="@vd" type="video/mp4">
-    Your browser does not support HTML5 video.
-</video>
+<div class="video-container1" style="position: relative; width: 100%; height: 100vh; overflow: hidden; background: unset;">
+    <video autoplay muted playsinline class="bg-video active" id="video1" preload="auto" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 1s ease-in-out; opacity: 1;"></video>
+    <video muted playsinline class="bg-video" id="video2" preload="auto" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 1s ease-in-out; opacity: 0;"></video>
+</div>
 
 <script>
-    document.getElementById('BGVideo').addEventListener('contextmenu', function(e) {
-      e.preventDefault();
+    const videoList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(videoItems));
+    const players = [document.getElementById("video1"), document.getElementById("video2")];
+
+    let currentIndex = 0;
+    let activePlayerIndex = 0;
+    let timer = null;
+
+    function playNextVideo() {
+        // 1. Identify active and inactive players
+        const currentPlayer = players[activePlayerIndex];
+        activePlayerIndex = 1 - activePlayerIndex; // Toggle between 0 and 1
+        const nextPlayer = players[activePlayerIndex];
+
+        // 2. Get the next video data
+        const videoData = videoList[currentIndex];
+
+        // 3. Prepare the next player in the background
+        nextPlayer.src = videoData.src;
+        nextPlayer.load();
+
+        nextPlayer.oncanplaythrough = () => {
+            // 4. Once loaded, start playing the hidden video
+            nextPlayer.play();
+
+            // 5. Cross-fade: Fade in the new, fade out the old
+            nextPlayer.style.opacity = "1";
+            currentPlayer.style.opacity = "0";
+
+            // 6. Set timer for the next switch based on duration
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                currentIndex = (currentIndex + 1) % videoList.length;
+                playNextVideo();
+            }, videoData.duration * 1000);
+
+            // Clean up event listener to prevent memory leaks
+            nextPlayer.oncanplaythrough = null;
+        };
+    }
+
+    // Initial Start
+    playNextVideo();
+
+    // Prevent context menu and handle visibility
+    players.forEach(p => {
+        p.addEventListener('contextmenu', e => e.preventDefault());
+    });
+
+    document.addEventListener("visibilitychange", () => {
+        const activePlayer = players[activePlayerIndex];
+        if (document.hidden) activePlayer.pause();
+        else activePlayer.play();
     });
 </script>

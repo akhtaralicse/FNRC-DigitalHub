@@ -159,6 +159,9 @@
   <data name="AddNewVideo" xml:space="preserve">
     <value>Add New Video</value>
   </data>
+  <data name="VideoDisplaySec" xml:space="preserve">
+    <value>VideoDisplaySec</value>
+  </data>
   <data name="File" xml:space="preserve">
     <value>File</value>
   </data>

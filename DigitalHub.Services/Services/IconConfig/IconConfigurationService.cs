@@ -83,6 +83,7 @@ namespace DigitalHub.Services.Services.IconConfig
             result.NameEn = mod.NameEn;
             result.OrderNo = mod.OrderNo;
             result.URL = mod.URL;
+            result.VideoDisplaySec = mod.VideoDisplaySec;
 
             _repository.Update(result, true);
 

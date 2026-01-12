@@ -57,11 +57,12 @@ body {
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     text-decoration: none;
+    /*background-color: black;*/
 }
 
 :root {
     --icon-size: 60px;
-    --gap: 22px;
+    --gap: 27px;
     --side-offset: 100px;
     --label-gap: 12px;
     --text-color: #fff;
@@ -88,16 +89,18 @@ html, body {
 }
 
     .video-container video {
-        position: absolute;
+        /*position: absolute;
         top: 50%;
         left: 50%;
         min-width: 100%;
         min-height: 92%;
         transform: translate(-50%,-50%);
         object-fit: cover;
-        z-index: 0;
+        z-index: 0;*/
     }
+ 
 
+/* --- News Strip Container --- */
 .news-strip {
     position: fixed;
     bottom: 0;
@@ -105,63 +108,48 @@ html, body {
     width: 100%;
     height: 50px;
     display: flex;
-    z-index: 10;
+    z-index: 1000;
     font-family: inherit;
+    border-top: 1px solid rgba(0,0,0,0.1);  
 }
-
-
+ 
 .news-label {
     width: 120px;
-    background: var(--base-color); /* blue */
+    background: var(--base-color, #0056b3);  
     color: #fff;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
     text-transform: uppercase;
+    z-index: 20;  
 }
-
-
+ 
 .news-text {
     flex: 1;
     background: #fff;
-    color: var(--gov-color);
+    color: var(--gov-color, #333);
     display: flex;
     align-items: center;
     overflow: hidden;
     position: relative;
 }
-    /*  .news-text {
-    direction: rtl;
-}*/
-
-    .news-text span:hover {
-        animation-play-state: paused;
-    }
-
+ 
     .news-text span {
+        display: inline-block;  
         white-space: nowrap;
-        padding-left: 100%;
         font-size: 16px;
+        will-change: transform;  
     }
-
+     
+.news-strip:hover .news-text span {
+    animation-play-state: paused;
+    cursor: pointer;
+}
+ 
 html[dir="ltr"] .news-text span {
-    animation: scrollNews 16s linear infinite;
-}
-
-html[dir="rtl"] .news-text span {
-    /*animation-name: scrollNewsAR;*/
-    animation: scrollNewsAR 30s linear infinite;
-}
-
-@keyframes scrollNewsAR {
-    0% {
-        transform: translateX(-100%);
-    }
-
-    100% {
-        transform: translateX(100%);
-    }
+    padding-left: 100%;  
+    animation: scrollNews 20s linear infinite;
 }
 
 @keyframes scrollNews {
@@ -173,6 +161,23 @@ html[dir="rtl"] .news-text span {
         transform: translateX(-100%);
     }
 }
+ 
+html[dir="rtl"] .news-text span {
+    padding-right: 100%; 
+    animation: scrollNewsAR 20s linear infinite;
+}
+
+@keyframes scrollNewsAR {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(100%);
+    }
+}
+
+/* ---END News Strip Container --- */
 
 .top-strip {
     direction: ltr !important;
@@ -207,7 +212,8 @@ html[dir="rtl"] .news-text span {
     align-items: center;
     pointer-events: auto;
     grid-template-columns: auto 1fr auto;
-    transform: translateX(70px);
+    transform: translateX(0px);
+    transform: translateY(-34px);
 }
 
     .top-center img {
@@ -223,6 +229,7 @@ html[dir="rtl"] .news-text span {
     align-items: center;
     gap: 7px;
     white-space: nowrap;
+    transform: translateX(-28px);
 }
 
 .lang-switch {
@@ -254,6 +261,7 @@ html[dir="rtl"] .news-text span {
 
 .user-info {
     font-size: 14px;
+    color: var(--base-color);
 }
 /* icon column base */
 .icon-column {
@@ -301,6 +309,26 @@ html[dir="rtl"] .news-text span {
     flex-direction: row-reverse;
     text-align: right;
 }
+
+.icon-item {
+    position: relative;
+}
+
+    /* Shadow image under icon */
+    .icon-item::after {
+        content: "";
+        position: absolute;
+        bottom: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 400px;
+        height: 17px;
+        background: url(/img/icons/stepline.png) no-repeat center;
+        background-size: contain;
+        /* opacity: 0.6; */
+        pointer-events: none;
+    }
+
 
 .icon-btn {
     width: var(--icon-size);
@@ -726,20 +754,7 @@ html[dir="rtl"] .notify-close {
     font-size: 12px;
     cursor: pointer;
     text-decoration: underline;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
+} 
 /* Add these to your existing CSS */
 
 /* Initial state - hidden and positioned */
@@ -850,4 +865,14 @@ html[dir="rtl"] .notify-close {
 
 .icon-column.right.animate-in .icon-item:hover {
     transform: translateX(var(--tx)) translateY(-5px);
+}
+
+#BGVideo {
+    position: fixed;
+    /*inset: 0;*/
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    background-color: transparent;
+    transition: opacity 0.25s ease-in-out;
 }

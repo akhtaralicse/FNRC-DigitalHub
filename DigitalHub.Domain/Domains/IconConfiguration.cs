@@ -12,6 +12,7 @@ namespace DigitalHub.Domain.Domains
         public int OrderNo { get; set; }
         public string URL { get; set; }
         public IconTypeEnum IconType { get; set; }
+        public int VideoDisplaySec { get; set; } = 2;
         public ICollection<IconConfigurationAttachment> IconConfigurationAttachments { get; set; } = [];
 
     }

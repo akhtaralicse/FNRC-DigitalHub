@@ -12,7 +12,7 @@ namespace DigitalHub.Services.DTO
         public string DescriptionEn { get; set; }
         public string DescriptionAr { get; set; }
         public int OrderNo { get; set; }
- 
+        public int VideoDisplaySec { get; set; }
         public IconTypeEnum IconType { get; set; }
         public ICollection<IconConfigurationAttachmentDTO> IconConfigurationAttachments { get; set; } = [];
 
