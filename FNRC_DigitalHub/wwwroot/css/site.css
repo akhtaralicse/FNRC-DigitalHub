@@ -3,6 +3,7 @@
     --gov-color: rgb(181 152 107);
     --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
 }
+
 @font-face {
     font-family: "UniversNextArabic";
     src: local("UniversNextArabic"), url("../font/DroidKufi-Regular.ttf") format("truetype");
@@ -16,14 +17,15 @@
     font-weight: bold;
     font-weight: 700;
 }
+
 html {
     font-size: 14px;
 }
+
     html[dir=ltr] body {
         direction: ltr !important;
         /*font-family: "Tahoma", "Verdana", sans-serif !important;*/
         font-family: var(--font-family);
-
     }
 
     html[dir=rtl] body {
@@ -61,8 +63,8 @@ body {
 }
 
 :root {
-    --icon-size: 60px;
-    --gap: 27px;
+    --icon-size: 65px;
+    --gap: 30px;
     --side-offset: 100px;
     --label-gap: 12px;
     --text-color: #fff;
@@ -98,7 +100,7 @@ html, body {
         object-fit: cover;
         z-index: 0;*/
     }
- 
+
 
 /* --- News Strip Container --- */
 .news-strip {
@@ -110,21 +112,21 @@ html, body {
     display: flex;
     z-index: 1000;
     font-family: inherit;
-    border-top: 1px solid rgba(0,0,0,0.1);  
+    border-top: 1px solid rgba(0,0,0,0.1);
 }
- 
+
 .news-label {
     width: 120px;
-    background: var(--base-color, #0056b3);  
+    background: var(--base-color, #0056b3);
     color: #fff;
     font-weight: bold;
     display: flex;
     align-items: center;
     justify-content: center;
     text-transform: uppercase;
-    z-index: 20;  
+    z-index: 20;
 }
- 
+
 .news-text {
     flex: 1;
     background: #fff;
@@ -134,21 +136,21 @@ html, body {
     overflow: hidden;
     position: relative;
 }
- 
+
     .news-text span {
-        display: inline-block;  
+        display: inline-block;
         white-space: nowrap;
         font-size: 16px;
-        will-change: transform;  
+        will-change: transform;
     }
-     
+
 .news-strip:hover .news-text span {
     animation-play-state: paused;
     cursor: pointer;
 }
- 
+
 html[dir="ltr"] .news-text span {
-    padding-left: 100%;  
+    padding-left: 100%;
     animation: scrollNews 20s linear infinite;
 }
 
@@ -161,9 +163,9 @@ html[dir="ltr"] .news-text span {
         transform: translateX(-100%);
     }
 }
- 
+
 html[dir="rtl"] .news-text span {
-    padding-right: 100%; 
+    padding-right: 100%;
     animation: scrollNewsAR 20s linear infinite;
 }
 
@@ -232,6 +234,10 @@ html[dir="rtl"] .news-text span {
     transform: translateX(-28px);
 }
 
+    .top-right img {
+        width: 5vw;
+    }
+
 .lang-switch {
     display: inline-flex;
     align-items: center;
@@ -267,7 +273,7 @@ html[dir="rtl"] .news-text span {
 .icon-column {
     direction: ltr !important;
     position: absolute;
-    top: 52%;
+    top: 45%;
     transform: translateY(-50%);
     display: flex;
     flex-direction: column;
@@ -275,7 +281,6 @@ html[dir="rtl"] .news-text span {
     z-index: 2;
     pointer-events: auto;
     width: 320px;
-
 }
 
     .icon-column.left {
@@ -340,7 +345,7 @@ html[dir="rtl"] .news-text span {
     background: rgb(255 255 255 / 34%);
     border-radius: 10%;
     border: none;
-    padding: 8px;
+    padding: 0px;
     cursor: pointer;
     transition: transform 220ms ease, background 220ms ease, box-shadow 220ms;
     box-shadow: 0 6px 18px rgba(0,0,0,0.45);
@@ -352,7 +357,6 @@ html[dir="rtl"] .news-text span {
         object-fit: contain;
         display: block;
         transition: transform 500ms cubic-bezier(0.68, -0.55, 0.27, 1.55);
-        
     }
 
     .icon-btn:hover {
@@ -423,17 +427,52 @@ html[dir="rtl"] .news-text span {
     }
 }
 
+
+@media (max-width: 1710px ) {
+    :root {
+        --gap: 40px;
+        --side-offset: 140px;
+    }
+}
+
+@media (max-width: 1200px ) {
+    :root {
+        --gap: 37px;
+        --side-offset: 140px;
+    }
+}
+@media (max-width: 1100px ) {
+    :root {
+        --gap: 37px;
+        --side-offset: 55px;
+    }
+}
 @media (max-width: 480px) {
     :root {
-        --icon-size: 48px;
-        --gap: 12px;
-        --side-offset: 8px;
+        --icon-size: 30px;
+        --gap: 40px;
+        --side-offset: 0px;
+        
     }
-
-    .icon-column {
-        display: none;
+    .icon-title {
+        font-size: 10px;
     }
-    /* hide side columns on tiny screens — you can change this */
+    .icon-desc {
+        font-size: 5px;
+    }
+        .top-center {
+        transform: translateY(-6px);
+    }
+    .top-right {
+        transform: translateX(-2px);
+        padding-bottom: 15px;
+    }
+        .top-right img{
+            width:8vw;
+        }
+        .icon-column {
+            /*display: none;*/
+        }
 }
 
 .footer {
@@ -602,6 +641,7 @@ html[dir="rtl"] .news-text span {
         opacity: 1;
         visibility: visible;
     }
+
 .notify-popup {
     position: fixed;
     top: 50%;
@@ -618,6 +658,7 @@ html[dir="rtl"] .news-text span {
     animation: fadeScale 700ms ease, vibrate 0.4s ease-in-out 700ms 2;
     box-sizing: border-box;
 }
+
     .notify-popup.success {
         background: #1e7e34;
     }
@@ -642,7 +683,7 @@ html[dir="rtl"] .notify-close {
     right: auto;
     left: 10px;
 }
- 
+
 .notify-title {
     margin: 0 0 10px;
     font-size: 19px;
@@ -650,13 +691,14 @@ html[dir="rtl"] .notify-close {
     text-align: center;
     color: var(--base-color);
 }
- 
+
 .notify-message {
     margin: 0;
     font-size: 14px;
     line-height: 1.5;
     text-align: center;
 }
+
 .notification-buttons {
     display: flex;
     justify-content: flex-end;
@@ -666,6 +708,7 @@ html[dir="rtl"] .notify-close {
     margin-top: 24px;
     text-align: center;
 }
+
 .notify-cancel-btn {
     padding: 10px 24px;
     background-color: var(--gov-color);
@@ -680,6 +723,7 @@ html[dir="rtl"] .notify-close {
     text-align: center;
     box-shadow: 0 2px 4px rgba(0, 123, 255, 0.2);
 }
+
     .notify-cancel-btn:hover {
         background-color: rgb(175 134 70);
         transform: translateY(-1px);
@@ -750,21 +794,20 @@ html[dir="rtl"] .notify-close {
         transform: translate(-50%, -50%) scale(1);
     }
 }
+
 .markasread {
     font-size: 12px;
     cursor: pointer;
     text-decoration: underline;
-} 
+}
 /* Add these to your existing CSS */
 
 /* Initial state - hidden and positioned */
-.icon-column.left .icon-item {    
- 
+.icon-column.left .icon-item {
     transition: transform 1.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 2.6s ease;
 }
 
-.icon-column.right .icon-item { 
-   
+.icon-column.right .icon-item {
     transition: transform 1.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 2.6s ease;
 }
 
@@ -812,7 +855,7 @@ html[dir="rtl"] .notify-close {
 }
 
 /* Animated state - triggered by adding a class */
- 
+
 /* Add subtle rotation for "C-shape" effect */
 .icon-column.left.animate-in .icon-item:nth-child(1) {
     --rot: -2deg;
@@ -855,7 +898,7 @@ html[dir="rtl"] .notify-close {
 }
 
 /* Hover enhancement */
-.icon-column.animate-in .icon-item:hover {    
+.icon-column.animate-in .icon-item:hover {
     transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
 }
 
