@@ -13,8 +13,8 @@
 
 }
 <div class="video-container1" style="position: relative; width: 100%; height: 100vh; overflow: hidden; background: unset;">
-    <video autoplay muted playsinline class="bg-video active" id="video1" preload="auto" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 1s ease-in-out; opacity: 1;"></video>
-    <video muted playsinline class="bg-video" id="video2" preload="auto" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 1s ease-in-out; opacity: 0;"></video>
+    <video autoplay muted loop playsinline class="bg-video active" id="video1" preload="auto" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 1s ease-in-out; opacity: 1;"></video>
+    <video muted playsinline loop class="bg-video" id="video2" preload="auto" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: opacity 1s ease-in-out; opacity: 0;"></video>
 </div>
 
 <script>
@@ -36,6 +36,7 @@
 
         // 3. Prepare the next player in the background
         nextPlayer.src = videoData.src;
+        //nextPlayer.loop = true;
         nextPlayer.load();
 
         nextPlayer.oncanplaythrough = () => {

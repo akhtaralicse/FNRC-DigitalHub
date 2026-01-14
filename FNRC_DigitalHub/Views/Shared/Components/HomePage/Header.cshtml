@@ -14,18 +14,9 @@
     var url = "https://fnrc.gov.ae/";
 }
 <div class="top-strip">
+   
     <div class="top-left">
-        <img src="img/icons/icon8.svg" alt="Menu" />
-    </div> 
-    <div class="top-center">
-        <span class="user-info">
-            @loc.localizer["Welcome"], <strong id="username">...</strong>
-        </span>
-
-        @if (isLogin)
-        {
-            @await Html.PartialAsync("~/views/shared/components/homepage/notificationicon.cshtml", Model)
-        }
+        
         <a class="lang-switch"
            style="display:@showAr"
            asp-controller="Home"
@@ -43,13 +34,26 @@
            asp-route-returnUrl="@($"{Context.Request.Path}{Context.Request.QueryString}")">
             <span class="lang-code" style="padding-bottom: 7px;">ع</span>
             <i class="fa fa-globe"> </i>
-        </a> 
-    </div>
+        </a>
+        @if (isLogin)
+        {
+            <div class="">
+                @await Html.PartialAsync("~/views/shared/components/homepage/notificationicon.cshtml", Model)
+            </div>
+        }
+        <span class="user-info mx-1">
+            <i class="fa fa-user"> </i> @loc.localizer["Welcome"], <strong id="username">...</strong>
+        </span>
 
+       
+    </div>
+    <div class="top-center">
+        @* <img src="img/icons/icon8.svg" alt="Menu" /> *@
+    </div>
     <div class="top-right">
         <div class=" ">
             <a class="" href="@url" target="_blank" width="80">
-                <img src="@imgURL" alt="@name" style="width: 5vw;">
+                <img src="@imgURL" alt="@name" >
             </a>
 
         </div>

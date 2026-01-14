@@ -199,9 +199,16 @@ html[dir="rtl"] .news-text span {
     grid-template-columns: auto 1fr auto
 }
 
-.top-left img {
-    height: 9vw;
-    cursor: pointer;
+.top-left   {
+    font-size: 18px;
+    /* font-weight: bold; */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: auto;
+    grid-template-columns: auto 1fr auto;
+    transform: translateX(0px);
+    transform: translateY(-34px);
 }
 
 /* CENTER */
@@ -235,7 +242,7 @@ html[dir="rtl"] .news-text span {
 }
 
     .top-right img {
-        width: 5vw;
+        width: 7vw;
     }
 
 .lang-switch {
@@ -253,6 +260,7 @@ html[dir="rtl"] .news-text span {
 
     .lang-switch i {
         font-size: 16px;
+        color: var(--gov-color);
     }
 
     .lang-switch:hover {
@@ -263,12 +271,17 @@ html[dir="rtl"] .news-text span {
 .lang-code {
     font-weight: 600;
     letter-spacing: 0.5px;
+    color: var(--gov-color);
 }
 
 .user-info {
     font-size: 14px;
     color: var(--base-color);
 }
+    .user-info i {
+        font-size: 16px;
+        color: var(--gov-color);
+    }
 /* icon column base */
 .icon-column {
     direction: ltr !important;
