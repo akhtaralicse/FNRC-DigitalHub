@@ -19,6 +19,7 @@ namespace DigitalHub.Services.Shared
                 options.MultipartBodyLengthLimit = Convert.ToInt32(Configuration["FileServer:AllowedFileSize"]);
             });
             //services.AddHttpClient();
+            services.AddMemoryCache();
             //services.AddScoped<IHttpClientFactory>(); 
 
             services.AddHttpContextAccessor();

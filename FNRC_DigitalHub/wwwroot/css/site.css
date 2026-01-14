@@ -33,16 +33,6 @@ html {
         font-family: "UniversNextArabic" !important;
     }
 
-@media (min-width: 768px) {
-    html {
-        font-size: 16px;
-    }
-
-    .news-label {
-        width: 90px;
-        font-size: 14px;
-    }
-}
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
     box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
@@ -103,6 +93,7 @@ html, body {
 
 
 /* --- News Strip Container --- */
+/* --- News Strip Container --- */
 .news-strip {
     position: fixed;
     bottom: 0;
@@ -113,6 +104,7 @@ html, body {
     z-index: 1000;
     font-family: inherit;
     border-top: 1px solid rgba(0,0,0,0.1);
+    background: #fff;
 }
 
 .news-label {
@@ -124,60 +116,36 @@ html, body {
     align-items: center;
     justify-content: center;
     text-transform: uppercase;
-    z-index: 20;
 }
 
 .news-text {
     flex: 1;
-    background: #fff;
-    color: var(--gov-color, #333);
-    display: flex;
-    align-items: center;
     overflow: hidden;
-    position: relative;
+    height: 50px;
+    line-height: 50px;
 }
 
-    .news-text span {
-        display: inline-block;
-        white-space: nowrap;
-        font-size: 16px;
-        will-change: transform;
-    }
+/* Slick slide styling */
+.news-slider .slick-slide {
+    display: flex !important;
+    align-items: center;
+    height: 50px;
+}
 
-.news-strip:hover .news-text span {
-    animation-play-state: paused;
+.news-item {
+    white-space: nowrap;
+    padding: 0 20px;
+    font-size: 14px;
     cursor: pointer;
+    color: var(--gov-color, #333);
 }
 
-html[dir="ltr"] .news-text span {
-    padding-left: 100%;
-    animation: scrollNews 20s linear infinite;
+/* Hide arrows & dots */
+.news-slider .slick-arrow,
+.news-slider .slick-dots {
+    display: none !important;
 }
 
-@keyframes scrollNews {
-    0% {
-        transform: translateX(0);
-    }
-
-    100% {
-        transform: translateX(-100%);
-    }
-}
-
-html[dir="rtl"] .news-text span {
-    padding-right: 100%;
-    animation: scrollNewsAR 20s linear infinite;
-}
-
-@keyframes scrollNewsAR {
-    0% {
-        transform: translateX(0);
-    }
-
-    100% {
-        transform: translateX(100%);
-    }
-}
 
 /* ---END News Strip Container --- */
 
@@ -199,7 +167,7 @@ html[dir="rtl"] .news-text span {
     grid-template-columns: auto 1fr auto
 }
 
-.top-left   {
+.top-left {
     font-size: 18px;
     /* font-weight: bold; */
     display: flex;
@@ -278,6 +246,7 @@ html[dir="rtl"] .news-text span {
     font-size: 14px;
     color: var(--base-color);
 }
+
     .user-info i {
         font-size: 16px;
         color: var(--gov-color);
@@ -424,6 +393,17 @@ html[dir="rtl"] .news-text span {
 }
 
 /* Responsive: smaller icons and tighter gaps */
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+
+    .news-label {
+        width: 90px;
+        font-size: 14px;
+    }
+}
+
 @media (max-width: 900px) {
     :root {
         --icon-size: 56px;
@@ -447,45 +427,58 @@ html[dir="rtl"] .news-text span {
         --side-offset: 140px;
     }
 }
-
+@media (max-width: 1280px ) {
+    :root {
+        --gap: 32px;
+        --side-offset: 140px;
+        --icon-size: 55px;
+    }
+}
 @media (max-width: 1200px ) {
     :root {
         --gap: 37px;
         --side-offset: 140px;
     }
 }
+
 @media (max-width: 1100px ) {
     :root {
         --gap: 37px;
         --side-offset: 55px;
     }
 }
+
 @media (max-width: 480px) {
     :root {
         --icon-size: 30px;
         --gap: 40px;
         --side-offset: 0px;
-        
     }
+
     .icon-title {
         font-size: 10px;
     }
+
     .icon-desc {
         font-size: 5px;
     }
-        .top-center {
+
+    .top-center {
         transform: translateY(-6px);
     }
+
     .top-right {
         transform: translateX(-2px);
         padding-bottom: 15px;
     }
-        .top-right img{
-            width:8vw;
+
+        .top-right img {
+            width: 8vw;
         }
-        .icon-column {
-            /*display: none;*/
-        }
+
+    .icon-column {
+        /*display: none;*/
+    }
 }
 
 .footer {
@@ -813,7 +806,7 @@ html[dir="rtl"] .notify-close {
     cursor: pointer;
     text-decoration: underline;
 }
-/* Add these to your existing CSS */
+ 
 
 /* Initial state - hidden and positioned */
 .icon-column.left .icon-item {

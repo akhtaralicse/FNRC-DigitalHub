@@ -46,7 +46,7 @@ builder.Services.AddAuthentication(options =>
 .AddCookie(options =>
 {
     options.LoginPath = xLoginPath;
-    options.Cookie.Name = "DSINTRANET";
+    options.Cookie.Name = "FNRC_DHINTRANET";
     options.Cookie.IsEssential = true;
 });
 

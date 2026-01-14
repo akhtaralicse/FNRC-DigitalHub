@@ -71,6 +71,7 @@
         </div>
     </div>
 </div>
+ 
 <script>
 
       document.addEventListener("DOMContentLoaded", function () {
@@ -261,12 +262,10 @@
     function closeNotify() {
         const popup = document.getElementById("notifyPopup");
         const closeButton = popup.querySelector(".notify-cancel-btn");
-        const notificationId = closeButton.getAttribute('data-id');
-         
+        const notificationId = closeButton.getAttribute('data-id');         
         if (notificationId) { 
             markNotificationAsRead(notificationId);
         }
-
         popup.style.display = "none";
     }
      
@@ -274,8 +273,7 @@
      function playNotificationSound() {
         try {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-            // Create multiple oscillators for richer sound
+ 
             const osc1 = audioContext.createOscillator();
             const osc2 = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
@@ -283,15 +281,13 @@
             osc1.connect(gainNode);
             osc2.connect(gainNode);
             gainNode.connect(audioContext.destination);
-
-            // Bell-like frequencies
-            osc1.frequency.setValueAtTime(1046.50, audioContext.currentTime); // C6
-            osc2.frequency.setValueAtTime(1318.51, audioContext.currentTime); // E6
+             
+            osc1.frequency.setValueAtTime(1046.50, audioContext.currentTime);  
+            osc2.frequency.setValueAtTime(1318.51, audioContext.currentTime);  
 
             osc1.type = 'sine';
             osc2.type = 'sine';
-
-            // Sharp attack, slow decay
+             
             gainNode.gain.setValueAtTime(0, audioContext.currentTime);
             gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.0);

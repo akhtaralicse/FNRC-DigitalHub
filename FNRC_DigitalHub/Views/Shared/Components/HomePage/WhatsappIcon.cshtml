@@ -1,0 +1,31 @@
+﻿<style>
+    .fix-icon {
+        position: fixed;
+        bottom: 60px;
+        left: 20px;
+        z-index: 1000;
+    }
+
+    .wtsapp-btn {
+        display: block;
+        width: 55px;
+        height: 55px;
+        transition: transform 0.3s ease;
+    }
+
+        .wtsapp-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .wtsapp-btn img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+</style>
+
+<div class="fix-icon">
+    <a href="https://api.whatsapp.com/send/?phone=9718003672&amp;text&amp;type=phone_number&amp;app_absent=0" class="wtsapp-btn" target="_blank">
+        <img src="/img/icons/wa.png" alt="WhatsApp">
+    </a>
+</div>

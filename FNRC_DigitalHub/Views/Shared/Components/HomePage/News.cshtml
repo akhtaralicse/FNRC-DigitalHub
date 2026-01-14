@@ -1,16 +1,126 @@
-﻿
+﻿@{
+    var lang = loc.localizer["lang"];
+    var isAr = lang == "ar";
+}
 <div class="news-strip">
     <div class="news-label">
-       @loc.localizer["News"]
+        @loc.localizer["News"]
     </div>
+
     <div class="news-text">
-        <span>
-            🔔 The UAE participated in the International Meeting of Geological Survey, held as part of the 4th International Mining Conference in Riyadh, Saudi Arabia.
-        </span>
+        <div id="newsContainer" class="news-slider">
+            <div>جاري تحميل الأخبار...</div>
+        </div>
     </div>
-     
 </div>
- 
-<style>
-     
-</style>
+
+
+<div class="modal fade" id="newsModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalTitle">تفاصيل الخبر</h5>
+            </div>
+            <div class="modal-body" id="modalBody">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetchLastMonthNews();
+    });
+    function fetchLastMonthNews() {
+        console.log('call news===');
+        const now = new Date();
+        const firstDayPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0];
+        const lastDayPrevMonth = new Date().toISOString().split('T')[0];
+        const apiUrl =  `/NewsAPI/GetExternalNews`;
+
+        $.ajax({
+            url: apiUrl,
+            type: 'GET',
+            dataType: 'text',
+            data: {
+                fromDate: firstDayPrevMonth,
+                toDate: lastDayPrevMonth
+            },
+            success: function (xmlString) {
+               // console.log(xmlString);
+                const newsItems = JSON.parse(xmlString) ;
+                let htmlContent = "";
+
+                if (newsItems.length === 0) {
+                    $('#newsContainer').html("<span>لا توجد أخبار للشهر الماضي</span>");
+                    return;
+                }
+                for (let i = 0; i < newsItems.length; i++) {
+                   const title = '@isAr' == 'True' ? newsItems[i].TitleArabic :newsItems[i].TitleEnglish ;
+                   const  detail = '@isAr' == 'True' ? newsItems[i].DetailArabic :newsItems[i].DetailEnglish;
+                   const  shortDetail = '@isAr' == 'True' ? newsItems[i].ShortArabic :newsItems[i].ShortEnglish;
+                   const cleanDetail = detail ;
+                 
+
+                   htmlContent += `
+                    <div class="news-item custom-hover-target"
+                         data-title="${title.replace(/"/g, '&quot;')}"
+                         data-desc="${shortDetail.replace(/"/g, '&quot;')}">
+                        🔔 ${title}
+                    </div>`;
+                }
+
+                const $slider = $('#newsContainer');
+
+                // Destroy slick if already initialized
+                if ($slider.hasClass('slick-initialized')) {
+                    $slider.slick('unslick');
+                }
+
+                $slider.html(htmlContent);
+
+                // Initialize slick
+                $slider.slick({
+                    slidesToShow: 1,
+                    slidesToScroll: 1,
+                    autoplay: true,
+                    autoplaySpeed: 4000,
+                    speed: 800,
+                    infinite: true,
+                    pauseOnHover: true,
+                    arrows: false,
+                    dots: false,
+                    rtl: $('html').attr('dir') === 'rtl'
+                });
+                initNewsModalListeners();
+            },
+            error: function (err) {
+                console.error("Error fetching news:", err);
+                //$('#newsContainer').html("<span>فشل تحميل الأخبار</span>");
+            }
+        });
+    }
+
+    function initNewsModalListeners() {
+        const newsItems = document.querySelectorAll('.custom-hover-target');
+        const modal = document.getElementById('descModal');
+        const modalContent = modal.querySelector('.description-modal-content') || modal;
+
+        newsItems.forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                var fullDescription = this.getAttribute('data-desc');
+                var limit = 1200;
+                var title = this.getAttribute('data-title');
+                if (fullDescription.length > limit) {
+                    fullDescription = fullDescription.substring(0, limit) + "...";
+                } 
+                modalContent.innerHTML = `<strong>${title}</strong><br/>${fullDescription}`;
+                modal.classList.add('active');
+            });
+
+            item.addEventListener('mouseleave', function() {
+                modal.classList.remove('active');
+            });
+        });
+    }
+</script>

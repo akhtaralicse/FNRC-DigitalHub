@@ -1,9 +1,11 @@
 ﻿using DigitalHub.Services.DTO;
-using FNRC_DigitalHub.Helper; 
+using FNRC_DigitalHub.Helper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FNRC_DigitalHub.Controllers
 {
+   
     public class BaseController : Controller
     {
         public BaseController() { }

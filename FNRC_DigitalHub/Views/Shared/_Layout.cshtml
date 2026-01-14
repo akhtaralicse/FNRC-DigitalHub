@@ -13,6 +13,8 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FNRC_DigitalHub.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css">
+   
 </head>
 <body>
     
@@ -27,6 +29,20 @@
     <script src="~/lib/bootstrap/dist/js/popper.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
+
+
+    <script>
+
+        (function (I, n, f, o, b, i, p) {
+            I[b] = I[b] || function () { (I[b].q = I[b].q || []).push(arguments) };
+            I[b].t = 1 * new Date(); i = n.createElement(f); i.async = 1; i.src = o;
+            p = n.getElementsByTagName(f)[0]; p.parentNode.insertBefore(i, p)
+        })
+        (window, document, 'script', 'https://livechat.infobip.com/widget.js', 'liveChat');
+        liveChat('init', '16c34c75-5011-4622-95e5-642963d965e1');
+
+    </script>
 </body>
 </html>
