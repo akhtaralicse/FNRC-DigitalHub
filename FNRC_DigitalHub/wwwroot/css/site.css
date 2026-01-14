@@ -126,12 +126,19 @@ html, body {
 }
 
 /* Slick slide styling */
+ 
+.news-slider,
+.news-slider .slick-list,
+.news-slider .slick-track,
 .news-slider .slick-slide {
-    display: flex !important;
-    align-items: center;
     height: 50px;
 }
 
+    .news-slider .slick-slide > div {
+        height: 100%;
+        display: flex;
+        align-items: center;
+    }
 .news-item {
     white-space: nowrap;
     padding: 0 20px;
