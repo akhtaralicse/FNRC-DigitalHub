@@ -34,7 +34,7 @@
     function fetchLastMonthNews() {
         console.log('call news===');
         const now = new Date();
-        const firstDayPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString().split('T')[0];
+        const firstDayPrevMonth = new Date(now.getFullYear(), now.getMonth() - 2, 1).toISOString().split('T')[0];
         const lastDayPrevMonth = new Date().toISOString().split('T')[0];
         const apiUrl =  `/NewsAPI/GetExternalNews`;
 
@@ -47,8 +47,9 @@
                 toDate: lastDayPrevMonth
             },
             success: function (xmlString) {
-               // console.log(xmlString);
+                
                 const newsItems = JSON.parse(xmlString) ;
+                 console.log(newsItems);
                 let htmlContent = "";
 
                 if (newsItems.length === 0) {

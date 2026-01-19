@@ -1,6 +1,8 @@
-:root {
+﻿:root {
     --base-color: #0e4b8e;
     --gov-color: rgb(181 152 107);
+    --fontSize-header: 16px;
+    --fontSize-news: 1.1rem;
     --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
 }
 
@@ -116,6 +118,7 @@ html, body {
     align-items: center;
     justify-content: center;
     text-transform: uppercase;
+    font-size:1rem;
 }
 
 .news-text {
@@ -142,7 +145,7 @@ html, body {
 .news-item {
     white-space: nowrap;
     padding: 0 20px;
-    font-size: 15px;
+    font-size: var(--fontSize-news);
     cursor: pointer;
     color: var(--gov-color, #333);
 }
@@ -229,12 +232,12 @@ html, body {
     background: rgba(255, 255, 255, 0.18);
     color: #fff;
     text-decoration: none;
-    font-size: 14px;
+     font-size: 14px ;
     transition: background 200ms ease, transform 200ms ease;
 }
 
     .lang-switch i {
-        font-size: 16px;
+        font-size: var(--fontSize-header);
         color: var(--gov-color);
     }
 
@@ -249,13 +252,12 @@ html, body {
     color: var(--gov-color);
 }
 
-.user-info {
-    font-size: 14px;
+.user-info {     
     color: var(--base-color);
 }
 
     .user-info i {
-        font-size: 16px;
+        font-size: var(--fontSize-header);
         color: var(--gov-color);
     }
 /* icon column base */
@@ -398,95 +400,12 @@ html, body {
 .icon-item:hover .icon-text .icon-title {
     /*color: #fff;*/
 }
-
-/* Responsive: smaller icons and tighter gaps */
-@media (min-width: 768px) {
-    html {
-        font-size: 16px;
-    }
-
-    .news-label {
-        width: 90px;
-        font-size: 14px;
-    }
+.icon-column img,
+.icon-column svg {
+    image-rendering: auto;
+    max-width: 100%;
 }
-
-@media (max-width: 900px) {
-    :root {
-        --icon-size: 56px;
-        --gap: 14px;
-        --side-offset: 12px;
-    }
-
-    .icon-column {
-        width: 260px;
-    }
-
-    .icon-text {
-        max-width: 180px;
-    }
-}
-
-
-@media (max-width: 1710px ) {
-    :root {
-        --gap: 40px;
-        --side-offset: 140px;
-    }
-}
-@media (max-width: 1280px ) {
-    :root {
-        --gap: 32px;
-        --side-offset: 140px;
-        --icon-size: 55px;
-    }
-}
-@media (max-width: 1200px ) {
-    :root {
-        --gap: 37px;
-        --side-offset: 140px;
-    }
-}
-
-@media (max-width: 1100px ) {
-    :root {
-        --gap: 37px;
-        --side-offset: 55px;
-    }
-}
-
-@media (max-width: 480px) {
-    :root {
-        --icon-size: 30px;
-        --gap: 40px;
-        --side-offset: 0px;
-    }
-
-    .icon-title {
-        font-size: 10px;
-    }
-
-    .icon-desc {
-        font-size: 5px;
-    }
-
-    .top-center {
-        transform: translateY(-6px);
-    }
-
-    .top-right {
-        transform: translateX(-2px);
-        padding-bottom: 15px;
-    }
-
-        .top-right img {
-            width: 8vw;
-        }
-
-    .icon-column {
-        /*display: none;*/
-    }
-}
+ 
 
 .footer {
     position: relative;
@@ -945,3 +864,5 @@ html[dir="rtl"] .notify-close {
     height: 50px;
     text-align: center;
 }
+
+

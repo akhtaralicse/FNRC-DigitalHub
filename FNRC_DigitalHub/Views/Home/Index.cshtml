@@ -3,7 +3,9 @@
     ViewData["Title"] = "DigitalHub";
 }
 
-<div class="video-container" tabindex="0">   
+<div class="video-container" tabindex="0">
+
+    @await Html.PartialAsync("~/views/shared/components/homepage/header.cshtml",Model )
 
     @await Html.PartialAsync("~/views/shared/components/homepage/BGVideo.cshtml", Model.Where(x => x.IconType == IconTypeEnum.BGVideo).ToList())
 

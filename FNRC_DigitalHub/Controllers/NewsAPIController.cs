@@ -22,7 +22,7 @@ namespace FNRC_DigitalHub.Controllers
             {
                 using var client = new HttpClient();
                 string newsBaseURL = configuration["APIURLS:NewsURL"];
-                string url = $"{newsBaseURL}?fromdate={fromDate}&todate={toDate}&keyword=&IsSearched=0";
+                string url = $"{newsBaseURL}?fromdate={fromDate}&todate={toDate}&keyword=&IsSearched=1";
                 try
                 {
                     var response = await client.GetAsync(url);
