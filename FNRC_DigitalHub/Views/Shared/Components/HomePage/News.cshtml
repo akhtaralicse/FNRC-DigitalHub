@@ -31,6 +31,10 @@
     document.addEventListener("DOMContentLoaded", function () {
         fetchLastMonthNews();
     });
+    function formatDate(dateStr) {
+    const [year, month, day] = dateStr.split("-");
+    return `${day}-${month}-${year}`;
+}
     function fetchLastMonthNews() {
         console.log('call news===');
         const now = new Date();
@@ -58,6 +62,7 @@
                 }
                 for (let i = 0; i < newsItems.length; i++) {
                    const title = '@isAr' == 'True' ? newsItems[i].TitleArabic :newsItems[i].TitleEnglish ;
+                   const dateNews =  newsItems[i].DateCreated.split('T')[0]  ;
                    const  detail = '@isAr' == 'True' ? newsItems[i].DetailArabic :newsItems[i].DetailEnglish;
                    const  shortDetail = '@isAr' == 'True' ? newsItems[i].ShortArabic :newsItems[i].ShortEnglish;
                    const cleanDetail = detail ;
@@ -67,7 +72,7 @@
                     <div class="news-item custom-hover-target"
                          data-title="${title.replace(/"/g, '&quot;')}"
                          data-desc="${shortDetail.replace(/"/g, '&quot;')}">
-                        🔔 ${title}
+                         📅 ${formatDate(dateNews)}  🔔  ${title}  
                     </div>`;
                 }
 
