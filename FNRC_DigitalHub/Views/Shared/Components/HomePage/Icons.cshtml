@@ -20,7 +20,7 @@
         imgURL = mod.IconConfigurationAttachments.Count>0? 
         mod.IconConfigurationAttachments.FirstOrDefault().AttachmentTransaction.FilePath :"/img/icons/icon1.svg";
         url = mod.URL;
-        <div class="icon-item" data-name="@name" data-desc="@desc" data-url="@url">
+        <div class="icon-item" data-name="@name" data-image="@imgURL" data-desc="@desc" data-url="@url">
             <a class="icon-btn">
                 <img src="@imgURL" alt="@name">
             </a>
@@ -44,7 +44,7 @@
         mod.IconConfigurationAttachments.FirstOrDefault().AttachmentTransaction.FilePath : "/img/icons/icon1.svg";
         url = mod.URL;
 
-        <div id="@mod.Id" class="icon-item" data-name="@name" data-desc="@desc" data-url="@url">
+        <div id="@mod.Id" class="icon-item" data-image="@imgURL" data-name="@name" data-desc="@desc" data-url="@url">
             <button class="icon-btn" aria-label="@name">
                 <img src="@imgURL" alt="@name">
             </button>
@@ -164,8 +164,10 @@
              
             iconItems.forEach(item => {
                 item.addEventListener('mouseenter', function() {
-                    const fullDescription = this.getAttribute('data-desc');
-                    modalContent.textContent = fullDescription;
+                    const fullName = this.getAttribute('data-name');
+                    const fullDescription = this.getAttribute('data-desc'); 
+                    const imgURL = this.getAttribute('data-image');
+                    modalContent.innerHTML  = `<img width="40" src="${imgURL}" alt="${name}"><span>${name}</span><strong>${fullName}</strong><br />${fullDescription}`;
                     modal.classList.add('active');
                 });
 
