@@ -31,12 +31,14 @@
     document.addEventListener("DOMContentLoaded", function () {
         fetchLastMonthNews();
     });
+
     function formatDate(dateStr) {
-    const [year, month, day] = dateStr.split("-");
-    return `${day}-${month}-${year}`;
-}
+        const [year, month, day] = dateStr.split("-");
+        return `${day}-${month}-${year}`;
+    }
+
     function fetchLastMonthNews() {
-        console.log('call news===');
+        console.log('===call news===');
         const now = new Date();
         const firstDayPrevMonth = new Date(now.getFullYear(), now.getMonth() - 2, 1).toISOString().split('T')[0];
         const lastDayPrevMonth = new Date().toISOString().split('T')[0];
@@ -115,7 +117,7 @@
         newsItems.forEach(item => {
             item.addEventListener('mouseenter', function() {
                 var fullDescription = this.getAttribute('data-desc');
-                var limit = 1200;
+                var limit = 300;
                 var title = this.getAttribute('data-title');
                 if (fullDescription.length > limit) {
                     fullDescription = fullDescription.substring(0, limit) + "...";

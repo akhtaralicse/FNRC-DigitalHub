@@ -118,7 +118,7 @@ html, body {
     align-items: center;
     justify-content: center;
     text-transform: uppercase;
-    font-size:1rem;
+    font-size: 1rem;
 }
 
 .news-text {
@@ -129,7 +129,7 @@ html, body {
 }
 
 /* Slick slide styling */
- 
+
 .news-slider,
 .news-slider .slick-list,
 .news-slider .slick-track,
@@ -142,6 +142,7 @@ html, body {
         display: flex;
         align-items: center;
     }
+
 .news-item {
     white-space: nowrap;
     padding: 0 20px;
@@ -232,7 +233,7 @@ html, body {
     background: rgba(255, 255, 255, 0.18);
     color: #fff;
     text-decoration: none;
-     font-size: 14px ;
+    font-size: 14px;
     transition: background 200ms ease, transform 200ms ease;
 }
 
@@ -252,7 +253,7 @@ html, body {
     color: var(--gov-color);
 }
 
-.user-info {     
+.user-info {
     color: var(--base-color);
 }
 
@@ -293,7 +294,7 @@ html, body {
     transform-origin: center;
     will-change: transform;
     transform: translateX(var(--tx,0)) rotate(var(--rot,0));
-    cursor:pointer;
+    cursor: pointer;
 }
 
 /* For left column: icon at left, text to right */
@@ -370,7 +371,18 @@ html, body {
     color: var(--text-color);
     max-width: 220px;
     line-height: 1.1;
+    letter-spacing: 0;
+    transition: font-size 220ms ease, letter-spacing 220ms ease, color 220ms ease, text-shadow 220ms ease;
 }
+
+.icon-item:hover .icon-text {
+    font-size: 18px;
+    letter-spacing: 2.6px; /* expand letters */
+    color: var(--text-color);
+    text-shadow: 0 0 10px rgba(0, 86, 179, 0.35);
+}
+
+
 
 .icon-title {
     font-size: 16px;
@@ -401,12 +413,13 @@ html, body {
 .icon-item:hover .icon-text .icon-title {
     /*color: #fff;*/
 }
+
 .icon-column img,
 .icon-column svg {
     image-rendering: auto;
     max-width: 100%;
 }
- 
+
 
 .footer {
     position: relative;
@@ -734,7 +747,7 @@ html[dir="rtl"] .notify-close {
     cursor: pointer;
     text-decoration: underline;
 }
- 
+
 
 /* Initial state - hidden and positioned */
 .icon-column.left .icon-item {
@@ -853,8 +866,8 @@ html[dir="rtl"] .notify-close {
     background-color: transparent;
     transition: opacity 0.25s ease-in-out;
 }
-#MrAccessInHand
- {
+
+#MrAccessInHand {
     z-index: 9999;
     cursor: pointer;
     position: fixed;
@@ -866,5 +879,3 @@ html[dir="rtl"] .notify-close {
     height: 50px;
     text-align: center;
 }
-
-

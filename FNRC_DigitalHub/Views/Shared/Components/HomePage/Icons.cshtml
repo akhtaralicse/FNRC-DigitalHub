@@ -167,7 +167,8 @@
                     const fullName = this.getAttribute('data-name');
                     const fullDescription = this.getAttribute('data-desc'); 
                     const imgURL = this.getAttribute('data-image');
-                    modalContent.innerHTML  = `<img width="40" src="${imgURL}" alt="${name}"><span>${name}</span><strong>${fullName}</strong><br />${fullDescription}`;
+                    // modalContent.innerHTML  = `<img width="40" src="${imgURL}" alt="${name}"><span>${name}</span><strong>${fullName}</strong><br />${fullDescription}`;
+                    modalContent.innerHTML  = `<span>${name}</span><strong>${fullName}</strong><br />${fullDescription}`;
                     modal.classList.add('active');
                 });
 
