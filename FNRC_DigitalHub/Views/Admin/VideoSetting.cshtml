@@ -107,9 +107,12 @@
                             {
                                 <tr>
                                     <td>
-                                        <a href="@item.IconConfigurationAttachments.First().AttachmentTransaction.FilePath" target="_blank">
-                                            <img width="50" src="/img/icons/v1.png" alt="" class="icon-preview" />
-                                        </a>
+                                        @if (item.IconConfigurationAttachments.Any())
+                                        {
+                                            <a href="@item.IconConfigurationAttachments.First().AttachmentTransaction.FilePath" target="_blank">
+                                                <img width="50" src="/img/icons/v1.png" alt="" class="icon-preview" />
+                                            </a>
+                                        }
                                     </td>
                                      
                                     <td>@item.OrderNo</td>

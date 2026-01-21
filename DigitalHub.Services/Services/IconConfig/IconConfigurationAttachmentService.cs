@@ -23,7 +23,7 @@ namespace DigitalHub.Services.Services.IconConfig
 
         public async Task<bool> DeleteAttachment(int id)
         {
-            var attachment = await _repository.GetAllIncludingNoTracking(x => x.AttachmentTransaction).FirstOrDefaultAsync(x => x.Id == id);
+            var attachment = await _repository.GetAllIncludingNoTracking(x => x.AttachmentTransaction).FirstOrDefaultAsync(x => x.IconConfigurationId == id);
             if (attachment != null)
             {
                 await _repository.DeleteAsync(attachment, true);

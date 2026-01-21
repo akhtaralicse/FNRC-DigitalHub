@@ -120,6 +120,9 @@
   <data name="Welcome" xml:space="preserve">
     <value>مرحبا</value>
   </data>
+  <data name="Message" xml:space="preserve">
+    <value>التفاصيل</value>
+  </data>
   <data name="News" xml:space="preserve">
     <value>أخبار</value>
   </data>
@@ -140,6 +143,12 @@
   </data>
   <data name="lang" xml:space="preserve">
     <value>ar</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>العنوان</value>
+  </data>
+  <data name="AnnouncementConfiguration" xml:space="preserve">
+    <value>إعدادات الإعلان</value>
   </data>
   <data name="IconManagement" xml:space="preserve">
     <value>إدارة الرموز</value>
@@ -171,6 +180,12 @@
   <data name="NameAr" xml:space="preserve">
     <value>الاسم بالعربي</value>
   </data>
+  <data name="ArabicLang" xml:space="preserve">
+    <value>باللغة العربية</value>
+  </data>
+  <data name="EnglishLang" xml:space="preserve">
+    <value>باللغة الإنجليزية</value>
+  </data>
   <data name="NameEn" xml:space="preserve">
     <value>الاسم بالانجليزي</value>
   </data>
@@ -198,11 +213,23 @@
   <data name="Update" xml:space="preserve">
     <value>تحديث</value>
   </data>
+  <data name="ActionText" xml:space="preserve">
+    <value>نص زر الإجراء</value>
+  </data>
   <data name="MarkAsRead" xml:space="preserve">
     <value>وضع علامة للقراءة</value>
   </data>
   <data name="UpdatedSuccessfully" xml:space="preserve">
     <value>تم التحديث بنجاح</value>
+  </data>
+  <data name="ActionURL" xml:space="preserve">
+    <value>رابط زر الإجراء</value>
+  </data>
+  <data name="StartDate" xml:space="preserve">
+    <value>تاريخ البدء</value>
+  </data>
+  <data name="EndDate" xml:space="preserve">
+    <value>تاريخ الانتهاء</value>
   </data>
   <data name="Save" xml:space="preserve">
     <value>حفظ</value>

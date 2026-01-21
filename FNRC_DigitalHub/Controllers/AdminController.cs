@@ -96,6 +96,12 @@ namespace FNRC_DigitalHub.Controllers
             return View(data);
         }
 
+        public async Task<IActionResult> GetNotificationById(int id)
+        {
+            var data = await   notificationConfigurationService.GetById(id);
+
+            return Json(new { success = true, message = data });
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddNotification(NotificationConfigurationDTO mod)
@@ -108,7 +114,7 @@ namespace FNRC_DigitalHub.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateNotification(NotificationConfigurationDTO mod)
         {
-            var data = await notificationConfigurationService.Add(mod);
+            var data = await notificationConfigurationService.Update(mod);
 
             return Json(new { success = true, message = "Saved" });
         }

@@ -9,6 +9,7 @@ namespace DigitalHub.Services.Services.IconConfig
         Task<bool> Delete(int id); 
         Task<List<NotificationConfigurationDTO>> Get(string username = null);
         Task<List<NotificationConfigurationDTO>> GetAll();
+        Task<NotificationConfigurationDTO> GetById(int id);
         Task<NotificationConfigurationDTO> GetNotificationToDisplay(string username);
         Task<bool> Update(NotificationConfigurationDTO mod);
     }

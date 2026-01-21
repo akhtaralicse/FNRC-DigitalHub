@@ -30,7 +30,7 @@ namespace DigitalHub.Services.Services.IconConfig
                     });
                 }
             }
-
+            model.Id = 0;
             var result = Mapper.Map<NotificationConfiguration>(model);
             await _repository.InsertAsync(result, true);
 
@@ -63,9 +63,17 @@ namespace DigitalHub.Services.Services.IconConfig
 
             return Mapper.Map<List<NotificationConfigurationDTO>>(await result.OrderByDescending(x => x.StartDate).ToListAsync());
         }
+        public async Task<NotificationConfigurationDTO> GetById(int id )
+        {
+            var result =await _repository.GetAllIncludingNoTracking(x => x.NotificationAttachment,
+                                    x => x.NotificationAttachment.Select(y => y.AttachmentTransaction))
+                        .Where(x => x.IsActive == true && x.Id == id).FirstOrDefaultAsync();
+
+            return Mapper.Map<NotificationConfigurationDTO>(result);
+        }
         public async Task<List<NotificationConfigurationDTO>> Get(string username = null)
         {
-            var result = _repository.GetAllIncludingNoTracking(  x => x.NotificationAttachment,
+            var result = _repository.GetAllIncludingNoTracking(x => x.NotificationAttachment,
                                     x => x.NotificationAttachment.Select(y => y.AttachmentTransaction))
                 .Where(x => x.IsActive == true && x.StartDate <= DateTime.Now && x.EndDate >= DateTime.Now).AsQueryable();
             //if (username != null)
@@ -83,8 +91,19 @@ namespace DigitalHub.Services.Services.IconConfig
 
             return Mapper.Map<NotificationConfigurationDTO>(result);
         }
-
         public async Task<bool> Update(NotificationConfigurationDTO mod)
+        {
+            var id = mod.Id;
+            var add = await Add(mod);
+            if (add)
+            {
+                var del = await Delete(id);
+                return del;
+            }
+            return false;
+            
+        }
+        public async Task<bool> Update_(NotificationConfigurationDTO mod)
         {
             var result = await _repository.GetAllIncludingNoTracking().FirstOrDefaultAsync(x => x.Id == mod.Id);
             var data = Mapper.Map<NotificationConfiguration>(result);
@@ -106,8 +125,8 @@ namespace DigitalHub.Services.Services.IconConfig
         public async Task<bool> Delete(int id)
         {
             var result = await _repository.GetAllIncludingNoTracking().FirstOrDefaultAsync(x => x.Id == id);
-            result.IsActive = false;
-            _repository.Update(result, true);
+
+            _repository.Delete(result, true);
 
             return true;
         }

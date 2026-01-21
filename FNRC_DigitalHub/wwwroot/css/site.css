@@ -371,119 +371,35 @@ html, body {
     font-size: 14px;
     line-height: 1.1;
     overflow: hidden;
-    /* animate text in sync with flash */
-    animation: textGrow 3s linear infinite;
     transition: transform 220ms ease;
 }
+
 
     .icon-text::before {
         content: '';
         position: absolute;
-        top: 50%;
-        left: -150%;
-        width: 120%;
+        top: -50%;
+        left: -50%;
+        width: 200%;
         height: 200%;
-        border-radius: 50%;
-        background: radial-gradient(circle, rgba(255, 220, 120, 0.6) 0%, rgba(255, 220, 120, 0.2) 60%, transparent 80%);
-        filter: blur(20px);
-        transform: translateY(-50%);
-        animation: circleFlash 3s linear infinite;
+        background: linear-gradient(0deg, transparent, transparent 30%, rgb(256 256 256 / 57%));
+        transform: rotate(-45deg);
+        transition: all 2.5s ease;
+        opacity: 0;
     }
-
-@keyframes circleFlash {
-    0% {
-        left: -150%;
-    }
-
-    50% {
-        left: 100%;
-    }
-
-    100% {
-        left: -150%;
-    }
-}
-
-@keyframes textGrow {
-    0%, 45%, 55%, 100% {
-        transform: scale(1);
-    }
-
-    50% {
+     
+     
+    .icon-text:hover {
         transform: scale(1.1);
+        box-shadow: -4px 0px 18px 11px rgb(236 206 21 / 26%);
+        background: rgb(236 206 21 / 26%);
+        color: white;
     }
-    /* peak exactly at middle of flash */
-}
-
-
-/*.icon-title,
-.icon-text {
-    position: relative;
-    display: inline-block;
-    color: #d6c48a;
-    overflow: hidden;*/ /* required for sweep */
-/*}
-    .icon-title::before,
-    .icon-text::before {
-        content: "";
-        position: absolute;
-        top: 0;
-        left: -150%;
-        width: 120%;
-        height: 100%;
-        background: linear-gradient( 260deg, transparent 40%, rgba(255, 220, 120, 0.6), transparent 60% );
-        animation: flashlight 3s linear infinite;
-        
-    }
-@keyframes flashlight {
-    0% {
-        left: -150%;
-    }
-
-    50% {
-        left: 100%;
-    }
-
-    100% {
-        left: -150%;
-    }
-}*/
-/*.icon-text {
-    position: relative;    
-    font-weight: 500;
-    letter-spacing: 0.3px;
-    text-shadow: 0 0 6px rgba(214, 196, 138, 0.25);
-    animation: textIdleFloat 4s ease-in-out infinite;
-    transition: color 300ms ease, text-shadow 300ms ease, transform 300ms ease;
-}
-@keyframes textIdleFloat {
-    0%, 100% {
-        transform: translateX(0);
-        opacity: 0.85;
-    }
-
-    50% {
-        transform: translateX(8px);
-        opacity: 1;
-    }
-}
-*/
-/* LTR hover */
-html[dir="ltr"] .icon-item:hover .icon-text {
-    font-size: 16px;
-    letter-spacing: 0px;
-    transform: scale(1.08);
-    text-shadow: 11px 4px 11px rgb(250 204 31 / 84%);
-}
-
-/* RTL hover */
-html[dir="rtl"] .icon-item:hover .icon-text {
-    font-size: 16px;
-    letter-spacing: 0;
-    transform: scale(1.08);
-    text-shadow: 11px 4px 11px rgb(250 204 31 / 84%);
-}
-
+        .icon-text:hover::before {
+            opacity: 1;
+            transform: rotate(-45deg) translateY(100%);
+        }
+         
 
 .icon-title {
     font-size: 16px;
@@ -492,17 +408,20 @@ html[dir="rtl"] .icon-item:hover .icon-text {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+    height: 25px;
 }
-
-.icon-desc {
-    font-size: 11px;
-    color: var(--base-color);
-    opacity: 0.95;
-    max-width: 120px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
+    .icon-title:hover {
+        /*background: rgb(236 206 21 / 42%);*/
+    }
+    .icon-desc {
+        font-size: 11px;
+        color: var(--base-color);
+        opacity: 0.95;
+        max-width: 120px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 
 /* Focus visible */
 .icon-btn:focus {
