@@ -12,15 +12,17 @@ html {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
-html {
-  position: relative;
-  min-height: 100%;
+ body{
+     overflow:auto !important;
+ }
+
+html[dir=ltr].dateshow {
+    direction: ltr;
 }
 
-body {
-  margin-bottom: 60px;
+html[dir=rtl].dateshow {
+    direction: rtl;
 }
-
 .menu-container {
     display: flex;
     flex-wrap: wrap;

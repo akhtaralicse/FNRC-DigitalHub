@@ -17,25 +17,19 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css">
    
 </head>
-<body>
-    
+<body>    
     <div class=" ">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
-    </div>
-
-    
+    </div>    
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/popper.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
-
-
     <script>
-
         (function (I, n, f, o, b, i, p) {
             I[b] = I[b] || function () { (I[b].q = I[b].q || []).push(arguments) };
             I[b].t = 1 * new Date(); i = n.createElement(f); i.async = 1; i.src = o;
@@ -43,7 +37,6 @@
         })
         (window, document, 'script', 'https://livechat.infobip.com/widget.js', 'liveChat');
         liveChat('init', '16c34c75-5011-4622-95e5-642963d965e1');
-
     </script>
 </body>
 </html>

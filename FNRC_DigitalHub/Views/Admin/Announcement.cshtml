@@ -7,14 +7,14 @@
 
 <div class="container">
     <div class="form-container">
-        <h2 class="text-center mb-4">
+        <h2 class="text-center mb-4 mt-5">
             <i class="bi bi-bell-fill"></i> @loc.localizer["AnnouncementConfiguration"]
         </h2>
 
         <form id="galleryForm" method="post" enctype="multipart/form-data" asp-antiforgery="true">
 
-            <div class="form-section">
-                <h5><i class="bi bi-info-circle"></i> Basic Information</h5>
+            <div class="form-section mt-5">
+             
 
                 <div class="row">
                     <div class="col-md-6 mb-3">
@@ -162,8 +162,8 @@
                                             <small class="text-muted" style="font-size:11px">@item.MessageAr</small>
                                         </td>
                                         <td>
-                                            <div>@item.StartDate</div>
-                                            <div>@item.EndDate</div>
+                                            <div class="dateshow">@item.StartDate</div>
+                                            <div class="dateshow">@item.EndDate</div>
                                         </td>
                                         <td>
                                             <div>@item.ActionUrl</div>
@@ -306,8 +306,8 @@
                         $('#galleryForm').find('input[name="TitleEn"]').val(msg.TitleEn);
                         $('#galleryForm').find('textarea[name="MessageAr"]').val(msg.MessageAr);
                         $('#galleryForm').find('textarea[name="MessageEn"]').val(msg.MessageEn);
-                        $('#galleryForm').find('textarea[name="StartDate"]').val(msg.StartDate);
-                        $('#galleryForm').find('textarea[name="EndDate"]').val(msg.EndDate);
+                        $('#galleryForm').find('input[name="StartDate"]').val(msg.StartDate);
+                        $('#galleryForm').find('input[name="EndDate"]').val(msg.EndDate);
 
                         $('#galleryForm').find('input[name="ActionURL"]').val(msg.ActionURL);
                         $('#galleryForm').find('input[name="ActionTextAr"]').val(msg.ActionTextAr);

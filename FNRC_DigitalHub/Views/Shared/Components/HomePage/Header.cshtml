@@ -62,6 +62,9 @@
 
 <div id="notifyPopup" class="notify-popup" style="display: none;">
     <div class="notification-content">
+        <div>
+            <img src="/img/icons/fnrc.png" width="80"/>
+        </div>
         <button class="notify-close" onclick="closeNotify()" style="display: none;">×</button>
         <h3 class="notify-title"></h3>
         <p class="notify-message"></p>
@@ -199,7 +202,7 @@
     }
 
      function NotificationData(id, titleAr,titleEn, messageAr,messageEn, btnTextAr,btnTextEn, btnURL) {
-        var actualTitle =  '@isAr' === 'True' ?titleAr : titleEn;
+        var actualTitle =   '@isAr' === 'True' ? titleAr : titleEn;
         var actualMessage =  '@isAr' === 'True' ? messageAr : messageEn;
         var actualBtnText =  '@isAr' === 'True' ? btnTextAr : btnTextEn;
 
@@ -251,7 +254,7 @@
             };
         } else {
             // If no button text/URL, show OK button that just closes
-            actionButton.textContent = '@loc.localizer["OK"]';
+            actionButton.textContent = '@Html.Raw(loc.localizer["OK"])';
             actionButton.style.display = "inline-block";
             actionButton.onclick = closeNotify;
         }
