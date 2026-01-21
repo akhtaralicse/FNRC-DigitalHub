@@ -35,7 +35,7 @@ namespace DigitalHub.Services.Services.IconConfig
                 return isDeleted;
             }
 
-            return false;
+            return true;
         }
 
     }

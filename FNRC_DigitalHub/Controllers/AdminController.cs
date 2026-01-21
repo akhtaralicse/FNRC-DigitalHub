@@ -14,15 +14,17 @@ namespace FNRC_DigitalHub.Controllers
     public class AdminController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly IConfiguration configuration;
         private readonly IIconConfigurationService iconConfigurationService;
         private readonly INotificationConfigurationService notificationConfigurationService;
         private readonly IIconConfigurationAttachmentService iconConfigurationAttachmentService;
 
-        public AdminController(ILogger<HomeController> logger, IIconConfigurationService iconConfigurationService
+        public AdminController(ILogger<HomeController> logger, IConfiguration configuration, IIconConfigurationService iconConfigurationService
             , INotificationConfigurationService notificationConfigurationService,
             IIconConfigurationAttachmentService  iconConfigurationAttachmentService)
         {
             _logger = logger;
+            this.configuration = configuration;
             this.iconConfigurationService = iconConfigurationService;
             this.notificationConfigurationService = notificationConfigurationService;
             this.iconConfigurationAttachmentService = iconConfigurationAttachmentService;
@@ -49,6 +51,8 @@ namespace FNRC_DigitalHub.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
+       // [RequestSizeLimit(40 * 1024 * 1024)]
+         [RequestFormLimits(MultipartBodyLengthLimit = 40 * 1024 * 1024)]
         public async Task<IActionResult> AddIcons(IconConfigurationDTO mod)
         {
             var data = await iconConfigurationService.Add(mod);
@@ -58,6 +62,7 @@ namespace FNRC_DigitalHub.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [RequestFormLimits(MultipartBodyLengthLimit = 40 * 1024 * 1024)]
         public async Task<IActionResult> UpdateIcons(IconConfigurationDTO mod)
         {
             var data = await iconConfigurationService.Update(mod);

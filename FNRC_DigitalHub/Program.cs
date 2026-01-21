@@ -57,6 +57,10 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.IsEssential = true;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(int.Parse(configuration["Session:ExpireDuration"]));
 });
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.Limits.MaxRequestBodySize = 40 * 1024 * 1024; // 50 MB
+});
 builder.Services.CustomServicesBuilder(configuration);
 
 var serilogConfig = new ConfigurationBuilder()
