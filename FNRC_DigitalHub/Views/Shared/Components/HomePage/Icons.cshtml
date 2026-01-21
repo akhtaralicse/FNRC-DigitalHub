@@ -6,9 +6,9 @@
     string desc = string.Empty;
     string imgURL = string.Empty;
     string url = string.Empty;
-    IconConfigurationDTO mod = new IconConfigurationDTO();   
+    IconConfigurationDTO mod = new IconConfigurationDTO();
 }
-  
+
 
 <div class="icon-column left mt-2" id="leftColumn" aria-label="Left icon column">
 
@@ -17,8 +17,8 @@
         mod = Model.FirstOrDefault(x => x.OrderNo == i);
         name = isAr ? mod.NameAr : mod.NameEn;
         desc = isAr ? mod.DescriptionAr : mod.DescriptionEn;
-        imgURL = mod.IconConfigurationAttachments.Count>0? 
-        mod.IconConfigurationAttachments.FirstOrDefault().AttachmentTransaction.FilePath :"/img/icons/icon1.svg";
+        imgURL = mod.IconConfigurationAttachments.Count > 0 ?
+        mod.IconConfigurationAttachments.FirstOrDefault().AttachmentTransaction.FilePath : "/img/icons/icon1.svg";
         url = mod.URL;
         <div class="icon-item" data-name="@name" data-image="@imgURL" data-desc="@desc" data-url="@url">
             <a class="icon-btn">
@@ -64,27 +64,27 @@
             <p id="modalDesc"></p>
         </div>
         <div class="modal-footer">
-            <button id="cancelBtn" class="btn cancel">Cancel</button>
+            <button id="cancelBtn" class="btn cancel">@loc.localizer["Cancel"]</button>
             <a id="externalLink" class="btn open-url" target="_blank">Learn more</a>
         </div>
     </div>
 </div>
 <div class="description-modal" id="descModal"></div>
 <script>
-    
+
     const modal = document.getElementById('simpleModal');
     const modalName = document.getElementById('modalName');
     const modalDesc = document.getElementById('modalDesc');
     const externalLink = document.getElementById('externalLink');
     const cancelBtn = document.getElementById('cancelBtn');
 
-  
-    if (modal) {      
+
+    if (modal) {
         function openModal(name, desc, url) {
             modalName.textContent = name || 'No Name';
             modalDesc.textContent = desc || 'No description available';
             externalLink.href = url || '#';
-            externalLink.textContent = url ? `Open ${name}` : 'No Link Available';
+            externalLink.textContent = url ? `@Html.Raw(loc.localizer["Open"]) ${name}` : 'No Link Available';
 
             // Disable button if no URL
             if (!url) {
@@ -98,27 +98,27 @@
             }
 
             modal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';  
+            document.body.style.overflow = 'hidden';
         }
-         
+
         function closeModal() {
             modal.style.display = 'none';
-            document.body.style.overflow = 'auto';  
-        } 
+            document.body.style.overflow = 'auto';
+        }
         const iconButtons = document.querySelectorAll('.icon-btn');
 
         if (iconButtons.length > 0) {
             iconButtons.forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
-                     
+
                     const iconItem = this.closest('.icon-item');
 
-                    if (iconItem) { 
+                    if (iconItem) {
                         const name = iconItem.getAttribute('data-name');
                         const desc = iconItem.getAttribute('data-desc');
                         const url = iconItem.getAttribute('data-url');
-                         
+
                         openModal(name, desc, url);
                     }
                 });
@@ -128,21 +128,21 @@
         } else {
             console.warn('No icon buttons found on the page');
         }
-         
+
         cancelBtn.addEventListener('click', closeModal);
-         
+
         modal.addEventListener('click', function(e) {
             if (e.target === modal) {
                 closeModal();
             }
         });
-         
+
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && modal.style.display === 'flex') {
                 closeModal();
             }
         });
-         
+
         const modalContent = document.querySelector('.modal-content');
         if (modalContent) {
             modalContent.addEventListener('click', function(e) {
@@ -161,11 +161,11 @@
             const modalContent = document.createElement('div');
             modalContent.className = 'description-modal-content';
             modal.appendChild(modalContent);
-             
+
             iconItems.forEach(item => {
                 item.addEventListener('mouseenter', function() {
                     const fullName = this.getAttribute('data-name');
-                    const fullDescription = this.getAttribute('data-desc'); 
+                    const fullDescription = this.getAttribute('data-desc');
                     const imgURL = this.getAttribute('data-image');
                     // modalContent.innerHTML  = `<img width="40" src="${imgURL}" alt="${name}"><span>${name}</span><strong>${fullName}</strong><br />${fullDescription}`;
                     modalContent.innerHTML  = `<span>${name}</span><strong>${fullName}</strong><br />${fullDescription}`;

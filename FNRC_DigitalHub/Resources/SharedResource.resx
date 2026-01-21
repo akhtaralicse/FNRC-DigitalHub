@@ -222,6 +222,12 @@
   <data name="UpdatedSuccessfully" xml:space="preserve">
     <value>تم التحديث بنجاح</value>
   </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>يلغي</value>
+  </data>
+  <data name="Open" xml:space="preserve">
+    <value>افتح</value>
+  </data>
   <data name="ActionURL" xml:space="preserve">
     <value>رابط زر الإجراء</value>
   </data>
