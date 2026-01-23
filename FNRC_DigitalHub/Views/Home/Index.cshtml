@@ -1,16 +1,19 @@
 ﻿@model List<IconConfigurationDTO>
 @{
     ViewData["Title"] = "DigitalHub";
+    var totalSecForOrder1And2 = (Model
+    .Where(x => x.IconType == IconTypeEnum.BGVideo).OrderBy(x=>x.OrderNo).Take(1)
+    .Sum(x => x.VideoDisplaySec)+1) * 1000;
 }
 
 <div class="video-container" tabindex="0">
 
-    @await Html.PartialAsync("~/views/shared/components/homepage/header.cshtml",Model )
+    @await Html.PartialAsync("~/views/shared/components/homepage/header.cshtml", Model)
 
     @await Html.PartialAsync("~/views/shared/components/homepage/BGVideo.cshtml", Model.Where(x => x.IconType == IconTypeEnum.BGVideo).ToList())
 
     @await Html.PartialAsync("~/views/shared/components/homepage/Icons.cshtml", Model.Where(x => x.IconType == IconTypeEnum.Icon).ToList())
-     
+
 </div>
 
 <div>
@@ -19,11 +22,26 @@
 
 
 <div class="">
- 
 </div>
 <script>
-        // The script calculates --tx and --rot CSS variables for each .icon-item based on index.
-      // Tweak amplitude and rotationFactor to change curve strength.
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const revealDelay = @totalSecForOrder1And2;
+         
+        function showHiddenElements() { 
+            const elementsToShow = document.querySelectorAll('#leftColumn, #rightColumn, .news-strip, .fix-icon, .top-strip,#ib-button-messaging');
+
+            elementsToShow.forEach(el => {
+                el.classList.add('visible-content');
+            }); 
+        }
+         
+        if (revealDelay > 0) {
+            setTimeout(showHiddenElements, revealDelay);
+        } else { 
+            showHiddenElements();
+        }
+    });
 
        function applyCurve(columnSelector, side = 'left') {
         const column = document.querySelector(columnSelector);
@@ -60,8 +78,8 @@
 
 
     function applyAllCurves() {
-        applyCurve('#leftColumn', 'right');    
-        applyCurve('#rightColumn', 'left');  
+        applyCurve('#leftColumn', 'right');
+        applyCurve('#rightColumn', 'left');
     }
 
     window.addEventListener('load', applyAllCurves);
@@ -71,9 +89,9 @@
     });
 
 
-  
 
-   
 
-     
+
+
+
 </script>

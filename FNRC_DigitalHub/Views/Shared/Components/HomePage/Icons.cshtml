@@ -6,11 +6,11 @@
     string desc = string.Empty;
     string imgURL = string.Empty;
     string url = string.Empty;
-    IconConfigurationDTO mod = new IconConfigurationDTO();
+    IconConfigurationDTO mod = new IconConfigurationDTO();     
 }
 
 
-<div class="icon-column left mt-2" id="leftColumn" aria-label="Left icon column">
+<div class="icon-column left mt-2"   id="leftColumn" aria-label="Left icon column">
 
     @for (int i = 2; i <= 6; i++)
     {
@@ -32,7 +32,7 @@
     }
 </div>
 
-<div class="icon-column right mt-2" id="rightColumn" aria-label="Right icon column">
+<div class="icon-column right mt-2"  id="rightColumn" aria-label="Right icon column">
 
 
     @for (int i = 7; i <= 11; i++)
@@ -105,7 +105,7 @@
             modal.style.display = 'none';
             document.body.style.overflow = 'auto';
         }
-        const iconButtons = document.querySelectorAll('.icon-btn');
+        const iconButtons = document.querySelectorAll('.icon-item');
 
         if (iconButtons.length > 0) {
             iconButtons.forEach(button => {

@@ -76,11 +76,11 @@ html, body {
 }
 
     html[dir=ltr].dateshow {
-        direction:ltr;
+        direction: ltr;
     }
 
     html[dir=rtl].dateshow {
-        direction:rtl;
+        direction: rtl;
     }
 
 .video-container {
@@ -367,7 +367,7 @@ html, body {
     }
 
         .icon-btn:hover img {
-            transform: rotate(360deg);
+            /*transform: rotate(360deg);*/
         }
 
 
@@ -395,19 +395,19 @@ html, body {
         transition: all 2.5s ease;
         opacity: 0;
     }
+ 
+ 
+.icon-text:hover  {
+    transform: scale(1.1);
+    box-shadow: -4px 0px 18px 11px rgb(236 206 21 / 26%);
+    background: rgb(236 206 21 / 26%);
+    color: white;
+}
 
-
-    .icon-text:hover {
-        transform: scale(1.1);
-        box-shadow: -4px 0px 18px 11px rgb(236 206 21 / 26%);
-        background: rgb(236 206 21 / 26%);
-        color: white;
+    .icon-text:hover::before   {
+        opacity: 1;
+        transform: rotate(-45deg) translateY(100%);
     }
-
-        .icon-text:hover::before {
-            opacity: 1;
-            transform: rotate(-45deg) translateY(100%);
-        }
 
 
 .icon-title {
@@ -561,16 +561,19 @@ html, body {
 /* Modal styles */
 .description-modal {
     position: fixed;
-    bottom: 55px;
+    /* 1. Set top and left to exactly 50% */
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    /* 2. Correct the transform to use 'translate' for both axes */
+    transform: translate(-50%, -50%);
+    /* Keep your existing styles */
     background: rgb(253, 253, 253, 0.58);
     color: var(--base-color);
     padding: 15px 20px 20px 20px;
     border-radius: 12px;
     max-width: 700px;
-    width: 100%;
-    max-height: 60vh;
+    width: 90%; /* Changed from 100% to 90% to prevent touching screen edges on mobile */
+    max-height: 80vh; /* Increased slightly to allow more content in the middle */
     z-index: 9999;
     opacity: 0;
     visibility: hidden;
@@ -581,6 +584,7 @@ html, body {
     display: flex;
     flex-direction: column;
     text-align: center;
+    transition: all 0.3s ease-in-out; /* Added for smooth appearing */
 }
 
     .description-modal.active {
@@ -779,6 +783,25 @@ html[dir="rtl"] .notify-close {
     text-decoration: underline;
 }
 
+.icon-column .icon-item {
+    opacity: 0;
+    /* Move them slightly off-screen to the side so they 'slide' in */
+    transform: translateX(var(--start-offset, -50px)) rotate(0deg);
+    transition: transform 1.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 2.6s ease;
+}
+/* Set different start directions for left vs right */
+#leftColumn .icon-item {
+    --start-offset: -100px;
+}
+
+#rightColumn .icon-item {
+    --start-offset: 100px;
+}
+.visible-content .icon-item {
+    opacity: 1 !important;
+    /* This uses the --tx and --rot variables calculated by your JS applyCurve function */
+    transform: translateX(var(--tx, 0)) rotate(var(--rot, 0)) !important;
+}
 
 /* Initial state - hidden and positioned */
 .icon-column.left .icon-item {
@@ -788,7 +811,26 @@ html[dir="rtl"] .notify-close {
 .icon-column.right .icon-item {
     transition: transform 1.6s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 2.6s ease;
 }
+/* 3. Ensure the staggered delays only apply once visible */
+.visible-content.icon-column .icon-item:nth-child(1) {
+    transition-delay: 0.2s;
+}
 
+.visible-content.icon-column .icon-item:nth-child(2) {
+    transition-delay: 0.4s;
+}
+
+.visible-content.icon-column .icon-item:nth-child(3) {
+    transition-delay: 0.6s;
+}
+
+.visible-content.icon-column .icon-item:nth-child(4) {
+    transition-delay: 0.8s;
+}
+
+.visible-content.icon-column .icon-item:nth-child(5) {
+    transition-delay: 1.0s;
+}
 /* Staggered animation delays for each icon */
 .icon-column.left .icon-item:nth-child(1) {
     transition-delay: 0.5s;
@@ -909,4 +951,15 @@ html[dir="rtl"] .notify-close {
     width: 50px;
     height: 50px;
     text-align: center;
+}
+
+#leftColumn, #rightColumn, .news-strip, .fix-icon, .top-strip, #ib-button-messaging {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1.5s ease-in-out;
+}
+
+.visible-content {
+    opacity: 1 !important;
+    visibility: visible !important;
 }

@@ -26,43 +26,59 @@
     let timer = null;
 
     function playNextVideo() {
-        // 1. Identify active and inactive players
         const currentPlayer = players[activePlayerIndex];
-        activePlayerIndex = 1 - activePlayerIndex; // Toggle between 0 and 1
+        activePlayerIndex = 1 - activePlayerIndex;
         const nextPlayer = players[activePlayerIndex];
 
-        // 2. Get the next video data
         const videoData = videoList[currentIndex];
 
-        // 3. Prepare the next player in the background
+        // 1. Set source
         nextPlayer.src = videoData.src;
-        //nextPlayer.loop = true;
+
+        // 2. Logic: Disable loop for the first two videos (index 0 and 1)
+        // Enable loop for everything from the 3rd video (index 2) onwards
+        if (currentIndex < 2) {
+            nextPlayer.loop = false;
+        } else {
+            nextPlayer.loop = true;
+        }
+
         nextPlayer.load();
 
         nextPlayer.oncanplaythrough = () => {
-            // 4. Once loaded, start playing the hidden video
             nextPlayer.play();
 
-            // 5. Cross-fade: Fade in the new, fade out the old
+            // Cross-fade
             nextPlayer.style.opacity = "1";
             currentPlayer.style.opacity = "0";
 
-            // 6. Set timer for the next switch based on duration
             clearTimeout(timer);
+
+            // 3. Determine if we should move to the next video
+            // If it's one of the first two, we move forward when duration ends.
+            // If we are at the end of the list, it continues looping the last video
+            // because of nextPlayer.loop = true.
             timer = setTimeout(() => {
-                currentIndex = (currentIndex + 1) % videoList.length;
-                playNextVideo();
+                // If it's the first two videos, OR if we've reached the looping section
+                if (currentIndex < videoList.length - 1 || currentIndex < 2) {
+                    currentIndex = (currentIndex + 1) % videoList.length;
+
+                    // If we just finished video 2 (index 1), we move to the rest
+                    // which will now loop.
+                    playNextVideo();
+                }
             }, videoData.duration * 1000);
 
-            // Clean up event listener to prevent memory leaks
             nextPlayer.oncanplaythrough = null;
         };
     }
 
     // Initial Start
-    playNextVideo();
+    if (videoList && videoList.length > 0) {
+        playNextVideo();
+    }
 
-    // Prevent context menu and handle visibility
+    // Existing safety handlers
     players.forEach(p => {
         p.addEventListener('contextmenu', e => e.preventDefault());
     });
