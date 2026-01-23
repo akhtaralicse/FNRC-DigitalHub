@@ -1,9 +1,9 @@
-﻿@model List<IconConfigurationDTO>
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@model List<IconConfigurationDTO>
 @{
-    ViewData["Title"] = "DigitalHub";
-    var totalSecForOrder1And2 = (Model
-    .Where(x => x.IconType == IconTypeEnum.BGVideo).OrderBy(x=>x.OrderNo).Take(1)
-    .Sum(x => x.VideoDisplaySec)+1) * 1000;
+    ViewData["Title"] = "DigitalHub"; 
+    var TotalSecondDelayInStart = int.Parse(Configuration["Session:TotalSecondDelayInStart"]) * 1000;
 }
 
 <div class="video-container" tabindex="0">
@@ -26,19 +26,19 @@
 <script>
 
     document.addEventListener("DOMContentLoaded", function() {
-        const revealDelay = @totalSecForOrder1And2;
-         
-        function showHiddenElements() { 
+        const revealDelay = @TotalSecondDelayInStart;
+
+        function showHiddenElements() {
             const elementsToShow = document.querySelectorAll('#leftColumn, #rightColumn, .news-strip, .fix-icon, .top-strip,#ib-button-messaging');
 
             elementsToShow.forEach(el => {
                 el.classList.add('visible-content');
-            }); 
+            });
         }
-         
+
         if (revealDelay > 0) {
             setTimeout(showHiddenElements, revealDelay);
-        } else { 
+        } else {
             showHiddenElements();
         }
     });
