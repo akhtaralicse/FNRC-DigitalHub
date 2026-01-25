@@ -32,16 +32,13 @@
 
         const videoData = videoList[currentIndex];
 
-        // 1. Set source
+        // Set source
         nextPlayer.src = videoData.src;
 
-        // 2. Logic: Disable loop for the first two videos (index 0 and 1)
-        // Enable loop for everything from the 3rd video (index 2) onwards
-        if (currentIndex < 2) {
-            nextPlayer.loop = false;
-        } else {
-            nextPlayer.loop = true;
-        }
+        // ALWAYS keep loop false.
+        // We want the JavaScript timer below to handle the "looping"
+        // so we can jump from the last video back to the 3rd one.
+        nextPlayer.loop = false;
 
         nextPlayer.load();
 
@@ -54,19 +51,20 @@
 
             clearTimeout(timer);
 
-            // 3. Determine if we should move to the next video
-            // If it's one of the first two, we move forward when duration ends.
-            // If we are at the end of the list, it continues looping the last video
-            // because of nextPlayer.loop = true.
             timer = setTimeout(() => {
-                // If it's the first two videos, OR if we've reached the looping section
-                if (currentIndex < videoList.length - 1 || currentIndex < 2) {
-                    currentIndex = (currentIndex + 1) % videoList.length;
-
-                    // If we just finished video 2 (index 1), we move to the rest
-                    // which will now loop.
-                    playNextVideo();
+                // INCREMENT LOGIC
+                if (currentIndex < videoList.length - 1) {
+                    // Move to the next video in the list
+                    currentIndex++;
+                } else {
+                    // We reached the last video.
+                    // If there are 3 or more videos, jump back to index 2 (the 3rd video).
+                    // If there are only 2 videos total, stay on the last one or jump to 0
+                    // depending on your preference, but usually index 2 starts the "loop".
+                    currentIndex = (videoList.length > 2) ? 2 : currentIndex;
                 }
+
+                playNextVideo();
             }, videoData.duration * 1000);
 
             nextPlayer.oncanplaythrough = null;
