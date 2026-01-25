@@ -66,7 +66,11 @@ namespace DigitalHub.Services.Services.IconConfig
             if (mod.Files != null && mod.Files.Count > 0)
             {
                 var attachmentList = await AttachmentService.UploadAttachment(mod.Files);
-
+                if (result.IconConfigurationAttachments.Any())
+                {
+                    result.IconConfigurationAttachments= new List<IconConfigurationAttachment>();
+                }
+                
                 foreach (var attach in attachmentList)
                 {
                     result.IconConfigurationAttachments.Add(new()
