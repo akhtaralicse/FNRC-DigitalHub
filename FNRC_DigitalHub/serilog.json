@@ -7,16 +7,16 @@
       "Serilog.Sinks.File"
     ],
     "MinimumLevel": {
-      "Default": "Debug",
+      "Default": "Error",
       "Override": {
-        "System": "Information",
-        "Microsoft": "Information",
-        "Microsoft.AspNetCore": "Information",
-        "Microsoft.EntityFrameworkCore": "Information",
-        "Microsoft.EntityFrameworkCore.Database.Command": "Information",
-        "Microsoft.Hosting.Lifetime": "Information",
-        "Microsoft.AspNetCore.Authentication": "Information",
-        "System.Net.Http.HttpClient": "Information"
+        "System": "Error",
+        "Microsoft": "Error",
+        "Microsoft.AspNetCore": "Error",
+        "Microsoft.EntityFrameworkCore": "Error",
+        "Microsoft.EntityFrameworkCore.Database.Command": "Error",
+        "Microsoft.Hosting.Lifetime": "Error",
+        "Microsoft.AspNetCore.Authentication": "Error",
+        "System.Net.Http.HttpClient": "Error"
       }
     },
     "WriteTo": [
@@ -29,7 +29,7 @@
               "Args": {
                 "theme": "Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme::Code, Serilog.Sinks.Console",
                 "outputTemplate": "[{Application}] [{Timestamp:HH:mm:ss} {Level:u4}] {Message:lj} {Exception}{NewLine}",
-                "restrictedToMinimumLevel": "Warning",
+                "restrictedToMinimumLevel": "Error",
                 "buffered": true
               }
             },
@@ -39,7 +39,8 @@
                 "path": "logs/log_.json",
                 "formatter": "Serilog.Formatting.Compact.CompactJsonFormatter, Serilog.Formatting.Compact",
                 "rollingInterval": "Day",
-                "retainedFileCountLimit": 7
+                "retainedFileCountLimit": 7,
+                "restrictedToMinimumLevel": "Error"
               }
             }
           ]
@@ -50,7 +51,7 @@
         "Args": {
           "serverUrl": "http://localhost:5341",
           "apiKey": "none",
-          "restrictedToMinimumLevel": "Information"
+          "restrictedToMinimumLevel": "Error"
         }
       }
     ],
@@ -60,7 +61,7 @@
       "WithExceptionDetails"
     ],
     "Properties": {
-      "Application": "FNRC.Innovation.Project"
+      "Application": "FNRC.Digital-Hub.Project"
     }
   }
 }
