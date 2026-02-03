@@ -1,0 +1,45 @@
+@model FNRC_DigitalHub.Controllers.CredentialInput
+@{
+    ViewData["Title"] = "Login";
+    var returnUrl = ViewData["ReturnUrl"] as string ?? Url.Content("~/");
+}
+
+<div class="container mt-5" style="max-width:420px;">
+    <h2 class="mb-3">Sign in</h2>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            @Html.ValidationSummary(false)
+        </div>
+    }
+    <div class="mt-4 mb-4">
+    @if (User.Identity.IsAuthenticated)
+    {
+        <h4>Welcome : @User.Identity.Name</h4>
+            <div>
+                <a class="dropdown-item text-danger"
+                   asp-controller="Account" asp-action="Logout"><i class="fa fa-sign-out"></i> @loc.localizer["Logout"]</a>
+            </div>
+    }
+    </div>
+    <form asp-action="Login" asp-controller="Account" method="post" asp-route-returnUrl="@returnUrl">
+        @Html.AntiForgeryToken()
+        <div class="mb-3">
+            <label asp-for="Username" class="form-label"></label>
+            <input asp-for="Username" class="form-control" autocomplete="username" />
+            <span asp-validation-for="Username" class="text-danger"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Password" class="form-label"></label>
+            <input asp-for="Password" class="form-control" autocomplete="current-password" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100">Sign in</button>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
