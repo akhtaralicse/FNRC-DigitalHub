@@ -71,7 +71,7 @@ namespace FNRC_DigitalHub.Controllers
             }
 
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProps);
-
+                
             return LocalRedirect(  Url.Content("~/Account/Login"));
         }
 
@@ -83,7 +83,7 @@ namespace FNRC_DigitalHub.Controllers
             HttpContext.Session.Clear(); 
             return RedirectToAction("Login");
         }
-
+         
         private string TryAuthenticateAndGetDisplayName(string username, string password)
         {
             if (string.IsNullOrWhiteSpace(username)) return null;
@@ -92,7 +92,8 @@ namespace FNRC_DigitalHub.Controllers
 
             var sam = username.Contains('\\') ? username.Split('\\').Last() : username;
             try
-            {
+            { 
+
                 using var entry = new DirectoryEntry(ldapPath, username, password, AuthenticationTypes.Secure);
                 // Force bind
                 var native = entry.NativeObject;
