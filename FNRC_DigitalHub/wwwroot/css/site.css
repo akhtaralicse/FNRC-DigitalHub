@@ -82,6 +82,10 @@ html, body {
         direction: rtl;
     }
 
+
+.red{
+    color:orangered;
+}
 .video-container {
     width: 100%;
     height: 100vh;
@@ -623,6 +627,9 @@ html, body {
         visibility: visible;
     }
 
+.notify-popup-img {
+    width: 560px !important;
+}
 .notify-popup {
     position: fixed;
     top: 50%;

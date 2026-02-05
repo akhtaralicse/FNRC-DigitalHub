@@ -1,22 +1,25 @@
-﻿@model List<IconConfigurationDTO>
+﻿@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@model List<IconConfigurationDTO>
 @{
     var session = HttpContextAccessor.HttpContext.Session;
     var user = session.Get<UserSessionDTO>("UserSession");
     var isLogin = user?.userName != null;
     var lang = loc.localizer["lang"];
     var isAr = lang == "ar";
-    var (showAr, showEn) =  isAr ? ("display", "none") : ("none", "display"); 
+    var (showAr, showEn) = isAr ? ("display", "none") : ("none", "display");
     var mod = Model.FirstOrDefault(x => x.OrderNo == 1) ?? new();
     var name = isAr ? mod.NameAr : mod.NameEn;
     var desc = isAr ? mod.DescriptionAr : mod.DescriptionEn;
     var imgURL = "img/icons/fnrc.png";//mod.IconConfigurationAttachments.Count > 0 ?
     //mod.IconConfigurationAttachments?.FirstOrDefault().AttachmentTransaction.FilePath : "/img/icons/icon1.svg";
     var url = "https://fnrc.gov.ae/";
+    var TotalSecondDelayInStart = int.Parse(Configuration["Session:TotalSecondDelayInStart"]) * 1000;
 }
 <div class="top-strip">
-   
+
     <div class="top-left">
-        
+
         <a class="lang-switch"
            style="display:@showAr"
            asp-controller="Home"
@@ -45,7 +48,7 @@
             <i class="fa fa-user"> </i> @loc.localizer["Welcome"], <strong id="username">...</strong>
         </span>
 
-       
+
     </div>
     <div class="top-center">
         @* <img src="img/icons/icon8.svg" alt="Menu" /> *@
@@ -53,7 +56,7 @@
     <div class="top-right">
         <div class=" ">
             <a class="" href="@url" target="_blank" width="80">
-                <img src="@imgURL" alt="@name" >
+                <img src="@imgURL" alt="@name">
             </a>
 
         </div>
@@ -62,29 +65,48 @@
 
 <div id="notifyPopup" class="notify-popup" style="display: none;">
     <div class="notification-content">
-        <div>
-            <img src="/img/icons/fnrc.png" width="80"/>
-        </div>
+
         <button class="notify-close" onclick="closeNotify()" style="display: none;">×</button>
-        <h3 class="notify-title"></h3>
-        <p class="notify-message"></p>
+
+        <div class="notify-image-container" style="display: none; margin-bottom: 15px;">
+            <img class="notify-display-image" src="" style="max-width: 100%; height: auto; border-radius: 8px;" />
+        </div>
+
+        <div class="notify-text-container ">
+            <div class="d-flex align-items-center position-relative">
+                <div class="notif-logo me-5">
+                    <img src="/img/icons/fnrc.png" width="80" />
+                </div>
+                <div class="me-1">
+                    <h3 class="notify-title"></h3>
+                </div>
+                <div></div>
+            </div>
+            <div>
+                <p class="notify-message"></p>
+            </div>
+        </div>
+
         <div class="notification-buttons">
             <button class="notify-cancel-btn" onclick="closeNotify()">@loc.localizer["Cancel"]</button>
             <button class="notify-action-btn"></button>
         </div>
     </div>
 </div>
- 
+
 <script>
 
       document.addEventListener("DOMContentLoaded", function () {
-            let timer = '';
+          const revealDelay = @TotalSecondDelayInStart;
+            let timer1 = '';     let timer2 = '';
 
-            fetchUserDetail(); 
+            fetchUserDetail();
 
-            timer = setInterval(fetchNotifications, 120000);
-              
-            setTimeout(fetchNotificationToDisplay,5000);
+            timer1 = setInterval(fetchNotifications, 120000);
+
+            setTimeout(fetchNotificationToDisplay, revealDelay);
+
+            timer2 = setInterval(fetchNotificationToDisplay, 120000);
 
       });
 
@@ -135,7 +157,7 @@
                                                              <p class="mt-4"> @(loc.localizer["NONotification"]) </p>
                                                  </div>`;
                          }
-                         data.message.forEach(x => {                             
+                         data.message.forEach(x => {
                             var message = '@isAr' =='True'?x.MessageAr:x.MessageEn;
                             const onclickCall = `NotificationData('${x.Id}', '${x.TitleAr}', '${x.TitleEn}', '${x.MessageAr}', '${x.MessageEn}',  '${x.ActionTextAr}',  '${x.ActionTextEn}','${x.ActionUrl}' )`;
                             notificationHTML += `<a rel="noreferrer" class="notification-item p-3" onclick="${onclickCall}">
@@ -150,7 +172,7 @@
                          var htmlFinal = `<div id="notifications-container">
                                             <div class="title d-flex justify-content-between p-2">
                                                     <span>@(loc.localizer["Notification"])</span>
-                                                    <div>                                                    
+                                                    <div>
                                                     </div>
                                             </div>
                                             <div class="notifications-wrapper overflow-y">
@@ -184,6 +206,7 @@
                     if(x.message == '[]'){
                         return;
                     }
+                    var attachment = x.message. NotificationAttachment.length > 0 ?  x.message.NotificationAttachment[0].AttachmentTransaction.FilePath :"";
                      NotificationData(
                         x.message.Id,
                         x.message.TitleAr,
@@ -192,7 +215,8 @@
                         x.message.MessageEn,
                         x.message.ActionTextAr,
                         x.message.ActionTextEn,
-                        x.message.ActionUrl
+                        x.message.ActionUrl,
+                       attachment
                     );
                      playNotificationSound();
                 })
@@ -200,17 +224,62 @@
                     console.error(error);
                 });
     }
+        function NotificationData(id, titleAr, titleEn, messageAr, messageEn, btnTextAr, btnTextEn, btnURL, imageUrl) {
+        var actualTitle = '@isAr' === 'True' ? titleAr : titleEn;
+        var actualMessage = '@isAr' === 'True' ? messageAr : messageEn;
+        var actualBtnText = '@isAr' === 'True' ? btnTextAr : btnTextEn;
 
-     function NotificationData(id, titleAr,titleEn, messageAr,messageEn, btnTextAr,btnTextEn, btnURL) {
-        var actualTitle =   '@isAr' === 'True' ? titleAr : titleEn;
-        var actualMessage =  '@isAr' === 'True' ? messageAr : messageEn;
-        var actualBtnText =  '@isAr' === 'True' ? btnTextAr : btnTextEn;
+        showNotify(actualTitle, actualMessage, id, actualBtnText, btnURL, imageUrl);
+    }
 
-        if (!actualBtnText || !btnURL) {
-            showNotify(actualTitle, actualMessage, id);
+    function NotificationData(id, titleAr, titleEn, messageAr, messageEn, btnTextAr, btnTextEn, btnURL, imageUrl) {
+        var actualTitle = '@isAr' === 'True' ? titleAr : titleEn;
+        var actualMessage = '@isAr' === 'True' ? messageAr : messageEn;
+        var actualBtnText = '@isAr' === 'True' ? btnTextAr : btnTextEn;
+
+        // Pass imageUrl to the next function
+        showNotify(actualTitle, actualMessage, id, actualBtnText, btnURL, imageUrl);
+    }
+
+    function showNotify(title, message, id, btnText, btnURL, imageUrl) {
+        const popup = document.getElementById("notifyPopup");
+        const textContainer = popup.querySelector(".notify-text-container");
+        //const notifLogo = popup.querySelector(".notif-logo");
+        const imageContainer = popup.querySelector(".notify-image-container");
+        const displayImage = popup.querySelector(".notify-display-image");
+
+        if (imageUrl && imageUrl.trim() !== "") {
+            imageContainer.style.display = "block";
+            displayImage.src = imageUrl;
+            textContainer.style.display = "none";
+            popup.classList.add("notify-popup-img");
+            //notifLogo.style.display = "none";
         } else {
-            showNotify(actualTitle, actualMessage, id, actualBtnText, btnURL);
+            imageContainer.style.display = "none";
+            textContainer.style.display = "block";
+            popup.querySelector(".notify-title").textContent = title;
+            popup.querySelector(".notify-message").textContent = message;
+             popup.classList.remove("notify-popup-img");
         }
+
+        const actionButton = popup.querySelector(".notify-action-btn");
+        const closeButton = popup.querySelector(".notify-cancel-btn");
+        closeButton.setAttribute('data-id', id);
+
+        if (btnText && btnURL) {
+            actionButton.textContent = btnText;
+            actionButton.style.display = "inline-block";
+            actionButton.onclick = function() {
+                window.open(btnURL, '_blank', 'noopener');
+                closeNotify();
+            };
+        } else {
+            actionButton.textContent = '@Html.Raw(loc.localizer["OK"])';
+            actionButton.style.display = "inline-block";
+            actionButton.onclick = closeNotify;
+        }
+
+        popup.style.display = "block";
     }
 
     function markNotificationAsRead(notificationId) {
@@ -231,52 +300,23 @@
         });
     }
 
-       function showNotify(title, message, id, btnText, btnURL) {
-        const popup = document.getElementById("notifyPopup");
-        popup.querySelector(".notify-title").textContent = title;
-        popup.querySelector(".notify-message").textContent = message;
 
-        // Get the button elements
-        const actionButton = popup.querySelector(".notify-action-btn");
-        const closeButton = popup.querySelector(".notify-cancel-btn");
 
-        // Set the ID as a data attribute on the close button
-        closeButton.setAttribute('data-id', id);
-
-        if (btnText && btnURL) {
-            // If button text and URL are provided, show action button
-            actionButton.textContent = btnText;
-            actionButton.style.display = "inline-block";
-            actionButton.onclick = function() {
-                //window.location.href = btnURL;
-                 window.open(btnURL, '_blank', 'noopener');
-                closeNotify();
-            };
-        } else {
-            // If no button text/URL, show OK button that just closes
-            actionButton.textContent = '@Html.Raw(loc.localizer["OK"])';
-            actionButton.style.display = "inline-block";
-            actionButton.onclick = closeNotify;
-        }
-
-        popup.style.display = "block";
-    }
-   
     function closeNotify() {
         const popup = document.getElementById("notifyPopup");
         const closeButton = popup.querySelector(".notify-cancel-btn");
-        const notificationId = closeButton.getAttribute('data-id');         
-        if (notificationId) { 
+        const notificationId = closeButton.getAttribute('data-id');
+        if (notificationId) {
             markNotificationAsRead(notificationId);
         }
         popup.style.display = "none";
     }
-     
+
 
      function playNotificationSound() {
         try {
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
- 
+
             const osc1 = audioContext.createOscillator();
             const osc2 = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
@@ -284,13 +324,13 @@
             osc1.connect(gainNode);
             osc2.connect(gainNode);
             gainNode.connect(audioContext.destination);
-             
-            osc1.frequency.setValueAtTime(1046.50, audioContext.currentTime);  
-            osc2.frequency.setValueAtTime(1318.51, audioContext.currentTime);  
+
+            osc1.frequency.setValueAtTime(1046.50, audioContext.currentTime);
+            osc2.frequency.setValueAtTime(1318.51, audioContext.currentTime);
 
             osc1.type = 'sine';
             osc2.type = 'sine';
-             
+
             gainNode.gain.setValueAtTime(0, audioContext.currentTime);
             gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
             gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.0);

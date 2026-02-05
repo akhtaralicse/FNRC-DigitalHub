@@ -124,8 +124,7 @@ namespace FNRC_DigitalHub.Controllers
             return Json(new { success = true, message = "Saved" });
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
+        [HttpPost] 
         public async Task<IActionResult> DeleteNotification(int id)
         {
             var data = await notificationConfigurationService.Delete(id);

@@ -11,110 +11,87 @@
             <i class="bi bi-bell-fill"></i> @loc.localizer["AnnouncementConfiguration"]
         </h2>
 
-        <form id="galleryForm" method="post" enctype="multipart/form-data" asp-antiforgery="true">
+        <form id="galleryForm" class="galleryForm" method="post" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
 
-            <div class="form-section mt-5">
-             
+            <div class="form-section mt-5 mb-2">
+                <div>
+                    <span class="me-4">
+                        <input type="radio" id="showDiv1" name="toggleGroup" value="1" checked>
+                        <label for="showDiv1">Notification By Text</label>
+                    </span>
 
-                <div class="row">
-                    <div class="col-md-6 mb-3">
+                    <span>
+                        <input type="radio" id="showDiv2" name="toggleGroup" value="2">
+                        <label for="showDiv2">Notification By Image</label>
+                    </span>
+                </div>
+            </div>
+
+            <hr />
+
+            <div class="row mt-5">
+                    <div class="col-md-3 mb-3 step1">
                         <input type="hidden" name="Id" id="Id" value="" />
-                        <label for="title" class="form-label required">@loc.localizer["Title"] @loc.localizer["ArabicLang"]</label>
-                        <input type="text" 
-                               class="form-control"
-                               id="TitleAr"
-                               name="TitleAr"
-                               placeholder="Title Ar"
-                               required
-                               maxlength="100">
+                        <label for="title" class="form-label  ">@loc.localizer["Title"] @loc.localizer["ArabicLang"]</label>
+                        <input type="text" class="form-control" id="TitleAr" name="TitleAr" placeholder="Title Ar"  maxlength="100">
                     </div>
-                    <div class="col-md-6 mb-3">
-                        <label for="title" class="form-label required">@loc.localizer["Title"] @loc.localizer["EnglishLang"]</label>
-                        <input type="text"
-                               class="form-control"
-                               id="TitleEn"
-                               name="TitleEn"
-                               placeholder="Title En"
-                               required
-                               maxlength="100">
+                    <div class="col-md-3 mb-3 step1">
+                        <label for="title" class="form-label  ">@loc.localizer["Title"] @loc.localizer["EnglishLang"]</label>
+                        <input type="text" class="form-control" id="TitleEn" name="TitleEn" placeholder="Title En"  maxlength="100">
 
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-3 mb-3">
+                        <label for="startDate" class="form-label">@loc.localizer["StartDate"] <span class="red"> *</span></label>
+                        <input type="datetime-local" class="form-control" id="StartDate" name="StartDate" required>
+
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="endDate" class="form-label">@loc.localizer["EndDate"] <span class="red"> *</span></label>
+                        <input type="datetime-local" class="form-control" id="EndDate" name="EndDate" required>
+
+                    </div>
+                    <div class="col-md-6 mb-3 step1">
                         <label for="message" class="form-label required">@loc.localizer["Message"] @loc.localizer["ArabicLang"]</label>
-                        <textarea class="form-control"
-                                  id="MessageAr"
-                                  name="MessageAr"
-                                  rows="3"
-                                  placeholder=""
-                                  required
-                                  maxlength="500"></textarea>
+                        <textarea class="form-control" id="MessageAr" name="MessageAr" rows="3" placeholder=""   maxlength="500"></textarea>
                     </div>
-                    <div class="col-md-6 mb-3">
+                    <div class="col-md-6 mb-3 step1">
                         <label for="message" class="form-label required">@loc.localizer["Message"] @loc.localizer["EnglishLang"]</label>
-                        <textarea class="form-control"
-                                  id="MessageEn"
-                                  name="MessageEn"
-                                  rows="3"
-                                  placeholder=""
-                                  required
-                                  maxlength="500"></textarea>
+                        <textarea class="form-control" id="MessageEn" name="MessageEn" rows="3" placeholder=""   maxlength="500"></textarea>
                     </div>
-                </div>
+                    <div class="col-lg-6 mb-4 step2">
+                        <div class="card border-left-primary mt-4  ">
 
-            </div>
-
-            <div class="form-section">
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="form-group">
-                            <label for="startDate" class="form-label">@loc.localizer["StartDate"]</label>
-                            <input type="datetime-local"
-                                   class="form-control"
-                                   id="StartDate"
-                                   name="StartDate">
-
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <div class="form-group">
-                            <label for="endDate" class="form-label">@loc.localizer["EndDate"]</label>
-                            <input type="datetime-local"
-                                   class="form-control"
-                                   id="EndDate"
-                                   name="EndDate">
+                            <div class="text-center">
+                                <p class="text-muted small">@(loc.localizer["SupportedFiles"]) PNG, JPG</p>
+                                <input type="file" class="attach-input" id="fileID" accept="image/*,.svg" style="display: none;" required>
+                                <button type="button" class="btn btn-primary attach-btn">
+                                    <i class="fas fa-upload mr-2 mx-2"></i>@(loc.localizer["ChooseFile"])
+                                </button>
+                                <div id="fileListUpdate" class="mt-2"></div>
+                                <div id="fileList" class="mt-3"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            
 
             <div class="form-section">
                 <div class="row">
                     <div class="mb-3 col-md-4">
                         <label for="actionUrl" class="form-label">@loc.localizer["ActionURL"]</label>
-                        <input type="url"
-                               class="form-control"
-                               id="ActionUrl"
-                               name="ActionUrl"
-                               placeholder="https://example.com/action">
+                        <!-- Name changed to ActionURL to match client script -->
+                        <input type="url" class="form-control" id="ActionUrl" name="ActionURL" placeholder="https://example.com/action" />
                     </div>
 
                     <div class="mb-3 col-md-4">
                         <label for="actionText" class="form-label">@loc.localizer["ActionText"] @loc.localizer["ArabicLang"]</label>
-                        <input type="text"
-                               class="form-control"
-                               id="ActionTextAr"
-                               name="ActionTextAr"
-                               placeholder="Learn More"
-                               maxlength="50">
+                        <input type="text" class="form-control" id="ActionTextAr" name="ActionTextAr" placeholder="Learn More" maxlength="50" />
                     </div>
+
                     <div class="mb-3 col-md-4">
                         <label for="actionText" class="form-label">@loc.localizer["ActionText"] @loc.localizer["EnglishLang"]</label>
-                        <input type="text"
-                               class="form-control"
-                               id="ActionTextEn"
-                               name="ActionTextEn"
-                               placeholder="Learn More"
-                               maxlength="50">
+                        <input type="text" class="form-control" id="ActionTextEn" name="ActionTextEn" placeholder="Learn More" maxlength="50" />
                     </div>
                 </div>
             </div>
@@ -123,25 +100,26 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <button type="button" id="submitDiv" class="btn btn-success">
-                              <span class="AddNew1">@(loc.localizer["Save"])</span>
+                            <span class="AddNew1">@(loc.localizer["Save"])</span>
                         </button>
                     </div>
                 </div>
             </div>
         </form>
     </div>
-
 </div>
+
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <div class="card">
+        <div class="card w-100">
             <div class="card-body p-0">
-                @if (Model.Count > 0)
+                @if (Model?.Count > 0)
                 {
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead>
                                 <tr>
+                                    <th>@loc.localizer["Iamge"]</th>
                                     <th>@loc.localizer["Name"]</th>
                                     <th>@loc.localizer["Description"]</th>
                                     <th>@loc.localizer["Date"]</th>
@@ -152,7 +130,13 @@
                             <tbody id="iconsTableBody">
                                 @foreach (var item in Model)
                                 {
+                                    var image = "";
+                                    if (item.NotificationAttachment.Any())
+                                    {
+                                        image = item.NotificationAttachment.FirstOrDefault().AttachmentTransaction.ThumbPath;
+                                    }
                                     <tr>
+                                        <td><img src="@image" width="70px" /></td>
                                         <td>
                                             <div>@item.TitleEn</div>
                                             <small class="text-muted">@item.TitleAr</small>
@@ -170,19 +154,15 @@
                                             <small class="text-muted">@item.ActionTextEn</small>
                                             <small class="text-muted">@item.ActionTextAr</small>
                                         </td>
-
                                         <td>
-                                            @* @if (item.StartDate <= DateTime.Now && item.EndDate >= DateTime.Now)
-                                            { *@
-                                                <div class="action-buttons">
-                                                    <button class="btn btn-sm btn-outline-primary" onclick="LoadUpdateRecord('@(item.Id)')">
-                                                        <i class="fas fa-edit"></i>
-                                                    </button>
-                                                    <button class="btn btn-sm btn-outline-danger" onclick="deleteRecord('@(item.Id)')">
-                                                        <i class="fas fa-trash-alt"></i>
-                                                    </button>
-                                                </div>
-                                            @* } *@
+                                            <div class="action-buttons">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" onclick="LoadUpdateRecord('@(item.Id)')">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteRecord('@(item.Id)')">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </div>
                                         </td>
                                     </tr>
                                 }
@@ -192,7 +172,7 @@
                 }
                 else
                 {
-                    <div id="emptyState" class="empty-state d-none">
+                    <div id="emptyState" class="empty-state">
                         <i class="fas fa-folder-open"></i>
                         <h4 class="mt-3">@loc.localizer["NoDataFound"]</h4>
                     </div>
@@ -208,16 +188,63 @@
     const button = document.querySelector(".attach-btn");
     const input  = document.querySelector(".attach-input");
     let file;
-    // button.onclick = () => {
-    //     input.click();
-    // };
+    button.onclick = () => {
+        input.click();
+    };
+    const radioText = document.getElementById('showDiv1');
+    const radioImage = document.getElementById('showDiv2');
+    
+    function updateToggle() {
+        const textElements = document.querySelectorAll('.step1');
+        const imageElements = document.querySelectorAll('.step2');        
+         
+        const fileInput = document.getElementById('fileID');
+
+        if (radioText.checked) { 
+            textElements.forEach(el => el.style.display = 'block');
+            imageElements.forEach(el => el.style.display = 'none');
+              
+            fileInput.required = false;
+        } else { 
+            textElements.forEach(el => el.style.display = 'none');
+            imageElements.forEach(el => el.style.display = 'block');
+              
+            fileInput.required = true;
+        }
+    }
+
+    radioText.addEventListener('change', updateToggle);
+    radioImage.addEventListener('change', updateToggle);    
+ 
+    updateToggle();
+
+     
+
+    function triggerRadio(optionNumber) {
+    // 1. Find the target radio button
+    const targetRadio = document.getElementById('showDiv' + optionNumber);
+    
+    if (targetRadio) {
+        // 2. Select it
+        targetRadio.checked = true;
+        
+        // 3. Manually fire the "change" event so the UI updates
+        const event = new Event('change');
+        targetRadio.dispatchEvent(event);
+    }
+}
+
+
     document.getElementById('submitDiv').addEventListener('click', function (e) {
         e.preventDefault();
         var isUpdate = $('#galleryForm').find('input[name="Id"]').val() != "";
 
-        if (selectedFiles.length === 0 && !isUpdate) {
-            Swal.fire("warning", "Please select at least one file.", "warning");
-            return;
+        // if (selectedFiles.length === 0 && !isUpdate) {
+        //     Swal.fire("warning", "Please select at least one file.", "warning");
+        //     return;
+        // }
+        if(!validateForm('galleryForm')){
+             return;
         }
 
         var formData = new FormData($('#galleryForm')[0]);
@@ -247,25 +274,25 @@
         });
     });
 
-    // document.getElementById('fileID').addEventListener('change', function () {
-    //         if (!validateFileSize(this)) {
-    //             return false;
-    //         }
+    document.getElementById('fileID').addEventListener('change', function () {
+            if (!validateFileSize(this)) {
+                return false;
+            }
 
-    //         var files = this.files;
-    //         var fileNames = '';
+            var files = this.files;
+            var fileNames = '';
 
-    //         for (var i = 0; i < files.length; i++) {
-    //             let file = files[i];
-    //             fileNames += files[i].name + '<br>';
-    //             if (file.name.length > 20) {
-    //                 const truncatedName = truncateFileName(file.name, 20);
-    //                 file = new File([file], truncatedName, { type: file.type });
-    //             }
-    //             selectedFiles.push(file);
-    //         }
-    //         updateFileList();
-    //     });
+            for (var i = 0; i < files.length; i++) {
+                let file = files[i];
+                fileNames += files[i].name + '<br>';
+                if (file.name.length > 20) {
+                    const truncatedName = truncateFileName(file.name, 20);
+                    file = new File([file], truncatedName, { type: file.type });
+                }
+                selectedFiles.push(file);
+            }
+            updateFileList();
+        });
         function updateFileList() {
             const fileList = document.getElementById('fileList');
             fileList.innerHTML = '';
@@ -291,7 +318,7 @@
             });
         }
           function LoadUpdateRecord(id) {
-       
+
            $.ajax({
             url: '/admin/GetNotificationById?id='+id,
             type: 'get',
@@ -302,6 +329,7 @@
                 if (response.success) {
                     var msg = response.message;
                         console.log(response.message);
+                            triggerRadio(1);
                         $('#galleryForm').find('input[name="TitleAr"]').val(msg.TitleAr);
                         $('#galleryForm').find('input[name="TitleEn"]').val(msg.TitleEn);
                         $('#galleryForm').find('textarea[name="MessageAr"]').val(msg.MessageAr);
@@ -309,22 +337,22 @@
                         $('#galleryForm').find('input[name="StartDate"]').val(msg.StartDate);
                         $('#galleryForm').find('input[name="EndDate"]').val(msg.EndDate);
 
-                        $('#galleryForm').find('input[name="ActionURL"]').val(msg.ActionURL);
+                            $('#galleryForm').find('input[name="ActionURL"]').val(msg.ActionUrl);
                         $('#galleryForm').find('input[name="ActionTextAr"]').val(msg.ActionTextAr);
-                        $('#galleryForm').find('input[name="ActionTextEn"]').val(msg.ActionTextEn); 
+                        $('#galleryForm').find('input[name="ActionTextEn"]').val(msg.ActionTextEn);
                         $('#galleryForm').find('input[name="Id"]').val(msg.Id);
                         $('#submitDiv').html('@loc.localizer["Update"]')
                         $('.AddNew1').html('@loc.localizer["Update"]')
                         var html ='';
-                            // msg.IconConfigurationAttachments.forEach(x =>
-                            // {
-                            //     html += `<a class=""  id="image_${x.Id}" style="position: relative;"  href="javascript:void(0)" onclick="deleteImage_Js('${x.Id}')">
-                            //                 <span><i class="fa fa-times delete-icon"></i></span>
-                            //                 <img width="60px" src="${x.AttachmentTransaction.ThumbPath}" alt="fnrc">
-                            //             </a>`;
-
-                            // })
-                           // $('#fileListUpdate').html(html);
+                            msg.NotificationAttachment.forEach(x =>
+                            {
+                                html += `<a class=""  id="image_${x.Id}" style="position: relative;"  href="javascript:void(0)" onclick="deleteImage_Js('${x.Id}')">
+                                            <span><i class="fa fa-times delete-icon"></i></span>
+                                            <img width="60px" src="${x.AttachmentTransaction.ThumbPath}" alt="fnrc">
+                                        </a>`;
+                                triggerRadio(2);
+                            })
+                           $('#fileListUpdate').html(html);
                             window.scroll(0,0);
                         }
                     },

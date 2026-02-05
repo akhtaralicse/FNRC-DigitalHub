@@ -28,17 +28,18 @@ namespace FNRC_DigitalHub.Controllers
             //        return Ok(new { UserName = "TestUser", DisplayName = "TestUser" });
             //}
 
-            var identity = User?.Identity;
+            var identity = HttpContext.User?.Identity;
             if (identity == null || !identity.IsAuthenticated)
             {
-               
+
                 await CreateUserSessionAsync(null, null, null, 0, null, "", "");
 
                 return Unauthorized();
             }
-            var domainUser = identity.Name;
-            var parts = domainUser.Split('\\');
-            string samAccountName = parts.Length == 2 ? parts[1] : domainUser;
+            var domainUser = identity.Name ?? string.Empty;
+           // var parts = domainUser.Split('\\');
+            var samAccountName = domainUser.Contains('\\') ? domainUser.Split('\\')[1] : domainUser;
+
 
             var displayName = GetDisplayNameFromAd(samAccountName);
             ICollection<UserTypeDTO> UserType = [new()

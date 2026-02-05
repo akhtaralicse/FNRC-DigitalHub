@@ -5,6 +5,7 @@ using DigitalHub.Services.Services.Attachment;
 using DigitalHub.Services.Shared;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Collections.Generic;
 
 namespace DigitalHub.Services.Services.IconConfig
 {
@@ -45,7 +46,7 @@ namespace DigitalHub.Services.Services.IconConfig
             var data = await _repository.GetAllIncludingNoTracking(x => x.NotificationUser).FirstOrDefaultAsync(x => x.Id == model.Id);
             if (data != null)
             {
-                if (!data.NotificationUser.Any(x => x.NotificationConfigurationId == model.Id))
+                if (!data.NotificationUser.Any(x => x.NotificationConfigurationId == model.Id && x.Username == model.Username))
                 {
                     result.Id = 0;
                     data.NotificationUser.Add(result);
@@ -93,6 +94,15 @@ namespace DigitalHub.Services.Services.IconConfig
         }
         public async Task<bool> Update(NotificationConfigurationDTO mod)
         {
+            var result = await _repository.GetAllIncludingNoTracking(x => x.NotificationAttachment).FirstOrDefaultAsync(x => x.Id == mod.Id);
+            if (result.NotificationAttachment.Count != 0)
+            {
+                mod.NotificationAttachment.Add(new NotificationAttachmentDTO
+                {
+                    AttachmentId = result.NotificationAttachment.FirstOrDefault().AttachmentId,                    
+                });
+            }
+
             var id = mod.Id;
             var add = await Add(mod);
             if (add)
@@ -124,9 +134,20 @@ namespace DigitalHub.Services.Services.IconConfig
 
         public async Task<bool> Delete(int id)
         {
-            var result = await _repository.GetAllIncludingNoTracking().FirstOrDefaultAsync(x => x.Id == id);
+            var result = await _repository.GetAllIncludingNoTracking(x => x.NotificationAttachment,
+                         x => x.NotificationAttachment.Select(y => y.AttachmentTransaction)).FirstOrDefaultAsync(x => x.Id == id);
 
-            _repository.Delete(result, true);
+            var attachment =  result.NotificationAttachment.FirstOrDefault(x => x.NotificationConfigurationId == id);
+            if (attachment != null)
+            {  
+                await AttachmentService.DeleteFile(attachment.AttachmentTransaction);
+
+                var isDeleted = AttachmentService.DeletePhysicalFile(attachment.AttachmentTransaction.FilePath, attachment.AttachmentTransaction.FileId + attachment.AttachmentTransaction.FileExtension);
+                var isDeletedThumb = AttachmentService.DeletePhysicalFile(attachment.AttachmentTransaction.FilePath, attachment.AttachmentTransaction.FileId + "_thumb" + attachment.AttachmentTransaction.FileExtension);
+                
+            }
+              
+            await _repository.DeleteAsync(result, true);
 
             return true;
         }
