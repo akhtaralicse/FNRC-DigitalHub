@@ -10,6 +10,7 @@ namespace DigitalHub.Services.Services.IconConfig
         Task<List<NotificationConfigurationDTO>> Get(string username = null);
         Task<List<NotificationConfigurationDTO>> GetAll();
         Task<NotificationConfigurationDTO> GetById(int id);
+        Task<List<NotificationConfigurationDTO>> GetBySearch(string name, DateTime? dateFrom, DateTime? dateTo, int pageSize=0, int skip = 0);
         Task<NotificationConfigurationDTO> GetNotificationToDisplay(string username);
         Task<bool> Update(NotificationConfigurationDTO mod);
     }

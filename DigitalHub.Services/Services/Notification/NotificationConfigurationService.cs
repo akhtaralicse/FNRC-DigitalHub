@@ -64,13 +64,33 @@ namespace DigitalHub.Services.Services.IconConfig
 
             return Mapper.Map<List<NotificationConfigurationDTO>>(await result.OrderByDescending(x => x.StartDate).ToListAsync());
         }
-        public async Task<NotificationConfigurationDTO> GetById(int id )
+        public async Task<NotificationConfigurationDTO> GetById(int id)
         {
-            var result =await _repository.GetAllIncludingNoTracking(x => x.NotificationAttachment,
+            var result = await _repository.GetAllIncludingNoTracking(x => x.NotificationAttachment,
                                     x => x.NotificationAttachment.Select(y => y.AttachmentTransaction))
                         .Where(x => x.IsActive == true && x.Id == id).FirstOrDefaultAsync();
 
             return Mapper.Map<NotificationConfigurationDTO>(result);
+        }
+
+        public async Task<List<NotificationConfigurationDTO>> GetBySearch(string name, DateTime? dateFrom, DateTime? dateTo, int pageSize = 0, int skip = 0)
+        {
+            var result = _repository.GetAllIncludingNoTracking(x => x.NotificationAttachment,
+                                    x => x.NotificationAttachment.Select(y => y.AttachmentTransaction)).AsQueryable();
+            if (!string.IsNullOrEmpty(name))
+            {
+                result = result.Where(x => x.TitleAr.Contains(name) || x.TitleEn.Contains(name) || x.MessageAr.Contains(name) || x.MessageEn.Contains(name));
+            }
+            if (dateFrom != null && dateTo != null)
+            {
+                result = result.Where(x => x.StartDate >= dateFrom && x.EndDate <= dateTo);
+            }
+            if (pageSize == 0)
+            {
+                return Mapper.Map<List<NotificationConfigurationDTO>>(await result.OrderByDescending(x => x.StartDate).ToListAsync());
+            }
+
+            return Mapper.Map<List<NotificationConfigurationDTO>>(await result.Skip(skip).Take(pageSize).ToListAsync());
         }
         public async Task<List<NotificationConfigurationDTO>> Get(string username = null)
         {
@@ -99,7 +119,7 @@ namespace DigitalHub.Services.Services.IconConfig
             {
                 mod.NotificationAttachment.Add(new NotificationAttachmentDTO
                 {
-                    AttachmentId = result.NotificationAttachment.FirstOrDefault().AttachmentId,                    
+                    AttachmentId = result.NotificationAttachment.FirstOrDefault().AttachmentId,
                 });
             }
 
@@ -111,7 +131,7 @@ namespace DigitalHub.Services.Services.IconConfig
                 return del;
             }
             return false;
-            
+
         }
         public async Task<bool> Update_(NotificationConfigurationDTO mod)
         {
@@ -137,16 +157,16 @@ namespace DigitalHub.Services.Services.IconConfig
             var result = await _repository.GetAllIncludingNoTracking(x => x.NotificationAttachment,
                          x => x.NotificationAttachment.Select(y => y.AttachmentTransaction)).FirstOrDefaultAsync(x => x.Id == id);
 
-            var attachment =  result.NotificationAttachment.FirstOrDefault(x => x.NotificationConfigurationId == id);
+            var attachment = result.NotificationAttachment.FirstOrDefault(x => x.NotificationConfigurationId == id);
             if (attachment != null)
-            {  
+            {
                 await AttachmentService.DeleteFile(attachment.AttachmentTransaction);
 
                 var isDeleted = AttachmentService.DeletePhysicalFile(attachment.AttachmentTransaction.FilePath, attachment.AttachmentTransaction.FileId + attachment.AttachmentTransaction.FileExtension);
                 var isDeletedThumb = AttachmentService.DeletePhysicalFile(attachment.AttachmentTransaction.FilePath, attachment.AttachmentTransaction.FileId + "_thumb" + attachment.AttachmentTransaction.FileExtension);
-                
+
             }
-              
+
             await _repository.DeleteAsync(result, true);
 
             return true;
