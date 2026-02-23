@@ -4,6 +4,7 @@ using FNRC_DigitalHub.Helper;
 using FNRC_DigitalHub.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.Server.IISIntegration;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 
@@ -31,6 +32,7 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
+ 
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -43,12 +45,15 @@ builder.Services.AddAuthentication(options =>
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
     options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
-.AddCookie(options =>
-{
-    options.LoginPath = xLoginPath;
-    options.Cookie.Name = "FNRC_DHINTRANET";
-    options.Cookie.IsEssential = true;
-});
+ .AddCookie("DigitalHubCookie", options =>
+ {
+     options.Cookie.Name = ".DigitalHubSharedCookie";
+     options.Cookie.Domain = ".fnrc.gov.ae";
+     options.Cookie.Path = "/";
+     options.Cookie.HttpOnly = true;
+     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+     options.Cookie.SameSite = SameSiteMode.Lax;
+ });
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
@@ -76,6 +81,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
         .AddSupportedCultures(supportedCultures)
         .AddSupportedUICultures(supportedCultures);
 });
+builder.Services.AddAuthentication(IISDefaults.AuthenticationScheme);
 
 var app = builder.Build();
 

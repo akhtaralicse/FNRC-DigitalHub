@@ -31,43 +31,67 @@ namespace FNRC_DigitalHub.Controllers
             var identity = HttpContext.User?.Identity;
             if (identity == null || !identity.IsAuthenticated)
             {
-
                 await CreateUserSessionAsync(null, null, null, 0, null, "", "");
-
                 return Unauthorized();
             }
             var domainUser = identity.Name ?? string.Empty;
-           // var parts = domainUser.Split('\\');
             var samAccountName = domainUser.Contains('\\') ? domainUser.Split('\\')[1] : domainUser;
 
-
-            var displayName = GetDisplayNameFromAd(samAccountName);
+            var (DisplayName, EmployeeId) = GetUserDetailsFromAd(samAccountName);
             ICollection<UserTypeDTO> UserType = [new()
             {
                 Type = UserTypeEnum.Employee
             }];
+             
+            var claims = new List<Claim>
+                        {
+                            new(ClaimTypes.Name, samAccountName),
+                            new("EmployeeId", EmployeeId ?? string.Empty),
+                            new("DisplayName", DisplayName), 
+                            new("UserType", string.Join(",", UserType.Select(u => u.Type.ToString())))                            
+                        };
 
-            var res = await CreateUserSessionAsync(samAccountName, displayName, displayName, 0, UserType, "", "");
+            var claimsIdentity = new ClaimsIdentity(claims, "DigitalHubCookie");
+         
+            var authProperties = new AuthenticationProperties
+            {
+                IsPersistent = true,
+                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(12)
+            };
 
-            return Ok(new { UserName = samAccountName, DisplayName = displayName });
+            await HttpContext.SignInAsync("DigitalHubCookie", new ClaimsPrincipal(claimsIdentity), authProperties);
+
+            var res = await CreateUserSessionAsync(samAccountName, DisplayName, DisplayName, int.Parse(EmployeeId), UserType, "", "");
+
+            return Ok(new { UserName = samAccountName, DisplayName, EmployeeId });
         }
 
-        private string GetDisplayNameFromAd(string samAccountName)
+        private (string DisplayName, string EmployeeId) GetUserDetailsFromAd(string samAccountName)
         {
-
             string ldapPath = Config["LDAP:Domain"].ToString();
+            string employeeID = Config["LDAP:EmployeeIDText"].ToString();
             using var entry = new DirectoryEntry(ldapPath);
             using var searcher = new DirectorySearcher(entry)
             {
                 Filter = $"(sAMAccountName={EscapeLdapSearchFilter(samAccountName)})"
             };
+
+            // Load both properties
             searcher.PropertiesToLoad.Add("displayName");
+            searcher.PropertiesToLoad.Add(employeeID);
+
             var res = searcher.FindOne();
-            if (res != null && res.Properties["displayName"].Count > 0)
+
+            if (res != null)
             {
-                return res.Properties["displayName"][0].ToString();
+                string displayName = res.Properties.Contains("displayName") ? res.Properties["displayName"][0].ToString() : samAccountName;
+
+                string employeeId = res.Properties.Contains(employeeID) ? res.Properties[employeeID][0].ToString() : null;
+
+                return (displayName, employeeId);
             }
-            return samAccountName;
+
+            return (samAccountName, null);
         }
 
         // Basic escaping for LDAP filter control characters
