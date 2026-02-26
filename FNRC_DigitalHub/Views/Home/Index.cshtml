@@ -26,8 +26,10 @@
 <script>
 
     document.addEventListener("DOMContentLoaded", function() {
-        const revealDelay = @TotalSecondDelayInStart;
-
+        let revealDelay = @TotalSecondDelayInStart;
+        if(!CheckLodingTimeOver()){
+               revealDelay = 0;
+           }
         function showHiddenElements() {
             const elementsToShow = document.querySelectorAll('#leftColumn, #rightColumn, .news-strip, .fix-icon, .top-strip,#ib-button-messaging');
 

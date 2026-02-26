@@ -1,6 +1,7 @@
 using DigitalHub.Services.DTO;
 using DigitalHub.Services.Interface;
 using DigitalHub.Services.Services.IconConfig;
+using FNRC_DigitalHub.Helper;
 using FNRC_DigitalHub.Models;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc;
@@ -86,6 +87,13 @@ namespace FNRC_DigitalHub.Controllers
             return LocalRedirect(returnUrl ?? "/");
         }
 
+        [HttpGet]
+        public IActionResult GenerateSSOToken(string employeeId, string username, string displayName)
+        {
+            var tokenService = new SSOTokenService();
+            var token = tokenService.GenerateToken(employeeId, username, displayName);
+            return Json(new { token });
+        }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

@@ -152,7 +152,16 @@ function truncateFileName(filename, maxLength = 10) {
 
     return filename; // Return original if it's within max length
 }
+function CheckLodingTimeOver() {
+    const skipStartTime = localStorage.getItem("skipStartTime");
+    const now = new Date().getTime();
 
+
+    if (skipStartTime && now - parseInt(skipStartTime) < 30 * 60 * 1000) {
+        return false;
+    }
+    return true;
+}
 function formInputs(controlName) {
     //return document.getElementsByClassName(controlName).length > 0
     //    ? document

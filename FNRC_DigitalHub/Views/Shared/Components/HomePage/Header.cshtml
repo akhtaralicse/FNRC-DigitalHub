@@ -97,9 +97,13 @@
 <script>
 
       document.addEventListener("DOMContentLoaded", function () {
-          const revealDelay = @TotalSecondDelayInStart;
-            let timer1 = '';     let timer2 = '';
+           let timer1 = '';     let timer2 = '';
+           let revealDelay = @TotalSecondDelayInStart;
 
+           if(!CheckLodingTimeOver()){
+               revealDelay = 0;
+           }
+            
             fetchUserDetail();
 
             timer1 = setInterval(fetchNotifications, 120000);
@@ -110,25 +114,26 @@
 
       });
 
-    function fetchUserDetail(){
-               fetch("/WhoAmI/me", {
-                    method: 'GET',
-                    credentials: 'include'
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Failed to fetch user");
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    document.getElementById("username").textContent = (data.DisplayName);
-                    fetchNotifications();
-                })
-                .catch(error => {
-                    console.error(error);
-                    document.getElementById("username").textContent = '@Html.Raw(loc.localizer["Guest"])';
-                });
+    function fetchUserDetail()
+    {
+        fetch("/WhoAmI/me", {
+            method: 'GET',
+            credentials: 'include'
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to fetch user");
+            }
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById("username").textContent = (data.DisplayName);
+            fetchNotifications();
+        })
+        .catch(error => {
+            console.error(error);
+            document.getElementById("username").textContent = '@Html.Raw(loc.localizer["Guest"])';
+        });
     }
          function fetchNotifications() {
              var notificationHTML = "";

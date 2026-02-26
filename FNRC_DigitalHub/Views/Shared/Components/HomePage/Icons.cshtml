@@ -65,7 +65,7 @@
         </div>
         <div class="modal-footer">
             <button id="cancelBtn" class="btn cancel">@loc.localizer["Cancel"]</button>
-            <a id="externalLink" class="btn open-url" onclick="openExternalLink( )" target="_blank">Learn more</a>
+            <a id="externalLink" class="btn open-url" data-url="#" onclick="openExternalLink( )" target="_blank">Learn more</a>
         </div>
     </div>
 </div>
@@ -80,31 +80,65 @@
 
 
     if (modal) {
-        function openModal(name, desc, url) {
+       function openModal(name, desc, url) {
             modalName.textContent = name || 'No Name';
             modalDesc.textContent = desc || 'No description available';
-            externalLink.href = url || '#';
-            externalLink.textContent = url ? `@Html.Raw(loc.localizer["Open"]) ${name}` : 'No Link Available';
 
-            // Disable button if no URL
-            if (!url) {
-                externalLink.classList.add('disabled');
-                externalLink.style.pointerEvents = 'none';
-                externalLink.style.opacity = '0.5';
-            } else {
+            if (url) {
+                externalLink.setAttribute('data-url', url); // Correctly set the data-url attribute
+                externalLink.textContent = `@Html.Raw(loc.localizer["Open"]) ${name}`;
                 externalLink.classList.remove('disabled');
                 externalLink.style.pointerEvents = 'auto';
                 externalLink.style.opacity = '1';
+            } else {
+                externalLink.setAttribute('data-url', '#'); // Fallback to '#' if no URL is provided
+                externalLink.textContent = 'No Link Available';
+                externalLink.classList.add('disabled');
+                externalLink.style.pointerEvents = 'none';
+                externalLink.style.opacity = '0.5';
             }
 
             modal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
        function openExternalLink() {
+            const url = externalLink.getAttribute('data-url');
+            if (url) {
+                fetch("/WhoAmI/me", { method: 'GET', credentials: 'include' })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to fetch user details');
+                        }
+                        return response.json();
+                    })
+                    .then(userDetails => {
+                        const employeeId = userDetails.EmployeeId;
+                        const username = userDetails.UserName;
+                        const displayName = userDetails.DisplayName;
+
+                        return fetch(`/home/GenerateSSOToken?employeeId=${employeeId}&username=${username}&displayName=${encodeURIComponent(displayName)}`);
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Failed to generate token');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.token) {
+                            const tokenizedUrl = `${url}?token=${data.token}`;
+                            window.open(tokenizedUrl, '_blank');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Failed to open the link. Please try again.');
+                    });
+            } else {
+                alert('No valid URL provided.');
+            }
 
             closeModal();
-             
-            return true;
         }
         function closeModal() {
             modal.style.display = 'none';

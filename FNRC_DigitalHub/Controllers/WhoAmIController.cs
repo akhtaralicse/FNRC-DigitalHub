@@ -21,12 +21,12 @@ namespace FNRC_DigitalHub.Controllers
         public async Task<IActionResult> GetCurrentUserAsync()
         {
 
-            //if (Environment.IsDevelopment())
-            //{
-            //    var r = await CreateUserSessionAsync("TestUser", "TestUser", "TestUser", 0, null, "", "");
-            //    if (r)
-            //        return Ok(new { UserName = "TestUser", DisplayName = "TestUser" });
-            //}
+            if (Environment.IsDevelopment())
+            {
+                var r = await CreateUserSessionAsync("TestUser", "TestUser", "TestUser", 0, null, "", "");
+                if (r)
+                    return Ok(new { UserName = "TestUser", DisplayName = "TestUser" });
+            }
 
             var identity = HttpContext.User?.Identity;
             if (identity == null || !identity.IsAuthenticated)
@@ -51,15 +51,15 @@ namespace FNRC_DigitalHub.Controllers
                             new("UserType", string.Join(",", UserType.Select(u => u.Type.ToString())))                            
                         };
 
-            var claimsIdentity = new ClaimsIdentity(claims, "DigitalHubCookie");
+            //var claimsIdentity = new ClaimsIdentity(claims, "DigitalHubCookie");
          
-            var authProperties = new AuthenticationProperties
-            {
-                IsPersistent = true,
-                ExpiresUtc = DateTimeOffset.UtcNow.AddHours(12)
-            };
+            //var authProperties = new AuthenticationProperties
+            //{
+            //    IsPersistent = true,
+            //    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(12)
+            //};
 
-            await HttpContext.SignInAsync("DigitalHubCookie", new ClaimsPrincipal(claimsIdentity), authProperties);
+            //await HttpContext.SignInAsync("DigitalHubCookie", new ClaimsPrincipal(claimsIdentity), authProperties);
 
             var res = await CreateUserSessionAsync(samAccountName, DisplayName, DisplayName, int.Parse(EmployeeId), UserType, "", "");
 

@@ -28,6 +28,26 @@
     let activePlayerIndex = 0;
     let timer = null;
 
+    // Function to check if we should skip the first videos
+    function shouldSkipInitialVideos() {
+        const skipStartTime = localStorage.getItem("skipStartTime");
+        const now = new Date().getTime();
+
+        // If skipStartTime exists and is within the 30-minute window, skip the first videos
+        if (skipStartTime && now - parseInt(skipStartTime) < 30 * 60 * 1000) {
+            return true;
+        }
+
+        // Otherwise, reset the skipStartTime
+        localStorage.setItem("skipStartTime", now.toString());
+        return false;
+    }
+
+    // Determine the starting index
+    if (shouldSkipInitialVideos()) {
+        currentIndex = SkipVideoFromStart;
+    }
+
     function playNextVideo() {
         const currentPlayer = players[activePlayerIndex];
         activePlayerIndex = 1 - activePlayerIndex;

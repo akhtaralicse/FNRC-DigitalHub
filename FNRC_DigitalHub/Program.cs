@@ -1,5 +1,6 @@
 using DigitalHub.Domain.DBContext;
 using DigitalHub.Services.Shared;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
 using FNRC_DigitalHub.Helper;
 using FNRC_DigitalHub.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -32,7 +33,7 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
- 
+
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -62,10 +63,13 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.IsEssential = true;
     options.ExpireTimeSpan = TimeSpan.FromMinutes(int.Parse(configuration["Session:ExpireDuration"]));
 });
+
 builder.WebHost.ConfigureKestrel(options =>
 {
     options.Limits.MaxRequestBodySize = 40 * 1024 * 1024; // 50 MB
 });
+
+builder.Services.AddSingleton<SSOTokenService>();
 builder.Services.CustomServicesBuilder(configuration);
 
 var serilogConfig = new ConfigurationBuilder()
@@ -73,6 +77,7 @@ var serilogConfig = new ConfigurationBuilder()
     .AddJsonFile("serilog.json", optional: false, reloadOnChange: true)
     .AddEnvironmentVariables()
     .Build();
+
 builder.Host.UseSerilogLogging(serilogConfig);
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
