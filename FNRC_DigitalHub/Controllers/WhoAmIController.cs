@@ -19,13 +19,12 @@ namespace FNRC_DigitalHub.Controllers
 
         [HttpGet("me")]
         public async Task<IActionResult> GetCurrentUserAsync()
-        {
-
+        { 
             if (Environment.IsDevelopment())
             {
                 var r = await CreateUserSessionAsync("TestUser", "TestUser", "TestUser", 0, null, "", "");
                 if (r)
-                    return Ok(new { UserName = "TestUser", DisplayName = "TestUser" });
+                    return Ok(new { UserName = "TestUser", DisplayName = "TestUser", EmployeeId= "74215" });
             }
 
             var identity = HttpContext.User?.Identity;
