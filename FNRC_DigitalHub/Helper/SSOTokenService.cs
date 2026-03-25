@@ -3,7 +3,6 @@ using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 
-
 namespace FNRC_DigitalHub.Helper
 {
     public class SSOTokenService
@@ -12,14 +11,14 @@ namespace FNRC_DigitalHub.Helper
         private readonly string _issuer = "Digital Hub";
         private readonly string _audience = "FNRC-Apps";
 
-        public string GenerateToken(string employeeId, string username, string displayName)
+        public string GenerateToken(string employeeId, string username, string displayName, int timeInMin = 1)
         {
             var claims = new[]
             {
-            new Claim("EmployeeId", employeeId),
-            new Claim(ClaimTypes.Name, username),
-            new Claim("DisplayName", displayName)
-        };
+                new Claim("EmployeeId", employeeId),
+                new Claim(ClaimTypes.Name, username),
+                new Claim("DisplayName", displayName)
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -28,7 +27,7 @@ namespace FNRC_DigitalHub.Helper
                 issuer: _issuer,
                 audience: _audience,
                 claims: claims,
-                expires: DateTime.UtcNow.AddSeconds(60), // short lifetime
+                expires: DateTime.UtcNow.AddMinutes(timeInMin),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

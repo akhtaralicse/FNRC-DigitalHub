@@ -34,13 +34,13 @@ namespace FNRC_DigitalHub.Controllers
             return View();
         }
 
-         
+
 
         [HttpPost]
         public async Task<IActionResult> MarkNotificationAsRead([FromBody] NotificationUserDTO mod)
         {
             mod.Username = GetUser().userName;
-            var result = await notificationConfigurationService.AddUserNotification( mod);
+            var result = await notificationConfigurationService.AddUserNotification(mod);
             return Json(new { success = true, message = result });
         }
 
@@ -92,6 +92,14 @@ namespace FNRC_DigitalHub.Controllers
         {
             var tokenService = new SSOTokenService();
             var token = tokenService.GenerateToken(employeeId, username, displayName);
+            return Json(new { token });
+        }
+
+        [HttpGet]
+        public IActionResult  SSOTokenTest()
+        {
+            var tokenService = new SSOTokenService();
+            var token = tokenService.GenerateToken("1234", "username_test", "displayName_test", 60);
             return Json(new { token });
         }
 

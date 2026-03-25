@@ -1,12 +1,12 @@
+using AutoMapper;
 using DigitalHub.Domain.DBContext;
-using DigitalHub.Services.Shared;
-using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using DigitalHub.Services.Shared; 
 using FNRC_DigitalHub.Helper;
 using FNRC_DigitalHub.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Server.IISIntegration;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore; 
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -33,7 +33,10 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
 });
-
+builder.Services.AddAutoMapper(cfg =>
+{
+    cfg.AddProfile(new ServicesMapper(configuration));
+}, typeof(Program));
 
 builder.Services.AddControllers().AddJsonOptions(options =>
 {

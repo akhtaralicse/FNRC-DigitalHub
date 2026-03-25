@@ -122,6 +122,7 @@
                         if (!response.ok) {
                             throw new Error('Failed to generate token');
                         }
+                        window.open(url, '_blank');
                         return response.json();
                     })
                     .then(data => {

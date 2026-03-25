@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿ 
+using AutoMapper;
 using DigitalHub.Services.Interface;
 using DigitalHub.Services.Services.Attachment;
 using DigitalHub.Services.Services.IconConfig; 
@@ -27,7 +28,7 @@ namespace DigitalHub.Services.Shared
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
            // services.AddScoped<LanguageContext>();
             services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
-            services.AddMapperProfile(Configuration);
+           // services.AddMapperProfile(Configuration);
             services.GenericServiceDataBuilder();
          
         }
@@ -42,13 +43,12 @@ namespace DigitalHub.Services.Shared
 
         public static IServiceCollection AddMapperProfile(this IServiceCollection services, IConfiguration Configuration)
         {
-            var mappingConfig = new MapperConfiguration(mc =>
+            // Automatically scans and registers all profiles in the assembly
+            services.AddAutoMapper(cfg =>
             {
-                //mc.AllowNullDestinationValues = false;
-                mc.AddProfile(new ServicesMapper(Configuration));
-            });
-            IMapper mapper = mappingConfig.CreateMapper();
-            services.AddSingleton(mapper);
+                cfg.AddProfile(new ServicesMapper(Configuration));
+            }, typeof(ServiceBuilderExtension).Assembly);
+
             return services;
         }
     }
