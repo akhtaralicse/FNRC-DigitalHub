@@ -37,6 +37,11 @@ namespace FNRC_DigitalHub.Controllers
             return View();
         }
 
+        public IActionResult AIAssistant()
+        {
+            return View();
+        }
+
 
         #region Icon and video--------------------
         public async Task<IActionResult> IconSetting()

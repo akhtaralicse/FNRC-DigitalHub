@@ -4,6 +4,7 @@ using DigitalHub.Domain.DBContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitalHub.Domain.Migrations
 {
     [DbContext(typeof(DigitalHubDBContext))]
-    partial class DigitalHubDBContextModelSnapshot : ModelSnapshot
+    [Migration("20260329074642_aiassitant")]
+    partial class aiassitant
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -43,9 +46,6 @@ namespace DigitalHub.Domain.Migrations
                     b.Property<string>("FileName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("FileSize")
-                        .HasColumnType("bigint");
-
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
@@ -59,60 +59,12 @@ namespace DigitalHub.Domain.Migrations
                     b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("UploaderName")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("UploadedDate")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.ToTable("AIAssistantDocuments");
-                });
-
-            modelBuilder.Entity("DigitalHub.Domain.Domains.AIChatLog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("BotResponse")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("FullName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Language")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SessionId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserQuery")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("AIChatLogs");
                 });
 
             modelBuilder.Entity("DigitalHub.Domain.Domains.AttachmentTransaction", b =>
@@ -169,58 +121,6 @@ namespace DigitalHub.Domain.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("AttachmentTransaction");
-                });
-
-            modelBuilder.Entity("DigitalHub.Domain.Domains.EmployeeChatMessage", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("AttachmentUrl")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsRead")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Message")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("ReceiverId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SenderId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("SentDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ReceiverId");
-
-                    b.HasIndex("SenderId");
-
-                    b.ToTable("EmployeeChatMessages");
                 });
 
             modelBuilder.Entity("DigitalHub.Domain.Domains.IconConfiguration", b =>
@@ -514,50 +414,6 @@ namespace DigitalHub.Domain.Migrations
                     b.ToTable("NotificationUser");
                 });
 
-            modelBuilder.Entity("DigitalHub.Domain.Domains.UserConnection", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("ConnectionId")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CreatedBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsOnline")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("LastActive")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UpdatedBy")
-                        .HasMaxLength(250)
-                        .HasColumnType("nvarchar(250)");
-
-                    b.Property<DateTime>("UpdatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserConnections");
-                });
-
             modelBuilder.Entity("DigitalHub.Domain.Domains.UserType", b =>
                 {
                     b.Property<int>("Id")
@@ -665,25 +521,6 @@ namespace DigitalHub.Domain.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("DigitalHub.Domain.Domains.EmployeeChatMessage", b =>
-                {
-                    b.HasOne("DigitalHub.Domain.Domains.Users", "Receiver")
-                        .WithMany()
-                        .HasForeignKey("ReceiverId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("DigitalHub.Domain.Domains.Users", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Receiver");
-
-                    b.Navigation("Sender");
-                });
-
             modelBuilder.Entity("DigitalHub.Domain.Domains.IconConfigurationAttachment", b =>
                 {
                     b.HasOne("DigitalHub.Domain.Domains.AttachmentTransaction", "AttachmentTransaction")
@@ -731,17 +568,6 @@ namespace DigitalHub.Domain.Migrations
                         .IsRequired();
 
                     b.Navigation("NotificationConfiguration");
-                });
-
-            modelBuilder.Entity("DigitalHub.Domain.Domains.UserConnection", b =>
-                {
-                    b.HasOne("DigitalHub.Domain.Domains.Users", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("DigitalHub.Domain.Domains.UserType", b =>

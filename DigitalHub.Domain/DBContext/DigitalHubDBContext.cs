@@ -26,6 +26,10 @@ namespace DigitalHub.Domain.DBContext
         public virtual DbSet<NotificationConfiguration> NotificationConfiguration { get; set; }
         public virtual DbSet<NotificationUser> NotificationUser { get; set; }
         public virtual DbSet<NotificationAttachment> NotificationAttachment { get; set; }
+        public virtual DbSet<AIAssistantDocument> AIAssistantDocuments { get; set; }
+        public virtual DbSet<AIChatLog> AIChatLogs { get; set; }
+        public virtual DbSet<EmployeeChatMessage> EmployeeChatMessages { get; set; }
+        public virtual DbSet<UserConnection> UserConnections { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -64,6 +68,19 @@ namespace DigitalHub.Domain.DBContext
                           value => value.ToString(),
                           value => (NotificationAudienceEnum)Enum.Parse(typeof(NotificationAudienceEnum), value)
                     ));
+            });
+
+            modelBuilder.Entity<EmployeeChatMessage>(entity =>
+            {
+                entity.HasOne(m => m.Sender)
+                    .WithMany()
+                    .HasForeignKey(m => m.SenderId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(m => m.Receiver)
+                    .WithMany()
+                    .HasForeignKey(m => m.ReceiverId)
+                    .OnDelete(DeleteBehavior.Restrict);
             });
 
             OnModelCreatingPartial(modelBuilder);

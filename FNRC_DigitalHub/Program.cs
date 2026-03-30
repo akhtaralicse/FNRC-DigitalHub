@@ -8,11 +8,13 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Server.IISIntegration;
 using Microsoft.EntityFrameworkCore; 
 using System.Text.Json.Serialization;
+using DigitalHub.Services.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddSignalR();
 
 string xLoginPath = "/Account/Login";
 ConfigurationManager configuration = builder.Configuration;
@@ -117,6 +119,8 @@ app.UseMiddleware<GlobalErrorHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseStaticFiles();
  
+
+app.MapHub<ChatHub>("/chatHub");
 
 app.MapControllerRoute(
     name: "default",
