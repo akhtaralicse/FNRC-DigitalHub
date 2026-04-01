@@ -7,20 +7,12 @@ namespace DigitalHub.Domain.Domains
 
     public class Users : BaseDomainEntity
     {
+        public Guid UId { get; set; } = new Guid();
         public int EmployeeId { get; set; }
         public string NameAr { get; set; }
-        public string NameEn { get; set; }
-        public string DepartmentNameEn { get; set; }
-        public string DepartmentNameAr { get; set; }
+        public string NameEn { get; set; } 
         public string Email { get; set; }
-        public string MobileNo { get; set; }
-
-        public string EId { get; set; }
-        public string UId { get; set; }
-        public string Gender { get; set; }
-        public string UserSOPType { get; set; }
-        public string IdType { get; set; }
-        public string UAEPassEmail { get; set; }
+        public string MobileNo { get; set; } 
 
 
         public ICollection<UserType> UserType { get; set; } = [];

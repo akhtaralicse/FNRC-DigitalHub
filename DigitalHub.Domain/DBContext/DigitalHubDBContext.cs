@@ -26,6 +26,7 @@ namespace DigitalHub.Domain.DBContext
         public virtual DbSet<NotificationConfiguration> NotificationConfiguration { get; set; }
         public virtual DbSet<NotificationUser> NotificationUser { get; set; }
         public virtual DbSet<NotificationAttachment> NotificationAttachment { get; set; }
+        public virtual DbSet<UserType> UserType { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

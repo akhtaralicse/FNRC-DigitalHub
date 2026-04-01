@@ -1,4 +1,4 @@
-﻿@using Microsoft.Extensions.Configuration
+@using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
 @model List<IconConfigurationDTO>
 @{
@@ -31,17 +31,22 @@
     // Function to check if we should skip the first videos
     function shouldSkipInitialVideos() {
         const skipStartTime = localStorage.getItem("skipStartTime");
+        const firstLoopFinished = localStorage.getItem("firstLoopFinished") === "true";
         const now = new Date().getTime();
 
-        // If skipStartTime exists and is within the 30-minute window, skip the first videos
-        if (skipStartTime && now - parseInt(skipStartTime) < 30 * 60 * 1000) {
-            return true;
+        // If 30-min window is over or cycle has reset, return false
+        if (!skipStartTime || now - parseInt(skipStartTime) >= 30 * 60 * 1000) {
+            localStorage.setItem("skipStartTime", now.toString());
+            localStorage.removeItem("firstLoopFinished");
+            return false;
         }
 
-        // Otherwise, reset the skipStartTime
-        localStorage.setItem("skipStartTime", now.toString());
-        return false;
+        // If first loop is finished, return true to skip initial content
+        return firstLoopFinished;
     }
+
+    let isInitialStart = true;
+    const SkipDelaySec = @int.Parse(Configuration["Session:TotalSecondDelayInStart"]);
 
     // Determine the starting index
     if (shouldSkipInitialVideos()) {
@@ -63,6 +68,16 @@
         nextPlayer.load();
 
         nextPlayer.oncanplaythrough = () => {
+             // If we are skipping (after first loop or refresh in cycle), set the offset
+            let skipped = false;
+            if (isInitialStart && shouldSkipInitialVideos()) {
+                if (nextPlayer.duration > SkipDelaySec) {
+                    nextPlayer.currentTime = SkipDelaySec;
+                    skipped = true;
+                }
+            }
+            isInitialStart = false;
+            
             nextPlayer.play();
 
             // Cross-fade
@@ -78,14 +93,13 @@
                     currentIndex++;
                 } else {
                     // We reached the last video.
-                    // If there are 3 or more videos, jump back to index 2 (the 3rd video).
-                    // If there are only 2 videos total, stay on the last one or jump to 0
-                    // depending on your preference, but usually index 2 starts the "loop".
-                    currentIndex = (videoList.length > SkipVideoFromStart) ? SkipVideoFromStart : currentIndex;
+                    // Mark first loop finished
+                    localStorage.setItem("firstLoopFinished", "true");
+                    currentIndex = (videoList.length > SkipVideoFromStart) ? SkipVideoFromStart : 0;
                 }
 
                 playNextVideo();
-            }, videoData.duration * 1000);
+            }, skipped ? (videoData.duration - SkipDelaySec) * 1000 : videoData.duration * 1000);
 
             nextPlayer.oncanplaythrough = null;
         };

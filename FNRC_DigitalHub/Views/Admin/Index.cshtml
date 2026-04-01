@@ -1,4 +1,4 @@
-﻿@{
+@{
     ViewData["Title"] = "Home Page";
     Layout = "~/Views/Shared/_Layout_Admin.cshtml";
 }
@@ -16,11 +16,10 @@
 
 
         <div class="menu-card">
-            <div class="menu-header">@loc.localizer["Ideas"]</div>
+            <div class="menu-header">@loc.localizer["Media"]</div>
             <ul class="submenu">
                
-                <li onclick="openNewApp('/admin/iconsetting')">@loc.localizer["Icons"]</li>
-                
+                <li onclick="openNewApp('/admin/iconsetting')">@loc.localizer["Icons"]</li>                
 
                 <li onclick="openNewApp('/admin/videosetting')">  @loc.localizer["BackgroundVideo"] </li>
 
@@ -30,6 +29,13 @@
             <div class="menu-header">@loc.localizer["Announcement"]</div>
             <ul class="submenu">
                 <li onclick="openNewApp('/admin/Announcement')">@loc.localizer["Announcement"]</li>
+
+            </ul>
+        </div>
+        <div class="menu-card">
+            <div class="menu-header">@loc.localizer["Users"]</div>
+            <ul class="submenu">
+                <li onclick="openNewApp('/admin/userrolemanage')">@loc.localizer["RoleManagement"]</li>
 
             </ul>
         </div>

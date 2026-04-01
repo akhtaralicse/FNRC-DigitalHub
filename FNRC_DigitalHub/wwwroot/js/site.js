@@ -1,4 +1,4 @@
-﻿$(function () {
+$(function () {
     //$(document).ajaxStart(function (r) {
     //   // console.log(r);
     //    //console.log("ajax start");
@@ -154,13 +154,23 @@ function truncateFileName(filename, maxLength = 10) {
 }
 function CheckLodingTimeOver() {
     const skipStartTime = localStorage.getItem("skipStartTime");
+    const firstLoopFinished = localStorage.getItem("firstLoopFinished") === "true";
     const now = new Date().getTime();
 
+    // If 30-min cycle is over or not started, reset and show intro
+    if (!skipStartTime || now - parseInt(skipStartTime) >= 30 * 60 * 1000) {
+        localStorage.removeItem("skipStartTime");
+        localStorage.removeItem("firstLoopFinished");
+        localStorage.setItem("skipStartTime", now.toString()); // Start new cycle
+        return true; // Loading time not over, show intro
+    }
 
-    if (skipStartTime && now - parseInt(skipStartTime) < 30 * 60 * 1000) {
+    // If first loop is finished, loading time is over
+    if (firstLoopFinished) {
         return false;
     }
-    return true;
+
+    return true; // First loop not finished yet, show intro
 }
 function formInputs(controlName) {
     //return document.getElementsByClassName(controlName).length > 0

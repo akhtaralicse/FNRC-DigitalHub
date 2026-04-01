@@ -1,6 +1,7 @@
 ﻿ 
 using AutoMapper;
 using DigitalHub.Services.Interface;
+using DigitalHub.Services.Services;
 using DigitalHub.Services.Services.Attachment;
 using DigitalHub.Services.Services.IconConfig; 
 using Microsoft.AspNetCore.Http;
@@ -38,6 +39,8 @@ namespace DigitalHub.Services.Shared
              services.AddScoped<IAttachmentService, AttachmentService>();
              services.AddScoped<INotificationConfigurationService, NotificationConfigurationService>();
              services.AddScoped<IIconConfigurationAttachmentService, IconConfigurationAttachmentService>();
+             services.AddScoped<IUserRoleService, UserRoleService>();
+             services.AddScoped<IUserService, UserService>();
 
         }
 

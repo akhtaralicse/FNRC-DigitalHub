@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 @{
     var lang = loc.localizer["lang"];
     var dir = lang == "ar" ? "rtl" : "ltr";
@@ -31,8 +31,9 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1 mr-auto">
                         <li class="nav-item mt-2">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="admin" asp-action="Index">Home</a>
+                            <a class="nav-link text-dark" asp-area="" asp-controller="admin" asp-action="Index">@loc.localizer["Home"]</a>
                         </li>
+                      
                         <li class="navbar-text my-lg-0">
                             <a class="lang-switch"
                                style="display:@showAr"

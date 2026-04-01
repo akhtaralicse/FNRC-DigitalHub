@@ -1,0 +1,206 @@
+@using DigitalHub.Services.DTO
+@model dynamic
+@{
+    ViewData["Title"] = "User Role Management";
+    Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+    var users = ViewBag.Users as List<UsersDTO>;
+    var roles = ViewBag.Roles; 
+    var lang = loc.localizer["lang"];
+}
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<link href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css" rel="stylesheet" />
+
+<div class="card shadow-sm mt-4">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">@loc.localizer["UserRoleManagement"]</h5>
+        <button type="button" class="btn btn-light btn-sm" onclick="showAddModal()">
+            <i class="fa fa-plus"></i> @loc.localizer["AssignNewRole"]
+        </button>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table id="roleTable" class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th>@loc.localizer["EmployeeID"]</th>
+                        <th>@loc.localizer["NameEn"]</th>
+                        <th>@loc.localizer["Email"]</th>
+                        <th>@loc.localizer["AssignedRoles"]</th>
+                        <th>@loc.localizer["Actions"]</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="roleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">@loc.localizer["AssignUserRoles"]</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="roleForm">
+                    <div class="mb-3">
+                        <label class="form-label">@loc.localizer["SearchUser"]</label>
+                        <select id="userSelect" class="form-control select2" style="width: 100%">
+                            <option value="">@loc.localizer["SelectUser"]</option>
+                            @foreach (var user in users)
+                            {
+                                <option value="@user.Id" data-eid="@user.EmployeeId">@(lang == "ar" ? user.NameAr : user.NameEn) (@user.EmployeeId)</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">@loc.localizer["SelectFeaturesRoles"]</label>
+                        <select id="roleSelect" class="form-control select2" multiple="multiple" style="width: 100%">
+                            @foreach (var role in roles)
+                            {
+                                <option value="@role.Id">@role.DisplayName</option>
+                            }
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">@loc.localizer["Cancel"]</button>
+                <button type="button" class="btn btn-primary" onclick="saveRoles()">@loc.localizer["SaveChanges"]</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
+
+    <script>
+        let table;
+
+        $(document).ready(function () {
+            $('.select2').select2({
+                dropdownParent: $('#roleModal')
+            });
+
+            table = $('#roleTable').DataTable({
+                ajax: {
+                    url: '/Admin/GetAssignedRoles',
+                    dataSrc: 'data'
+                },
+                columns: [
+                    { data: 'EmployeeId' },
+                    { data: 'NameEn' },
+                    { data: 'Email' },
+                    { 
+                        data: 'UserType',
+                        render: function(data) {
+                            const allRoles = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(roles));
+                            return data.map(r => {
+                                const found = allRoles.find(ar => ar.Id === r.Type || ar.Name === r.Type);
+                                const label = found ? found.DisplayName : r.Type;
+                                return `<span class="badge bg-warning text-dark me-1">${label}</span>`;
+                            }).join('');
+                        }
+                    },
+                    {
+                        data: 'Id',
+                        render: function(data, type, row) {
+                            return `
+                                <button class="btn btn-sm btn-outline-primary" onclick="editRoles(${data})"><i class="fa fa-edit"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteRoles(${data})"><i class="fa fa-trash"></i></button>
+                            `;
+                        }
+                    }
+                ]
+            });
+        });
+
+        function getRoleName(typeIntOrName) {
+            const allRoles = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(roles));
+            const role = allRoles.find(r => r.Id === typeIntOrName || r.Name === typeIntOrName);
+            return role ? role.DisplayName : '@(loc.localizer["Unknown"])';
+        }
+
+        function showAddModal() {
+            $('#userSelect').val(null).trigger('change').prop('disabled', false);
+            $('#roleSelect').val(null).trigger('change');
+            $('#roleModal').modal('show');
+        }
+
+        async function editRoles(userId) {
+            $('#userSelect').val(userId).trigger('change').prop('disabled', true);
+            const res = await fetch(`/Admin/GetUserRoles?userId=${userId}`);
+            const result = await res.json();
+            if (result.success) {
+                const allRoles = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(roles));
+                // Map names back to IDs if they are strings
+                const roleIds = result.data.map(r => {
+                    const found = allRoles.find(ar => ar.Name === r.Type || ar.Id === r.Type);
+                    return found ? found.Id : r.Type;
+                });
+                $('#roleSelect').val(roleIds).trigger('change');
+                $('#roleModal').modal('show');
+            }
+        }
+
+        async function saveRoles() {
+            const userId = $('#userSelect').val();
+            const roles = $('#roleSelect').val();
+
+            if (!userId) {
+                Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SelectUserError"])', 'error');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('userId', userId);
+            roles.forEach(r => formData.append('roles', r));
+
+            const res = await fetch('/Admin/AssignUserRoles', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await res.json();
+            if (result.success) {
+                Swal.fire('@(loc.localizer["Success"])', '@(loc.localizer["RolesAssigned"])', 'success');
+                $('#roleModal').modal('hide');
+                table.ajax.reload();
+            } else {
+                Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["RolesFailed"])', 'error');
+            }
+        }
+
+        async function deleteRoles(userId) {
+            const confirm = await Swal.fire({
+                title: '@(loc.localizer["AreYouSure"])',
+                text: "@(loc.localizer["RemoveAllRoles"])",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '@(loc.localizer["YesRemoveThem"])'
+            });
+
+            if (confirm.isConfirmed) {
+                const formData = new FormData();
+                formData.append('userId', userId);
+                const res = await fetch('/Admin/DeleteUserRoles', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await res.json();
+                if (result.success) {
+                    Swal.fire('@(loc.localizer["Success"])', '@(loc.localizer["RolesRemoved"])', 'success');
+                    table.ajax.reload();
+                } else {
+                    Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["RolesRemoveFailed"])', 'error');
+                }
+            }
+        }
+    </script>
+}

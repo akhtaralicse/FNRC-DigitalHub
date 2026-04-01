@@ -38,13 +38,13 @@
             <span class="lang-code" style="padding-bottom: 7px;">ع</span>
             <i class="fa fa-globe"> </i>
         </a>
-        @if (isLogin)
-        {
-            <div class="">
+       @*  @if (isLogin)
+        { *@
+            <div class="Notification_Icon"  >
                 @await Html.PartialAsync("~/views/shared/components/homepage/notificationicon.cshtml", Model)
             </div>
-        }
-        <span class="user-info mx-1">
+        @* } *@
+        <span class="user-info mx-2">
             <i class="fa fa-user"> </i> @loc.localizer["Welcome"], <strong id="username">...</strong>
         </span>
 
@@ -208,6 +208,7 @@
                 })
                 .then(x => {
                     console.log(x);
+                    $('#Notification_Icon').show();
                     if(x.message == '[]'){
                         return;
                     }

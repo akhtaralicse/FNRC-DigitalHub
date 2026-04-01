@@ -10,13 +10,15 @@
     <PackageReference Include="AutoMapper" Version="16.1.1" />
     <PackageReference Include="ClosedXML" Version="0.105.0" />
     <PackageReference Include="EPPlus" Version="8.4.2" />
-    <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.11.0" />
+    <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="14.11.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.11">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="System.DirectoryServices.AccountManagement" Version="10.0.0" />
-  </ItemGroup>
+      <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+    <PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="8.14.0" />
+    </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DigitalHub.Domain\DigitalHub.Domain.csproj" />

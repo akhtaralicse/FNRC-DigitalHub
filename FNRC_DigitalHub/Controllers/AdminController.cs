@@ -10,6 +10,9 @@ using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Reflection;
+using System.ComponentModel.DataAnnotations;
 
 namespace FNRC_DigitalHub.Controllers
 {
@@ -20,16 +23,19 @@ namespace FNRC_DigitalHub.Controllers
         private readonly IIconConfigurationService iconConfigurationService;
         private readonly INotificationConfigurationService notificationConfigurationService;
         private readonly IIconConfigurationAttachmentService iconConfigurationAttachmentService;
+        private readonly IUserRoleService userRoleService;
 
         public AdminController(ILogger<HomeController> logger, IConfiguration configuration, IIconConfigurationService iconConfigurationService
             , INotificationConfigurationService notificationConfigurationService,
-            IIconConfigurationAttachmentService iconConfigurationAttachmentService)
+            IIconConfigurationAttachmentService iconConfigurationAttachmentService,
+            IUserRoleService userRoleService)
         {
             _logger = logger;
             this.configuration = configuration;
             this.iconConfigurationService = iconConfigurationService;
             this.notificationConfigurationService = notificationConfigurationService;
             this.iconConfigurationAttachmentService = iconConfigurationAttachmentService;
+            this.userRoleService = userRoleService;
         }
 
         public IActionResult Index()
@@ -198,7 +204,54 @@ namespace FNRC_DigitalHub.Controllers
         }
         #endregion
 
+        #region User Role Management ------------------------------
+        public async Task<IActionResult> UserRoleManage()
+        {
+            var users = await userRoleService.GetAllUsers();
+            var roles = Enum.GetValues(typeof(UserTypeEnum))
+                            .Cast<UserTypeEnum>()
+                            .Select(e => new
+                            {
+                                Id = (int)e,
+                                Name = e.ToString(), // Keep enum name for mapping
+                                DisplayName = typeof(UserTypeEnum).GetMember(e.ToString()).FirstOrDefault()?.GetCustomAttribute<DisplayAttribute>()?.Name ?? e.ToString()
+                            })
+                            .ToList();
 
+            ViewBag.Users = users;
+            ViewBag.Roles = roles;
+
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAssignedRoles()
+        {
+            var data = await userRoleService.GetUsersWithRoles();
+            return Json(new { success = true, data });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetUserRoles(int userId)
+        {
+            var data = await userRoleService.GetUserRoles(userId);
+            return Json(new { success = true, data });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AssignUserRoles(int userId, List<int> roles)
+        {
+            var result = await userRoleService.AssignRoles(userId, roles);
+            return Json(new { success = result, message = result ? "Roles assigned successfully" : "Failed to assign roles" });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUserRoles(int userId)
+        {
+            var result = await userRoleService.AssignRoles(userId, new List<int>()); // Assign empty list to remove all
+            return Json(new { success = result, message = result ? "Roles removed successfully" : "Failed to remove roles" });
+        }
+        #endregion
 
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

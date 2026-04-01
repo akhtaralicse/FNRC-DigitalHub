@@ -16,6 +16,7 @@ namespace DigitalHub.Services.Shared
             
             CreateMap<IconConfigurationAttachment, IconConfigurationAttachmentDTO>().ReverseMap();
             CreateMap<Users, UsersDTO>().ReverseMap(); 
+            CreateMap<UserType, UserTypeDTO>().ReverseMap();
             CreateMap<NotificationConfiguration,NotificationConfigurationDTO>().ReverseMap(); 
             CreateMap<NotificationUser, NotificationUserDTO>().ReverseMap(); 
             CreateMap<NotificationAttachment,NotificationAttachmentDTO>().ReverseMap(); 

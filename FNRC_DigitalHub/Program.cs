@@ -4,9 +4,11 @@ using DigitalHub.Services.Shared;
 using FNRC_DigitalHub.Helper;
 using FNRC_DigitalHub.Middleware;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Server.IISIntegration;
-using Microsoft.EntityFrameworkCore; 
+using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -85,9 +87,14 @@ builder.Host.UseSerilogLogging(serilogConfig);
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
     var supportedCultures = new[] { "ar", "en" };
-    options.SetDefaultCulture(supportedCultures[0])
-        .AddSupportedCultures(supportedCultures)
-        .AddSupportedUICultures(supportedCultures);
+    var cultures = supportedCultures.Select(c => new CultureInfo(c)).ToList();
+
+    options.DefaultRequestCulture = new RequestCulture("ar");
+    options.SupportedCultures = cultures;
+    options.SupportedUICultures = cultures;
+
+    // Force Arabic by ignoring the browser's language header (Accept-Language)
+    options.RequestCultureProviders.Remove(options.RequestCultureProviders.OfType<AcceptLanguageHeaderRequestCultureProvider>().First());
 });
 builder.Services.AddAuthentication(IISDefaults.AuthenticationScheme);
 

@@ -1,5 +1,6 @@
 ﻿using DigitalHub.Domain.Enums;
 using DigitalHub.Services.DTO;
+using DigitalHub.Services.Interface;
 using FNRC_DigitalHub.Helper;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -12,17 +13,19 @@ namespace FNRC_DigitalHub.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WhoAmIController(IConfiguration config, IHostEnvironment environment) : BaseController
+    public class WhoAmIController(IConfiguration config, IHostEnvironment environment, IUserService userService) : BaseController
     {
         public IConfiguration Config { get; } = config;
         public IHostEnvironment Environment { get; } = environment;
+        private readonly IUserService _userService = userService;
 
         [HttpGet("me")]
         public async Task<IActionResult> GetCurrentUserAsync()
         { 
             if (Environment.IsDevelopment())
             {
-                var r = await CreateUserSessionAsync("TestUser", "TestUser", "TestUser", 0, null, "", "");
+                var r = await CreateUserSessionAsync("TestUser", "TestUser", "TestUser", 74215, null, "", "");
+                var user1 = await _userService.GetOrRegisterUser( 74215, "TestUser", "TestUser@fnrc.gov.ae");
                 if (r)
                     return Ok(new { UserName = "TestUser", DisplayName = "TestUser", EmployeeId= "74215" });
             }
@@ -37,32 +40,21 @@ namespace FNRC_DigitalHub.Controllers
             var samAccountName = domainUser.Contains('\\') ? domainUser.Split('\\')[1] : domainUser;
 
             var (DisplayName, EmployeeId) = GetUserDetailsFromAd(samAccountName);
-            ICollection<UserTypeDTO> UserType = [new()
-            {
-                Type = UserTypeEnum.Employee
-            }];
+            if (string.IsNullOrEmpty(EmployeeId)) return Unauthorized("Employee ID not found in AD.");
+
+            var user = await _userService.GetOrRegisterUser(int.Parse(EmployeeId), DisplayName, samAccountName + "@fnrc.gov.ae");
              
             var claims = new List<Claim>
-                        {
-                            new(ClaimTypes.Name, samAccountName),
-                            new("EmployeeId", EmployeeId ?? string.Empty),
-                            new("DisplayName", DisplayName), 
-                            new("UserType", string.Join(",", UserType.Select(u => u.Type.ToString())))                            
-                        };
+            {
+                new(ClaimTypes.Name, samAccountName),
+                new("EmployeeId", user.EmployeeId.ToString()),
+                new("DisplayName", user.NameEn), 
+                new("UserType", string.Join(",", user.UserType.Select(u => u.Type.ToString())))                            
+            };
 
-            //var claimsIdentity = new ClaimsIdentity(claims, "DigitalHubCookie");
-         
-            //var authProperties = new AuthenticationProperties
-            //{
-            //    IsPersistent = true,
-            //    ExpiresUtc = DateTimeOffset.UtcNow.AddHours(12)
-            //};
+            await CreateUserSessionAsync(samAccountName, user.NameEn, user.NameAr, user.EmployeeId,  user.UserType, user.MobileNo, samAccountName+"@fnrc.gov.ae");
 
-            //await HttpContext.SignInAsync("DigitalHubCookie", new ClaimsPrincipal(claimsIdentity), authProperties);
-
-            var res = await CreateUserSessionAsync(samAccountName, DisplayName, DisplayName, int.Parse(EmployeeId), UserType, "", "");
-
-            return Ok(new { UserName = samAccountName, DisplayName, EmployeeId });
+            return Ok(new { UserName = samAccountName, DisplayName = user.NameEn, EmployeeId = user.EmployeeId.ToString() });
         }
 
         private (string DisplayName, string EmployeeId) GetUserDetailsFromAd(string samAccountName)

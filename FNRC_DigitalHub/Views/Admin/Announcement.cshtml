@@ -1,4 +1,4 @@
-﻿ 
+ 
 @{
     ViewData["Title"] = "Home Page";
     Layout = "~/Views/Shared/_Layout_Admin.cshtml";
@@ -18,12 +18,12 @@
                 <div>
                     <span class="me-4">
                         <input type="radio" id="showDiv1" name="toggleGroup" value="1" checked>
-                        <label for="showDiv1">Notification By Text</label>
+                        <label for="showDiv1">@loc.localizer["NotificationByText"]</label>
                     </span>
 
                     <span>
                         <input type="radio" id="showDiv2" name="toggleGroup" value="2">
-                        <label for="showDiv2">Notification By Image</label>
+                        <label for="showDiv2">@loc.localizer["NotificationByImage"]</label>
                     </span>
                 </div>
             </div>
@@ -34,11 +34,11 @@
                 <div class="col-md-3 mb-3 step1">
                     <input type="hidden" name="Id" id="Id" value="" />
                     <label for="title" class="form-label  ">@loc.localizer["Title"] @loc.localizer["ArabicLang"]</label>
-                    <input type="text" class="form-control" id="TitleAr" name="TitleAr" placeholder="Title Ar" maxlength="100">
+                    <input type="text" class="form-control" id="TitleAr" name="TitleAr" placeholder="@loc.localizer["NameAr"]" maxlength="100">
                 </div>
                 <div class="col-md-3 mb-3 step1">
                     <label for="title" class="form-label  ">@loc.localizer["Title"] @loc.localizer["EnglishLang"]</label>
-                    <input type="text" class="form-control" id="TitleEn" name="TitleEn" placeholder="Title En" maxlength="100">
+                    <input type="text" class="form-control" id="TitleEn" name="TitleEn" placeholder="@loc.localizer["NameEn"]" maxlength="100">
 
                 </div>
                 <div class="col-md-3 mb-3">
@@ -81,17 +81,17 @@
                     <div class="mb-3 col-md-4">
                         <label for="actionUrl" class="form-label">@loc.localizer["ActionURL"]</label>
                         <!-- Name changed to ActionURL to match client script -->
-                        <input type="url" class="form-control" id="ActionUrl" name="ActionURL" placeholder="https://example.com/action" />
+                        <input type="url" class="form-control" id="ActionUrl" name="ActionURL" placeholder="@loc.localizer["ActionURL"]" />
                     </div>
 
                     <div class="mb-3 col-md-4">
                         <label for="actionText" class="form-label">@loc.localizer["ActionText"] @loc.localizer["ArabicLang"]</label>
-                        <input type="text" class="form-control" id="ActionTextAr" name="ActionTextAr" placeholder="Learn More" maxlength="50" />
+                        <input type="text" class="form-control" id="ActionTextAr" name="ActionTextAr" placeholder="@loc.localizer["ActionText"] @loc.localizer["ArabicLang"]" maxlength="50" />
                     </div>
 
                     <div class="mb-3 col-md-4">
                         <label for="actionText" class="form-label">@loc.localizer["ActionText"] @loc.localizer["EnglishLang"]</label>
-                        <input type="text" class="form-control" id="ActionTextEn" name="ActionTextEn" placeholder="Learn More" maxlength="50" />
+                        <input type="text" class="form-control" id="ActionTextEn" name="ActionTextEn" placeholder="@loc.localizer["ActionText"] @loc.localizer["EnglishLang"]" maxlength="50" />
                     </div>
                 </div>
             </div>

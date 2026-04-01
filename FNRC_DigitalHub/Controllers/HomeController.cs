@@ -96,13 +96,19 @@ namespace FNRC_DigitalHub.Controllers
         }
 
         [HttpGet]
-        public IActionResult  SSOTokenTest()
+        public IActionResult SSOTokenTest(string employeeId)
         {
-            var tokenService = new SSOTokenService();
-            var token = tokenService.GenerateToken("1234", "username_test", "displayName_test", 60);
-            return Json(new { token });
+            try
+            {
+                var tokenService = new SSOTokenService();
+                var token = tokenService.GenerateToken(employeeId, "username_test", "displayName_test", 960);
+                return Json(new { token });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { error = ex.Message });
+            }
         }
-
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
