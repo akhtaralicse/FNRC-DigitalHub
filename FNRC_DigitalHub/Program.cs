@@ -8,8 +8,12 @@ using Microsoft.AspNetCore.Localization;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.AspNetCore.Server.IISIntegration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Globalization;
 using System.Text.Json.Serialization;
+
+CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("ar");
+CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("ar");
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,7 +29,7 @@ builder.Services.AddDbContext<DigitalHubDBContext>(options => options.UseSqlServ
     )
 );
 
-builder.Services.AddSingleton<CommonLocalizationService>();
+builder.Services.AddScoped<CommonLocalizationService>();
 builder.Services.AddMvc().AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix);
 //builder.Services.AddSingleton<SharedResource>();
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
@@ -86,21 +90,26 @@ var serilogConfig = new ConfigurationBuilder()
 builder.Host.UseSerilogLogging(serilogConfig);
 builder.Services.Configure<RequestLocalizationOptions>(options =>
 {
-    var supportedCultures = new[] { "ar", "en" };
-    var cultures = supportedCultures.Select(c => new CultureInfo(c)).ToList();
+    var supportedCultures = new[] { 
+        new CultureInfo("ar"), 
+        new CultureInfo("en") 
+    };
 
-    options.DefaultRequestCulture = new RequestCulture("ar");
-    options.SupportedCultures = cultures;
-    options.SupportedUICultures = cultures;
+    options.DefaultRequestCulture = new RequestCulture("ar", "ar");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
 
-    // Force Arabic by ignoring the browser's language header (Accept-Language)
-    options.RequestCultureProviders.Remove(options.RequestCultureProviders.OfType<AcceptLanguageHeaderRequestCultureProvider>().First());
+    // By clearing providers and adding only QueryString and Cookie, 
+    // we ensure the browser's language (Accept-Language) is ignored.
+    options.RequestCultureProviders.Clear();
+    options.RequestCultureProviders.Add(new QueryStringRequestCultureProvider());
+    options.RequestCultureProviders.Add(new CookieRequestCultureProvider());
 });
 builder.Services.AddAuthentication(IISDefaults.AuthenticationScheme);
 
 var app = builder.Build();
 
-app.UseRequestLocalization();
+app.UseRequestLocalization(app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value);
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
