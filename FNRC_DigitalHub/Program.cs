@@ -20,7 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-string xLoginPath = "/Account/Login";
+string xLoginPath = "/WhoAmI/me";
 ConfigurationManager configuration = builder.Configuration;
 ConfigureHostBuilder hostBuilder = builder.Host;
 var connectionDB = builder.Configuration.GetConnectionString("SqlConnectionStrings");
@@ -52,11 +52,13 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultScheme = "DigitalHubCookie";
+    options.DefaultAuthenticateScheme = "DigitalHubCookie";
+    options.DefaultChallengeScheme = "DigitalHubCookie";
 })
  .AddCookie("DigitalHubCookie", options =>
  {
+     options.LoginPath = "/WhoAmI/me";
      options.Cookie.Name = ".DigitalHubSharedCookie";
      options.Cookie.Domain = ".fnrc.gov.ae";
      options.Cookie.Path = "/";
@@ -65,13 +67,7 @@ builder.Services.AddAuthentication(options =>
      options.Cookie.SameSite = SameSiteMode.Lax;
  });
 
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.LoginPath = xLoginPath;
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(int.Parse(configuration["Session:ExpireDuration"]));
-});
+
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -99,13 +95,11 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.SupportedCultures = supportedCultures;
     options.SupportedUICultures = supportedCultures;
 
-    // By clearing providers and adding only QueryString and Cookie, 
-    // we ensure the browser's language (Accept-Language) is ignored.
     options.RequestCultureProviders.Clear();
     options.RequestCultureProviders.Add(new QueryStringRequestCultureProvider());
     options.RequestCultureProviders.Add(new CookieRequestCultureProvider());
 });
-builder.Services.AddAuthentication(IISDefaults.AuthenticationScheme);
+
 
 var app = builder.Build();
 

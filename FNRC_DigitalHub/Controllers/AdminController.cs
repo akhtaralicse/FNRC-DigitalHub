@@ -5,17 +5,20 @@ using DigitalHub.Services.DTO;
 using DigitalHub.Services.Interface;
 using DigitalHub.Services.Services;
 using DigitalHub.Services.Services.IconConfig;
+using DocumentFormat.OpenXml.InkML;
 using FNRC_DigitalHub.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OfficeOpenXml;
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics;
-using System.Threading.Tasks;
 using System.Linq;
 using System.Reflection;
-using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace FNRC_DigitalHub.Controllers
 {
+   // [Authorize]
     public class AdminController : Controller
     {
         private readonly ILogger<HomeController> _logger;
@@ -39,20 +42,30 @@ namespace FNRC_DigitalHub.Controllers
         }
 
         public IActionResult Index()
-        {
+        { 
+            //if (!User.Claims.Any(c => c.Type == System.Security.Claims.ClaimTypes.Role && c.Value != UserTypeEnum.Employee.ToString()))
+            //{
+            //    return RedirectToAction("Index", "Home");
+            //}
             return View();
         }
 
 
-        #region Icon and video--------------------
+        #region Icon and video------------------------------
         public async Task<IActionResult> IconSetting()
         {
+            if (!User.IsInRole(UserTypeEnum.IconManager.ToString()) && !User.IsInRole(UserTypeEnum.OthersManager.ToString()))
+                return RedirectToAction("Index");
+
             var data = await iconConfigurationService.GetByType(IconTypeEnum.Icon);
 
             return View(data);
         }
         public async Task<IActionResult> VideoSetting()
         {
+            if (!User.IsInRole(UserTypeEnum.VideoManager.ToString()) && !User.IsInRole(UserTypeEnum.OthersManager.ToString()))
+                return RedirectToAction("Index");
+
             var data = await iconConfigurationService.GetByType(IconTypeEnum.BGVideo);
 
             return View(data);
@@ -101,9 +114,12 @@ namespace FNRC_DigitalHub.Controllers
         #endregion
 
 
-        #region Notification ------------------------------
+        #region Notification --------------------------------------
         public async Task<IActionResult> Announcement()
         {
+            if (!User.IsInRole(UserTypeEnum.AnnouncementManager.ToString()) && !User.IsInRole(UserTypeEnum.OthersManager.ToString()))
+                return RedirectToAction("Index");
+
             //var data = await notificationConfigurationService.GetAll();
 
             return View();
@@ -207,6 +223,9 @@ namespace FNRC_DigitalHub.Controllers
         #region User Role Management ------------------------------
         public async Task<IActionResult> UserRoleManage()
         {
+            if (!User.IsInRole(UserTypeEnum.OthersManager.ToString()))
+                return RedirectToAction("Index");
+
             var users = await userRoleService.GetAllUsers();
             var roles = Enum.GetValues(typeof(UserTypeEnum))
                             .Cast<UserTypeEnum>()

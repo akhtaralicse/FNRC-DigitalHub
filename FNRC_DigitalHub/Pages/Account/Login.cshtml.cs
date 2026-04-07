@@ -62,7 +62,7 @@ namespace FNRC_DigitalHub.Pages.Account
                 new Claim(ClaimTypes.Email, "")
             };
 
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            var identity = new ClaimsIdentity(claims, "DigitalHubCookie");
             var principal = new ClaimsPrincipal(identity);
 
             var authProps = new AuthenticationProperties
@@ -75,7 +75,7 @@ namespace FNRC_DigitalHub.Pages.Account
                 authProps.ExpiresUtc = DateTime.UtcNow.AddMinutes(minutes);
             }
 
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProps);
+            await HttpContext.SignInAsync("DigitalHubCookie", principal, authProps);
 
             return LocalRedirect(ReturnUrl);
         }

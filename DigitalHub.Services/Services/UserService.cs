@@ -48,6 +48,15 @@ namespace DigitalHub.Services.Services
 
                 await _context.SaveChangesAsync();
             }
+            return _mapper.Map<UsersDTO>(user);
+        }
+
+        public async Task<UsersDTO> GetUserByUsername(string username)
+        {
+            var email = username + "@fnrc.gov.ae";
+            var user = await _context.Users
+                .Include(u => u.UserType)
+                .FirstOrDefaultAsync(u => u.Email == email);
 
             return _mapper.Map<UsersDTO>(user);
         }

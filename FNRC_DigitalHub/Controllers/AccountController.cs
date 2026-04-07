@@ -12,9 +12,16 @@ namespace FNRC_DigitalHub.Controllers
     public class AccountController : Controller
     {
         private readonly IConfiguration _config;
-        public AccountController(IConfiguration config)
+        private readonly DigitalHub.Services.Interface.IUserService _userService;
+        private readonly DigitalHub.Services.Interface.IUserRoleService _userRoleService;
+
+        public AccountController(IConfiguration config, 
+            DigitalHub.Services.Interface.IUserService userService, 
+            DigitalHub.Services.Interface.IUserRoleService userRoleService)
         {
             _config = config;
+            _userService = userService;
+            _userRoleService = userRoleService;
         }
 
         [HttpGet]
@@ -50,14 +57,36 @@ namespace FNRC_DigitalHub.Controllers
                 return View(model);
             }
 
+            var sam = username.Contains('\\') ? username.Split('\\').Last() : username;
+            
+            // Try identifying employeeId from sam or from AD.
+            int.TryParse(sam, out int employeeId);
+
+            // Get user from DB or register they first time.
+            var userDto = await _userService.GetOrRegisterUser(employeeId, displayName, username);
+            
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, username),
                 new Claim(ClaimTypes.Name, displayName),
-                new Claim(ClaimTypes.Email, string.Empty)
+                new Claim("EmployeeId", userDto.Id.ToString()),
+                new Claim(ClaimTypes.Email, userDto.Email ?? string.Empty)
             };
 
-            var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            // Add roles to claims
+            if (userDto.UserType != null && userDto.UserType.Any())
+            {
+                foreach (var role in userDto.UserType)
+                {
+                    claims.Add(new Claim(ClaimTypes.Role, role.Type.ToString()));
+                }
+            }
+            else
+            {
+                 claims.Add(new Claim(ClaimTypes.Role, DigitalHub.Domain.Enums.UserTypeEnum.Employee.ToString()));
+            }
+
+            var identity = new ClaimsIdentity(claims, "DigitalHubCookie");
             var principal = new ClaimsPrincipal(identity);
 
             var authProps = new AuthenticationProperties
@@ -70,15 +99,15 @@ namespace FNRC_DigitalHub.Controllers
                 authProps.ExpiresUtc = DateTime.UtcNow.AddMinutes(minutes);
             }
 
-            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal, authProps);
+            await HttpContext.SignInAsync("DigitalHubCookie", principal, authProps);
                 
-            return LocalRedirect(  Url.Content("~/Account/Login"));
+            return LocalRedirect(returnUrl ?? Url.Content("~/"));
         }
 
         [HttpGet] 
         public async Task<IActionResult> Logout()
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignOutAsync("DigitalHubCookie");
 
             HttpContext.Session.Clear(); 
             return RedirectToAction("Login");

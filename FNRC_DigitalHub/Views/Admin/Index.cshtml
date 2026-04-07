@@ -1,8 +1,16 @@
+@using DigitalHub.Domain.Enums
 @{
     ViewData["Title"] = "Home Page";
     Layout = "~/Views/Shared/_Layout_Admin.cshtml";
+    var session = HttpContextAccessor.HttpContext.Session;
+    var user = session.Get<UserSessionDTO>("UserSession");
+
+    var isIconManager = user.Type.Any(x => x.Type == UserTypeEnum.IconManager);
+    var isVideoManager = user.Type.Any(x => x.Type == UserTypeEnum.VideoManager);
+    var isAnnouncementManager = user.Type.Any(x => x.Type == UserTypeEnum.AnnouncementManager);
+    var isOthersManager = user.Type.Any(x => x.Type == UserTypeEnum.OthersManager);
 }
- 
+
 
 <div class="container mt-5 mb-5">
 
@@ -14,31 +22,44 @@
     <div class="menu-container">
 
 
+        @if (isIconManager || isVideoManager)
+        {
+            <div class="menu-card">
+                <div class="menu-header">@loc.localizer["Media"]</div>
+                <ul class="submenu">
+                    @if (isIconManager)
+                    {
+                        <li onclick="openNewApp('/admin/iconsetting')">@loc.localizer["Icons"]</li>
+                    }
+                    @if (isVideoManager)
+                    {
+                        <li onclick="openNewApp('/admin/videosetting')">  @loc.localizer["BackgroundVideo"] </li>
+                    }
+                </ul>
+            </div>
+        }
 
-        <div class="menu-card">
-            <div class="menu-header">@loc.localizer["Media"]</div>
-            <ul class="submenu">
-               
-                <li onclick="openNewApp('/admin/iconsetting')">@loc.localizer["Icons"]</li>                
+        @if (isAnnouncementManager)
+        {
+            <div class="menu-card">
+                <div class="menu-header">@loc.localizer["Announcement"]</div>
+                <ul class="submenu">
+                    <li onclick="openNewApp('/admin/Announcement')">@loc.localizer["Announcement"]</li>
 
-                <li onclick="openNewApp('/admin/videosetting')">  @loc.localizer["BackgroundVideo"] </li>
+                </ul>
+            </div>
+        }
 
-            </ul>
-        </div>
-        <div class="menu-card">
-            <div class="menu-header">@loc.localizer["Announcement"]</div>
-            <ul class="submenu">
-                <li onclick="openNewApp('/admin/Announcement')">@loc.localizer["Announcement"]</li>
+        @if (isOthersManager)
+        {
+            <div class="menu-card">
+                <div class="menu-header">@loc.localizer["Users"]</div>
+                <ul class="submenu">
+                    <li onclick="openNewApp('/admin/userrolemanage')">@loc.localizer["RoleManagement"]</li>
 
-            </ul>
-        </div>
-        <div class="menu-card">
-            <div class="menu-header">@loc.localizer["Users"]</div>
-            <ul class="submenu">
-                <li onclick="openNewApp('/admin/userrolemanage')">@loc.localizer["RoleManagement"]</li>
-
-            </ul>
-        </div>
+                </ul>
+            </div>
+        }
     </div>
 </div>
 
