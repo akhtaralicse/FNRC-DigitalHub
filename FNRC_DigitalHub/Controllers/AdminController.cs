@@ -258,7 +258,7 @@ namespace FNRC_DigitalHub.Controllers
         [HttpPost]
         public async Task<IActionResult> DeleteUserRoles(int userId)
         {
-            var result = await userRoleService.AssignRoles(userId, new List<int>()); // Assign empty list to remove all
+            var result = await userRoleService.AssignRoles(userId, []);  
             return Json(new { success = result, message = result ? "Roles removed successfully" : "Failed to remove roles" });
         }
         #endregion

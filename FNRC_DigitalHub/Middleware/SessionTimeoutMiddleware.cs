@@ -17,7 +17,7 @@ namespace FNRC_DigitalHub.Middleware
         public async Task InvokeAsync(HttpContext context)
         {
             var user = context.Session.Get<UserSessionDTO>("UserSession");
-            var isAdmin = user?.Type.Count > 1;
+            var isAdmin = user?.Type.Count(z => z.Type != UserTypeEnum.Employee) > 0;
 
             var adminPublicPaths = new[] { "/admin" };
 
