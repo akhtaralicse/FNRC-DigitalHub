@@ -1,4 +1,8 @@
-﻿<style>
+﻿@inject IConfiguration Configuration
+@{
+    var mailURL = Configuration["APIURLS:EmailURL"];
+}
+<style>
     .fix-icon {
         position: fixed;
         bottom: 60px;
@@ -6,6 +10,12 @@
         z-index: 1000;
     }
 
+    .fix-icon-email {
+        position: fixed;
+        bottom: 130px;
+        left: 20px;
+        z-index: 1000;
+    }
     .wtsapp-btn {
         display: block;
         width: 55px;
@@ -29,6 +39,11 @@
     }
 </style>
 
+<div class="fix-icon-email">
+    <a href="https://api.whatsapp.com/send/?phone=9718003672&amp;text&amp;type=phone_number&amp;app_absent=0" class="wtsapp-btn" target="_blank">
+        <img src="@mailURL" alt="WhatsApp">
+    </a>
+</div>
 <div class="fix-icon">
     <a href="https://api.whatsapp.com/send/?phone=9718003672&amp;text&amp;type=phone_number&amp;app_absent=0" class="wtsapp-btn" target="_blank">
         <img src="/img/icons/wa.png" alt="WhatsApp">

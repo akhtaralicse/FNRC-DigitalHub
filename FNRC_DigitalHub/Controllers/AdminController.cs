@@ -53,18 +53,14 @@ namespace FNRC_DigitalHub.Controllers
 
         #region Icon and video------------------------------
         public async Task<IActionResult> IconSetting()
-        {
-            if (!User.IsInRole(UserTypeEnum.IconManager.ToString()) && !User.IsInRole(UserTypeEnum.OthersManager.ToString()))
-                return RedirectToAction("Index");
+        { 
 
             var data = await iconConfigurationService.GetByType(IconTypeEnum.Icon);
 
             return View(data);
         }
         public async Task<IActionResult> VideoSetting()
-        {
-            if (!User.IsInRole(UserTypeEnum.VideoManager.ToString()) && !User.IsInRole(UserTypeEnum.OthersManager.ToString()))
-                return RedirectToAction("Index");
+        { 
 
             var data = await iconConfigurationService.GetByType(IconTypeEnum.BGVideo);
 
@@ -116,9 +112,7 @@ namespace FNRC_DigitalHub.Controllers
 
         #region Notification --------------------------------------
         public async Task<IActionResult> Announcement()
-        {
-            if (!User.IsInRole(UserTypeEnum.AnnouncementManager.ToString()) && !User.IsInRole(UserTypeEnum.OthersManager.ToString()))
-                return RedirectToAction("Index");
+        { 
 
             //var data = await notificationConfigurationService.GetAll();
 
@@ -222,10 +216,7 @@ namespace FNRC_DigitalHub.Controllers
 
         #region User Role Management ------------------------------
         public async Task<IActionResult> UserRoleManage()
-        {
-            if (!User.IsInRole(UserTypeEnum.OthersManager.ToString()))
-                return RedirectToAction("Index");
-
+        {  
             var users = await userRoleService.GetAllUsers();
             var roles = Enum.GetValues(typeof(UserTypeEnum))
                             .Cast<UserTypeEnum>()
