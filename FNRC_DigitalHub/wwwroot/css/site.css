@@ -959,7 +959,7 @@ html[dir="rtl"] .notify-close {
     text-align: center;
 }
 
-#leftColumn, #rightColumn, .news-strip, .fix-icon, .top-strip, #ib-button-messaging {
+#leftColumn, #rightColumn, .news-strip, .icon2hide, .top-strip, #ib-button-messaging {
     opacity: 0;
     visibility: hidden;
     transition: opacity 1.5s ease-in-out;

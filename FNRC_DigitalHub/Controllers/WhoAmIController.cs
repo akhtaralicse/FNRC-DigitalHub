@@ -32,7 +32,7 @@ namespace FNRC_DigitalHub.Controllers
                     return Ok(new { UserName = "TestUser", DisplayName = "TestUser", EmployeeId = "74215" });
                 }
                 else
-                { 
+                {
                     var role = new List<UserTypeDTO>
                     {
                         new UserTypeDTO { Type = UserTypeEnum.Employee }

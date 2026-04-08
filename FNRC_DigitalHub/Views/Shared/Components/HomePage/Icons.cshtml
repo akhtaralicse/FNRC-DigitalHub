@@ -133,7 +133,7 @@
                     })
                     .catch(error => {
                         console.error('Error:', error);
-                        alert('Failed to open the link. Please try again.');
+                        window.open(url, '_blank');
                     });
             } else {
                 alert('No valid URL provided.');
