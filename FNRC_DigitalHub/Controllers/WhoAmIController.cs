@@ -22,30 +22,30 @@ namespace FNRC_DigitalHub.Controllers
         [HttpGet("me")]
         public async Task<IActionResult> GetCurrentUserAsync(string returnUrl = null)
         {
-            if (Environment.IsDevelopment())
-            {
-                var usera = await _userService.GetUserByUsername("TestUser");
-                if (usera != null)
-                {
-                    await CreateUserSessionAsync("TestUser", "TestUser", "TestUser", 74215, usera.UserType, usera.MobileNo, "");
-                    if (!string.IsNullOrEmpty(returnUrl)) return LocalRedirect(returnUrl);
-                    return Ok(new { UserName = "TestUser", DisplayName = "TestUser", EmployeeId = "74215" });
-                }
-                else
-                {
-                    var role = new List<UserTypeDTO>
-                    {
-                        new UserTypeDTO { Type = UserTypeEnum.Employee }
-                    };
-                    var r = await CreateUserSessionAsync("TestUser", "TestUser", "TestUser", 74215, role, "", "");
-                    var user1 = await _userService.GetOrRegisterUser(74215, "TestUser", "TestUser@fnrc.gov.ae");
-                    if (r)
-                    {
-                        if (!string.IsNullOrEmpty(returnUrl)) return LocalRedirect(returnUrl);
-                        return Ok(new { UserName = "TestUser", DisplayName = "TestUser", EmployeeId = "74215" });
-                    }
-                }
-            }
+            //if (Environment.IsDevelopment())
+            //{
+            //    var usera = await _userService.GetUserByUsername("TestUser");
+            //    if (usera != null)
+            //    {
+            //        await CreateUserSessionAsync("TestUser", "TestUser", "TestUser", 74215, usera.UserType, usera.MobileNo, "");
+            //        if (!string.IsNullOrEmpty(returnUrl)) return LocalRedirect(returnUrl);
+            //        return Ok(new { UserName = "TestUser", DisplayName = "TestUser", EmployeeId = "74215" });
+            //    }
+            //    else
+            //    {
+            //        var role = new List<UserTypeDTO>
+            //        {
+            //            new UserTypeDTO { Type = UserTypeEnum.Employee }
+            //        };
+            //        var r = await CreateUserSessionAsync("TestUser", "TestUser", "TestUser", 74215, role, "", "");
+            //        var user1 = await _userService.GetOrRegisterUser(74215, "TestUser", "TestUser@fnrc.gov.ae");
+            //        if (r)
+            //        {
+            //            if (!string.IsNullOrEmpty(returnUrl)) return LocalRedirect(returnUrl);
+            //            return Ok(new { UserName = "TestUser", DisplayName = "TestUser", EmployeeId = "74215" });
+            //        }
+            //    }
+            //}
 
             var identity = HttpContext.User?.Identity;
             if (identity == null || !identity.IsAuthenticated)
