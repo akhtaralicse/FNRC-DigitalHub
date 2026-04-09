@@ -20,7 +20,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-string xLoginPath = "/WhoAmI/me";
+string xLoginPath = "/Account/Login";
 ConfigurationManager configuration = builder.Configuration;
 ConfigureHostBuilder hostBuilder = builder.Host;
 var connectionDB = builder.Configuration.GetConnectionString("SqlConnectionStrings");
@@ -52,21 +52,25 @@ builder.Services.AddControllers().AddJsonOptions(options =>
 });
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultScheme = "DigitalHubCookie";
-    options.DefaultAuthenticateScheme = "DigitalHubCookie";
-    options.DefaultChallengeScheme = "DigitalHubCookie";
+    options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+    options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
 })
  .AddCookie("DigitalHubCookie", options =>
  {
-     options.LoginPath = "/WhoAmI/me";
      options.Cookie.Name = ".DigitalHubSharedCookie";
      options.Cookie.Domain = ".fnrc.gov.ae";
      options.Cookie.Path = "/";
      options.Cookie.HttpOnly = true;
      options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
      options.Cookie.SameSite = SameSiteMode.Lax;
- });
-
+ }) ;  
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = xLoginPath;
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(int.Parse(configuration["Session:ExpireDuration"]));
+});
 
 
 builder.WebHost.ConfigureKestrel(options =>
@@ -99,7 +103,7 @@ builder.Services.Configure<RequestLocalizationOptions>(options =>
     options.RequestCultureProviders.Add(new QueryStringRequestCultureProvider());
     options.RequestCultureProviders.Add(new CookieRequestCultureProvider());
 });
-
+builder.Services.AddAuthentication(IISDefaults.AuthenticationScheme);
 
 var app = builder.Build();
 
