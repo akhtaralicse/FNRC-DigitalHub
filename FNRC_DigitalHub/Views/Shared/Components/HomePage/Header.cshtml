@@ -135,66 +135,82 @@
             document.getElementById("username").textContent = '@Html.Raw(loc.localizer["Guest"])';
         });
     }
-         function fetchNotifications() {
-             var notificationHTML = "";
-             try {
-                 $.ajax({
-                     url: "/home/GetNotifications",
-                     method: "GET",
-                     success: function (data) {
 
-                         console.log(data);
-                         if(data.message =='[]'){
-                             return;
-                         }
-                         var countUnRead = data.message.length;
-                         if (countUnRead == 0) {
-                             $('#notificationCount').hide();
-                         } else {
-                             $('#notificationCount').show();
-                         }
-                         $('#notificationCount').html(countUnRead);
+          function fetchNotifications() {
+        var notificationHTML = "";
+        try {
+            $.ajax({
+                url: "/home/GetNotifications",
+                method: "GET",
+                success: function (data) {
+                    if (!data || !data.message || data.message == '[]') {
+                        $('#notificationCount').hide();
+                        return;
+                    }
 
-                         if (data.message.length == 0) {
-                             $('#notificationCount').hide();
-                             notificationHTML += `<div class="text-center mt-5 search-message" aria-hidden="false">
-                                                             <i class="fa fa-smile-o fa-3x"></i>
-                                                             <p class="mt-4"> @(loc.localizer["NONotification"]) </p>
-                                                 </div>`;
-                         }
-                         data.message.forEach(x => {
-                            var message = '@isAr' =='True'?x.MessageAr:x.MessageEn;
-                            const onclickCall = `NotificationData('${x.Id}', '${x.TitleAr}', '${x.TitleEn}', '${x.MessageAr}', '${x.MessageEn}',  '${x.ActionTextAr}',  '${x.ActionTextEn}','${x.ActionUrl}' )`;
-                            notificationHTML += `<a rel="noreferrer" class="notification-item p-3" onclick="${onclickCall}">
-                                                    <div class="d-flex align-items-center"><i class="fa fa-bell"></i><span class="mx-3">
-                                                    ${message}
-                                                    </span >
-                                                    </div >
-                                                    <div class="small text-sm-end"><i class="fa fa-calendar"></i> ${x.CreatedDate.split("T")[0]}</div>
-                                                </a>`;
-                         })
-
-                         var htmlFinal = `<div id="notifications-container">
-                                            <div class="title d-flex justify-content-between p-2">
-                                                    <span>@(loc.localizer["Notification"])</span>
-                                                    <div>
-                                                    </div>
-                                            </div>
-                                            <div class="notifications-wrapper overflow-y">
-                                                        ${notificationHTML}
-                                                </div>
+                    var countUnRead = data.message.length;
+                    if (countUnRead == 0) {
+                        $('#notificationCount').hide();
+                        notificationHTML += `<div class="text-center mt-5 search-message">
+                                                <i class="fa fa-smile-o fa-3x"></i>
+                                                <p class="mt-4"> @(loc.localizer["NONotification"]) </p>
                                             </div>`;
-                         $('#notificationText').html(htmlFinal);
+                    } else {
+                        $('#notificationCount').show().html(countUnRead);
+                    }
 
-                     },
-                     error: function () {
-                         $(".notifications-wrapper").html('loading error...');
-                     }
-                 });
-             } catch (e) {
-                 console.error("Error fetching notifications: ", e);
-             }
-         }
+                    data.message.forEach(x => {
+                        var isArabic = '@isAr' == 'True';
+                        var displayMessage = isArabic ? x.MessageAr : x.MessageEn;
+
+                        // Clean the data: Remove newlines and escape single quotes to prevent JS crashes
+                        const clean = (str) => {
+                            if (!str) return "";
+                            return str.replace(/[\r\n]+/g, ' ').replace(/'/g, "\\'");
+                        };
+
+                        // Building the call safely
+                        const onclickCall = `NotificationData('${x.Id}',
+                            '${clean(x.TitleAr)}',
+                            '${clean(x.TitleEn)}',
+                            '${clean(x.MessageAr)}',
+                            '${clean(x.MessageEn)}',
+                            '${clean(x.ActionTextAr)}',
+                            '${clean(x.ActionTextEn)}',
+                            '${clean(x.ActionUrl)}')`;
+
+                        notificationHTML += `
+                            <a rel="noreferrer" class="notification-item p-3" style="cursor:pointer" onclick="${onclickCall}">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-bell"></i>
+                                    <span class="mx-3">${displayMessage}</span>
+                                </div>
+                                <div class="small text-sm-end">
+                                    <i class="fa fa-calendar"></i> ${x.CreatedDate ? x.CreatedDate.split("T")[0] : ''}
+                                </div>
+                            </a>`;
+                    });
+
+                    var htmlFinal = `
+                        <div id="notifications-container">
+                            <div class="title d-flex justify-content-between p-2">
+                                <span>@(loc.localizer["Notification"])</span>
+                            </div>
+                            <div class="notifications-wrapper overflow-y">
+                                ${notificationHTML}
+                            </div>
+                        </div>`;
+
+                    $('#notificationText').html(htmlFinal);
+                },
+                error: function () {
+                    $("#notificationText").html('<div class="p-3 text-danger">Error loading notifications...</div>');
+                }
+            });
+        } catch (e) {
+            console.error("Error fetching notifications: ", e);
+        }
+    }
 
      function fetchNotificationToDisplay(){
          fetch("/home/GetNotificationsToDisplay", {
@@ -230,13 +246,7 @@
                     console.error(error);
                 });
     }
-        function NotificationData(id, titleAr, titleEn, messageAr, messageEn, btnTextAr, btnTextEn, btnURL, imageUrl) {
-        var actualTitle = '@isAr' === 'True' ? titleAr : titleEn;
-        var actualMessage = '@isAr' === 'True' ? messageAr : messageEn;
-        var actualBtnText = '@isAr' === 'True' ? btnTextAr : btnTextEn;
-
-        showNotify(actualTitle, actualMessage, id, actualBtnText, btnURL, imageUrl);
-    }
+          
 
     function NotificationData(id, titleAr, titleEn, messageAr, messageEn, btnTextAr, btnTextEn, btnURL, imageUrl) {
         var actualTitle = '@isAr' === 'True' ? titleAr : titleEn;
