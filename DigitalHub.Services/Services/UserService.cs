@@ -19,7 +19,7 @@ namespace DigitalHub.Services.Services
             _mapper = mapper;
         }
 
-        public async Task<UsersDTO> GetOrRegisterUser(int employeeId, string displayName,string username)
+        public async Task<UsersDTO> GetOrRegisterUser(int employeeId, string displayName, string username)
         {
             var user = await _context.Users
                 .Include(u => u.UserType)
@@ -30,7 +30,7 @@ namespace DigitalHub.Services.Services
                 user = new Users
                 {
                     Email = username + "@fnrc.gov.ae",
-                    
+
                     EmployeeId = employeeId,
                     NameEn = displayName,
                     NameAr = displayName,
@@ -54,10 +54,11 @@ namespace DigitalHub.Services.Services
         public async Task<UsersDTO> GetUserByUsername(string username)
         {
             var email = username + "@fnrc.gov.ae";
-            var user = await _context.Users
-                .Include(u => u.UserType)
-                .FirstOrDefaultAsync(u => u.Email == email);
-
+            var user = await _context.Users.Include(u => u.UserType).FirstOrDefaultAsync(u => u.Email == email);
+            if(user == null)
+            {
+                return null;
+            }
             return _mapper.Map<UsersDTO>(user);
         }
     }

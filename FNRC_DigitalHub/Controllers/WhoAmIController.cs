@@ -3,7 +3,6 @@ using DigitalHub.Services.DTO;
 using DigitalHub.Services.Interface;
 using FNRC_DigitalHub.Helper;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using System.DirectoryServices;
 using System.Security.Claims;
@@ -13,11 +12,14 @@ namespace FNRC_DigitalHub.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WhoAmIController(IConfiguration config, IHostEnvironment environment, IUserService userService) : BaseController
+    public class WhoAmIController(IConfiguration config, IHostEnvironment environment, IUserService userService,
+        ILogger<WhoAmIController> logger
+        ) : BaseController
     {
         public IConfiguration Config { get; } = config;
         public IHostEnvironment Environment { get; } = environment;
         private readonly IUserService _userService = userService;
+        private readonly ILogger<WhoAmIController> logger = logger;
 
         [HttpGet("me")]
         public async Task<IActionResult> GetCurrentUserAsync(string returnUrl = null)
@@ -35,7 +37,7 @@ namespace FNRC_DigitalHub.Controllers
                 {
                     var role = new List<UserTypeDTO>
                     {
-                        new UserTypeDTO { Type = UserTypeEnum.Employee }
+                        new() { Type = UserTypeEnum.Employee }
                     };
                     var r = await CreateUserSessionAsync("TestUser", "TestUser", "TestUser", 74215, role, "", "");
                     var user1 = await _userService.GetOrRegisterUser(74215, "TestUser", "TestUser@fnrc.gov.ae");
@@ -56,11 +58,15 @@ namespace FNRC_DigitalHub.Controllers
             var domainUser = identity.Name ?? string.Empty;
             var samAccountName = domainUser.Contains('\\') ? domainUser.Split('\\')[1] : domainUser;
 
+            logger.LogWarning("ActiveDirectory user {SamAccountName} is authenticated.: ", samAccountName);
             var user = await _userService.GetUserByUsername(samAccountName);
 
             if (user == null)
             {
+                logger.LogWarning("User {SamAccountName} not found in the application database. Attempting to retrieve details from Active Directory.", samAccountName);
                 var (DisplayName, EmployeeId) = GetUserDetailsFromAd(samAccountName);
+                logger.LogWarning("Retrieved details from Active Directory for user {SamAccountName}: DisplayName={DisplayName}, EmployeeId={EmployeeId}", samAccountName, DisplayName, EmployeeId);
+
                 if (string.IsNullOrEmpty(EmployeeId)) return Unauthorized("Employee ID not found in AD.");
 
                 user = await _userService.GetOrRegisterUser(int.Parse(EmployeeId), DisplayName, samAccountName);
