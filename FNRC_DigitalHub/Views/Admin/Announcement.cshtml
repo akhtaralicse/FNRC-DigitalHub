@@ -341,8 +341,9 @@
                      });
 
                      fileItem.appendChild(fileName);
-                     fileItem.appendChild(deleteButton);
+                    // fileItem.appendChild(deleteButton);
                      fileList.appendChild(fileItem);
+                         $('#fileListUpdate').html('');
                  });
              }
                function LoadUpdateRecord(id) {
@@ -374,8 +375,7 @@
                              var html ='';
                                  msg.NotificationAttachment.forEach(x =>
                                  {
-                                     html += `<a class=""  id="image_${x.Id}" style="position: relative;"  href="javascript:void(0)" onclick="deleteImage_Js('${x.Id}')">
-                                                 <span><i class="fa fa-times delete-icon"></i></span>
+                                     html += `<a class=""  id="image_${x.Id}" style="position: relative;"  href="javascript:void(0)"  >                                                 
                                                  <img width="60px" src="${x.AttachmentTransaction.ThumbPath}" alt="fnrc">
                                              </a>`;
                                      triggerRadio(2);
@@ -426,40 +426,57 @@
             success: function (response) {
                 console.log(response);
                 if (response.success) {
-                    $('#iconsTableBody').html(response.data.map(item => `
-                        <tr>
-                            <td><img src="${item.NotificationAttachment[0]?.AttachmentTransaction?.ThumbPath || ''}" width="70px" /></td>
-                            <td>
-                                <div>${item.TitleEn}</div>
-                                <small class="text-muted">${item.TitleAr}</small>
-                            </td>
-                            <td width="40%">
-                                <div style="font-size:11px">${item.MessageEn}</div>
-                                <small class="text-muted" style="font-size:11px">${item.MessageAr}</small>
-                            </td>
-                            <td>
-                                <div class="dateshow">${item.StartDate}</div>
-                                <div class="dateshow">${item.EndDate}</div>
-                            </td>
-                            <td>
-                                <div>${item.ActionUrl}</div>
-                                <small class="text-muted">${item.ActionTextEn}</small>
-                                <small class="text-muted">${item.ActionTextAr}</small>
-                            </td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="LoadUpdateRecord('${item.Id}')">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteRecord('${item.Id}')">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    `).join(''));
+                     $('#iconsTableBody').html(response.data.map(item => {
+          
+            const startDate = new Date(item.StartDate);
+            const today = new Date();
+             
+            const oneMonthAgo = new Date();
+            oneMonthAgo.setMonth(today.getMonth() - 1);
+             
+           const dateColor = (startDate < oneMonthAgo) ? 'red' : 'green';
+           const name_ar = item.TitleAr == null?"":item.TitleAr;
+           const name_en = item.TitleEn == null?"":item.TitleEn;
+           const msg_en = item.MessageEn == null?"":item.MessageEn;
+           const msg_ar = item.MessageAr == null?"":item.MessageAr;
+           const actURL = item.ActionUrl == null?"":item.ActionUrl;
+           const action_en = item.ActionTextEn == null?"":item.ActionTextEn;
+           const action_ar = item.ActionTextAr == null?"":item.ActionTextAr;
 
-                    // Update pagination controls
+            return `
+             <tr>
+                 <td><img src="${item.NotificationAttachment[0]?.AttachmentTransaction?.ThumbPath || ''}" width="70px" /></td>
+                 <td>
+                         <div>${name_en}</div>
+                         <small class="text-muted">${name_ar}</small>
+                 </td>
+                 <td width="30%">
+                         <div style="font-size:11px">${msg_en}</div>
+                         <small class="text-muted" style="font-size:11px">${msg_ar}</small>
+                 </td>
+                 <td width="15%">
+                     <div class="dateshow" style="color: ${dateColor}">${item.StartDate.replace('T',' ')}</div>
+                     <div class="dateshow" style="color: ${dateColor}">${item.EndDate.replace('T',' ')}</div>
+                 </td>
+                 <td>
+                         <div>${actURL}</div>
+                         <small class="text-muted">${action_en}</small>
+                         <small class="text-muted">${action_ar}</small>
+                 </td>
+                 <td>
+                     <div class="action-buttons">
+                         <button type="button" class="btn btn-sm btn-outline-primary" onclick="LoadUpdateRecord('${item.Id}')">
+                             <i class="fas fa-edit"></i>
+                         </button>
+                         <button type="button" class="btn btn-sm btn-outline-danger" onclick="deleteRecord('${item.Id}')">
+                             <i class="fas fa-trash-alt"></i>
+                         </button>
+                     </div>
+                 </td>
+             </tr>
+            `;
+        }).join(''));
+                     
                     updatePagination(response.currentPage, response.totalPages);
                 } else {
                     Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
@@ -492,5 +509,27 @@
             }
         };
     }
+         function deleteImage_Js(id) {
+
+                DeleteWithCallBack('@lang', () => {
+                    $.ajax({
+                        url: '/admin/DeleteImage?id=' + id,
+                        type: 'POST',
+                        data: {},
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            if (response.success) {
+                                $('#image_' + id).remove();
+                            } else {
+                                Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            Swal.fire('@(loc.localizer["Error"])', '@(loc.localizer["SomethingWentWrong"])', "error");
+                        }
+                    });
+                })
+            }
 </script>
 }

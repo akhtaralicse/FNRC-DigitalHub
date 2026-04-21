@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using DigitalHub.Domain.Domains;
 using DigitalHub.Services.DTO;
 using DigitalHub.Services.Services.Attachment;
@@ -90,13 +90,13 @@ namespace DigitalHub.Services.Services.IconConfig
                 return Mapper.Map<List<NotificationConfigurationDTO>>(await result.OrderByDescending(x => x.StartDate).ToListAsync());
             }
 
-            return Mapper.Map<List<NotificationConfigurationDTO>>(await result.Skip(skip).Take(pageSize).ToListAsync());
+            return Mapper.Map<List<NotificationConfigurationDTO>>(await result.Skip(skip).Take(pageSize).OrderByDescending(x => x.StartDate).ToListAsync());
         }
         public async Task<List<NotificationConfigurationDTO>> Get(string username = null)
         {
             var result = _repository.GetAllIncludingNoTracking(x => x.NotificationAttachment,
                                     x => x.NotificationAttachment.Select(y => y.AttachmentTransaction))
-                .Where(x => x.IsActive == true && x.StartDate <= DateTime.Now && x.EndDate >= DateTime.Now).AsQueryable();
+                .Where(x => x.IsActive == true && x.StartDate <= DateTime.Now.AddMonths(1)).AsQueryable();
             //if (username != null)
             //{
             //    result = result.Where(x => !x.NotificationUser.Any(x => x.Username == username && x.IsRead == true));
@@ -107,69 +107,120 @@ namespace DigitalHub.Services.Services.IconConfig
         {
             var result = await _repository.GetAllIncludingNoTracking(x => x.NotificationAttachment,
                                     x => x.NotificationAttachment.Select(y => y.AttachmentTransaction))
-                .Where(x => x.IsActive == true && x.StartDate <= DateTime.Now && x.EndDate >= DateTime.Now
+                .Where(x => x.IsActive == true && x.StartDate <= DateTime.Now.AddMonths(1)  
                         && !x.NotificationUser.Any(x => x.Username == username && x.IsRead == true)).OrderByDescending(x => x.StartDate).FirstAsync();
 
             return Mapper.Map<NotificationConfigurationDTO>(result);
         }
         public async Task<bool> Update(NotificationConfigurationDTO mod)
         {
-            var result = await _repository.GetAllIncludingNoTracking(x => x.NotificationAttachment).FirstOrDefaultAsync(x => x.Id == mod.Id);
-            if (result.NotificationAttachment.Count != 0)
+            // 1. Fetch existing record with attachments, users, and the actual file transactions
+            var existing = await _repository.GetAllIncluding(
+                    x => x.NotificationAttachment,
+                    x => x.NotificationUser,
+                    x => x.NotificationAttachment.Select(y => y.AttachmentTransaction)
+                ).FirstOrDefaultAsync(x => x.Id == mod.Id);
+
+            if (existing == null) return false;
+
+            // 2. Clear NotificationUser records (reset read status)
+            existing.NotificationUser.Clear();
+
+            // 3. Update scalar properties
+            existing.TitleAr = mod.TitleAr;
+            existing.TitleEn = mod.TitleEn;
+            existing.MessageAr = mod.MessageAr;
+            existing.MessageEn = mod.MessageEn;
+            existing.StartDate = mod.StartDate;
+            existing.EndDate = mod.EndDate;
+            existing.ActionUrl = mod.ActionUrl;
+            existing.ActionTextAr = mod.ActionTextAr;
+            existing.ActionTextEn = mod.ActionTextEn;
+
+            // 4. Handle image replacement (Requirement: Max 1 file)
+            if (mod.Files != null && mod.Files.Count > 0)
             {
-                mod.NotificationAttachment.Add(new NotificationAttachmentDTO
+                // A. Delete ALL old attachments associated with this notification (Physical + DB)
+                var oldAttachments = existing.NotificationAttachment.ToList();
+                foreach (var oldNav in oldAttachments)
                 {
-                    AttachmentId = result.NotificationAttachment.FirstOrDefault().AttachmentId,
-                });
+                    var trans = oldNav.AttachmentTransaction;
+                    if (trans != null)
+                    {
+                        try
+                        {
+                            // Delete physical files from disk
+                            string fileName = trans.FileId + trans.FileExtension;
+                            string thumbName = trans.FileId + "_thumb" + trans.FileExtension;
+                            AttachmentService.DeletePhysicalFile(trans.FilePath, fileName);
+                            AttachmentService.DeletePhysicalFile(trans.FilePath, thumbName);
+
+                            // Delete the transaction record from the database
+                            await AttachmentService.DeleteFile(trans);
+                        }
+                        catch (Exception) { /* Log error if necessary */ }
+                    }
+                    existing.NotificationAttachment.Remove(oldNav);
+                }
+
+                // B. Upload and attach the NEW file (strictly pick only the first one if multiple were sent)
+                var newFiles = mod.Files.Take(1).ToList();
+                var attachmentList = await AttachmentService.UploadAttachment(newFiles);
+                foreach (var attach in attachmentList)
+                {
+                    existing.NotificationAttachment.Add(new NotificationAttachment
+                    {
+                        AttachmentId = attach.Id,
+                        NotificationConfigurationId = existing.Id
+                    });
+                }
             }
 
-            var id = mod.Id;
-            var add = await Add(mod);
-            if (add)
-            {
-                var del = await Delete(id);
-                return del;
-            }
-            return false;
-
-        }
-        public async Task<bool> Update_(NotificationConfigurationDTO mod)
-        {
-            var result = await _repository.GetAllIncludingNoTracking().FirstOrDefaultAsync(x => x.Id == mod.Id);
-            var data = Mapper.Map<NotificationConfiguration>(result);
-            result.TitleAr = mod.TitleAr;
-            result.TitleEn = mod.TitleEn;
-            result.MessageEn = mod.MessageEn;
-            result.MessageAr = mod.MessageAr;
-            result.ActionTextEn = mod.ActionTextEn;
-            result.ActionTextAr = mod.ActionTextAr;
-            result.ActionUrl = mod.ActionUrl;
-            result.StartDate = mod.StartDate;
-            result.EndDate = mod.EndDate;
-
-            _repository.Update(result, true);
+            // 5. Save all changes in-place
+            await _repository.UpdateAsync(existing, true);
 
             return true;
         }
+
+
 
         public async Task<bool> Delete(int id)
-        {
-            var result = await _repository.GetAllIncludingNoTracking(x => x.NotificationAttachment,
-                         x => x.NotificationAttachment.Select(y => y.AttachmentTransaction)).FirstOrDefaultAsync(x => x.Id == id);
+        { 
+            var notification = await _repository.GetAllIncludingNoTracking(
+                    x => x.NotificationAttachment,
+                    x => x.NotificationAttachment.Select(y => y.AttachmentTransaction)
+                ).FirstOrDefaultAsync(x => x.Id == id);
 
-            var attachment = result.NotificationAttachment.FirstOrDefault(x => x.NotificationConfigurationId == id);
-            if (attachment != null)
+             
+            if (notification == null) return false;           
+
+            foreach (var nav in notification.NotificationAttachment)
             {
-                await AttachmentService.DeleteFile(attachment.AttachmentTransaction);
+                var trans = nav.AttachmentTransaction;
+                if (trans != null)
+                {
+                    try
+                    { 
+                        //await AttachmentService.DeleteFile(trans);
 
-                var isDeleted = AttachmentService.DeletePhysicalFile(attachment.AttachmentTransaction.FilePath, attachment.AttachmentTransaction.FileId + attachment.AttachmentTransaction.FileExtension);
-                var isDeletedThumb = AttachmentService.DeletePhysicalFile(attachment.AttachmentTransaction.FilePath, attachment.AttachmentTransaction.FileId + "_thumb" + attachment.AttachmentTransaction.FileExtension);
+                        // Delete Physical Files
+                        string fileName = trans.FileId + trans.FileExtension;
+                        string thumbName = trans.FileId + "_thumb" + trans.FileExtension;
 
+                        AttachmentService.DeletePhysicalFile(trans.FilePath, fileName);
+                        AttachmentService.DeletePhysicalFile(trans.FilePath, thumbName);
+                    }
+                    catch (Exception ex)
+                    { 
+                    }
+                }
             }
 
-            await _repository.DeleteAsync(result, true);
+            // 3. Delete the parent record last
+            await _repository.DeleteAsync(notification, true);
 
             return true;
         }
+         
     }
 }

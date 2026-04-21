@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using DigitalHub.Domain.DBContext;
@@ -121,13 +121,34 @@ namespace DigitalHub.Services.Shared
         public IQueryable<TEntity> GetAllIncluding(params Expression<Func<TEntity, object>>[] includeProperties)
         {
             IQueryable<TEntity> queryable = DbSet;
-            foreach (Expression<Func<TEntity, object>> includeProperty in includeProperties)
-            {
 
-                queryable = queryable.Include(includeProperty);
+            foreach (var includeProperty in includeProperties)
+            {
+                if (includeProperty.Body is MemberExpression memberExpression)
+                {
+                    // Handle simple Include
+                    queryable = queryable.Include(includeProperty);
+                }
+                else if (includeProperty.Body is MethodCallExpression methodCallExpression)
+                {
+                    // Handle Select for nested properties
+                    if (methodCallExpression.Method.Name == "Select")
+                    {
+                        // Extract the parent property name
+                        var parentProperty = ((MemberExpression)methodCallExpression.Arguments[0]).Member.Name;
+
+                        // Extract the nested property name
+                        var nestedPropertyName = GetNestedPropertyName(methodCallExpression.Arguments[1]);
+
+                        // Build the include path
+                        queryable = queryable.Include($"{parentProperty}.{nestedPropertyName}");
+                    }
+                }
             }
+
             return queryable;
         }
+
 
         //public IQueryable<TEntity> GetAllIncludingNoTracking(params Expression<Func<TEntity, object>>[] includeProperties)
         //{

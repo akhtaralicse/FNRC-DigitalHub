@@ -1,4 +1,4 @@
-﻿@using Microsoft.Extensions.Configuration
+@using Microsoft.Extensions.Configuration
 @inject IConfiguration Configuration
 @model List<IconConfigurationDTO>
 @{
@@ -136,7 +136,8 @@
         });
     }
 
-          function fetchNotifications() {
+     function fetchNotifications() 
+     {
         var notificationHTML = "";
         try {
             $.ajax({
@@ -162,6 +163,23 @@
                     data.message.forEach(x => {
                         var isArabic = '@isAr' == 'True';
                         var displayMessage = isArabic ? x.MessageAr : x.MessageEn;
+                        var displayTitle = isArabic ? x.TitleAr : x.TitleEn;
+
+                        // Check for image
+                        var imageUrl = (x.NotificationAttachment && x.NotificationAttachment.length > 0)
+                            ? x.NotificationAttachment[0].AttachmentTransaction.ThumbPath
+                            : null;
+
+                        // Decide what to show in the list item
+                        var contentHtml = '';
+                        if ((!displayMessage || displayMessage === "null") && imageUrl) {
+                            // If no message but image exists, show the image
+                            contentHtml = `<img src="${imageUrl}" style="max-height: 40px; max-width: 150px; border-radius: 4px;" alt="Notification Image">`;
+                        } else {
+                            // Otherwise show text (fallback to title if message is null)
+                            var textToShow = (displayMessage && displayMessage !== "null") ? displayMessage : (displayTitle && displayTitle !== "null" ? displayTitle : "");
+                            contentHtml = `<span>${textToShow}</span>`;
+                        }
 
                         // Clean the data: Remove newlines and escape single quotes to prevent JS crashes
                         const clean = (str) => {
@@ -169,7 +187,7 @@
                             return str.replace(/[\r\n]+/g, ' ').replace(/'/g, "\\'");
                         };
 
-                        // Building the call safely
+                        // Building the call safely, including imageUrl as the last parameter
                         const onclickCall = `NotificationData('${x.Id}',
                             '${clean(x.TitleAr)}',
                             '${clean(x.TitleEn)}',
@@ -177,19 +195,21 @@
                             '${clean(x.MessageEn)}',
                             '${clean(x.ActionTextAr)}',
                             '${clean(x.ActionTextEn)}',
-                            '${clean(x.ActionUrl)}')`;
+                            '${clean(x.ActionUrl)}',
+                            '${imageUrl || ""}')`;
 
                         notificationHTML += `
                             <a rel="noreferrer" class="notification-item p-3" style="cursor:pointer" onclick="${onclickCall}">
                                 <div class="d-flex align-items-center">
                                     <i class="fa fa-bell"></i>
-                                    <span class="mx-3">${displayMessage}</span>
+                                    <div class="mx-3 flex-grow-1">${contentHtml}</div>
                                 </div>
                                 <div class="small text-sm-end">
                                     <i class="fa fa-calendar"></i> ${x.CreatedDate ? x.CreatedDate.split("T")[0] : ''}
                                 </div>
                             </a>`;
                     });
+
 
                     var htmlFinal = `
                         <div id="notifications-container">
