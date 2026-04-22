@@ -1,4 +1,4 @@
-﻿@{
+@{
     var lang = loc.localizer["lang"];
     var isAr = lang == "ar";
 }
@@ -33,61 +33,65 @@
     });
 
     function formatDate(dateStr) {
-        const [year, month, day] = dateStr.split("-");
+        if (!dateStr || dateStr === "---" || !dateStr.includes("-")) return dateStr || "---";
+        const parts = dateStr.split("-");
+        if (parts.length < 3) return dateStr;
+        const [year, month, day] = parts;
         return `${day}-${month}-${year}`;
     }
 
     function fetchLastMonthNews() {
-        console.log('===call news===');
-        const now = new Date();
-        const firstDayPrevMonth = new Date(now.getFullYear(), now.getMonth() - 2, 1).toISOString().split('T')[0];
-        const lastDayPrevMonth = new Date().toISOString().split('T')[0];
-        const apiUrl =  `/NewsAPI/GetExternalNews`;
+        console.log('===call combined news===');
+         
+        const apiUrl = `/NewsAPI/GetExternalNews`;
 
         $.ajax({
             url: apiUrl,
             type: 'GET',
-            dataType: 'text',
-            data: {
-                fromDate: firstDayPrevMonth,
-                toDate: lastDayPrevMonth
-            },
-            success: function (xmlString) {
-                
-                const newsItems = JSON.parse(xmlString) ;
-                 console.log(newsItems);
+            dataType: 'json',  
+            success: function (newsItems) {
+                console.log("Combined News received:", newsItems);
+
                 let htmlContent = "";
+                const isArabic = '@isAr' == 'True';
 
-                if (newsItems.length === 0) {
-                    $('#newsContainer').html("<span>لا توجد أخبار للشهر الماضي</span>");
+                if (!newsItems || newsItems.length === 0) {
+                    const noNewsMsg = isArabic ? "لا توجد أخبار حالياً" : "No news available";
+                    $('#newsContainer').html(`<span>${noNewsMsg}</span>`);
                     return;
-                }
+                } 
                 for (let i = 0; i < newsItems.length; i++) {
-                   const title = '@isAr' == 'True' ? newsItems[i].TitleArabic :newsItems[i].TitleEnglish ;
-                   const dateNews =  newsItems[i].DateCreated.split('T')[0]  ;
-                   const  detail = '@isAr' == 'True' ? newsItems[i].DetailArabic :newsItems[i].DetailEnglish;
-                   const  shortDetail = '@isAr' == 'True' ? newsItems[i].ShortArabic :newsItems[i].ShortEnglish;
-                   const cleanDetail = detail ;
-                 
+                    const item = newsItems[i];
+                     
+                    const title = (isArabic ? item.TitleAr : item.TitleEn) || "";
+                    const shortDetail = (isArabic ? item.DescriptionAr : item.DescriptionEn) || "";
+                    
+                    let dateNews = "---";
+                    if (item.PublishDate) {
+                        // Handle potential space or T separator (ISO)
+                        const rawDate = item.PublishDate.split(/[ T]/)[0];
+                        dateNews = rawDate.replace(/\//g, '-');
+                    }
 
-                   htmlContent += `
-                    <div class="news-item custom-hover-target"
-                         data-title="${title.replace(/"/g, '&quot;')}"
-                         data-desc="${shortDetail.replace(/"/g, '&quot;')}">
-                         📅 ${formatDate(dateNews)}  🔔  ${title}  
-                    </div>`;
+                    const cleanTitle = title.toString().replace(/"/g, '&quot;');
+                    const cleanDetail = shortDetail.toString().replace(/"/g, '&quot;');
+
+                    htmlContent += `
+                     <div class="news-item custom-hover-target"
+                          data-title="${cleanTitle}"
+                          data-desc="${cleanDetail}">
+                          📅 ${formatDate(dateNews)}  🔔  ${title}
+                     </div>`;
                 }
 
                 const $slider = $('#newsContainer');
-
-                // Destroy slick if already initialized
+                 
                 if ($slider.hasClass('slick-initialized')) {
                     $slider.slick('unslick');
                 }
 
                 $slider.html(htmlContent);
-
-                // Initialize slick
+                 
                 $slider.slick({
                     slidesToShow: 1,
                     slidesToScroll: 1,
@@ -100,11 +104,13 @@
                     dots: false,
                     rtl: $('html').attr('dir') === 'rtl'
                 });
+
                 initNewsModalListeners();
             },
             error: function (err) {
-                console.error("Error fetching news:", err);
-                //$('#newsContainer').html("<span>فشل تحميل الأخبار</span>");
+                console.error("Error fetching combined news:", err);
+                const errorMsg = '@isAr' == 'True' ? "فشل تحميل الأخبار" : "Failed to load news";
+                $('#newsContainer').html(`<span>${errorMsg}</span>`);
             }
         });
     }
@@ -112,13 +118,16 @@
     function initNewsModalListeners() {
         const newsItems = document.querySelectorAll('.custom-hover-target');
         const modal = document.getElementById('descModal');
+        if (!modal) return;
+        
         const modalContent = modal.querySelector('.description-modal-content') || modal;
 
         newsItems.forEach(item => {
             item.addEventListener('mouseenter', function() {
-                var fullDescription = this.getAttribute('data-desc');
+                var title = this.getAttribute('data-title') || "";
+                var fullDescription = this.getAttribute('data-desc') || "";
                 var limit = 300;
-                var title = this.getAttribute('data-title');
+                
                 if (fullDescription.length > limit) {
                     fullDescription = fullDescription.substring(0, limit) + "...";
                 } 
@@ -131,4 +140,5 @@
             });
         });
     }
+
 </script>
