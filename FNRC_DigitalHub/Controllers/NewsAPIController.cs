@@ -83,7 +83,7 @@ namespace FNRC_DigitalHub.Controllers
             string newsBaseURL = configuration["APIURLS:NewsURL"];
             string website_url = $"{newsBaseURL}?fromdate={fromDate}&todate={toDate}&keyword=&IsSearched=1";
             string manara_news = configuration["APIURLS:ManaraNews"];
-
+            string format = "MM/dd/yyyy HH:mm:ss";
             try
             {
                 var response = await client.GetAsync(website_url);
@@ -94,6 +94,7 @@ namespace FNRC_DigitalHub.Controllers
                     
                         foreach (var item in jsonData)
                         {
+                        var dt = ((string)item.DateCreated).Replace("T", " ");
                             list.Add(new UnifiedNewsViewModel
                             {
                                 Id = item.ID.ToString(),
@@ -101,7 +102,7 @@ namespace FNRC_DigitalHub.Controllers
                                 TitleAr = item.TitleArabic,
                                 DescriptionEn = item.ShortEnglish,
                                 DescriptionAr = item.ShortArabic, 
-                                PublishDate = item.DateCreated,
+                                PublishDate = DateTime.ParseExact(dt, format, System.Globalization.CultureInfo.InvariantCulture),
                                 Source = "website"
                             });
                         }
@@ -120,6 +121,7 @@ namespace FNRC_DigitalHub.Controllers
                 {
                     foreach (var item in jsonData.data)
                     {
+                            var dt = ((string)item.NewsEventDate).Replace("T", " ");
                         list.Add(new UnifiedNewsViewModel
                         {
                             Id = item.Id.ToString(),
@@ -128,7 +130,7 @@ namespace FNRC_DigitalHub.Controllers
                             DescriptionEn = item.DescriptionEn,
                             DescriptionAr = item.DescriptionAr,
                             ImageUrl = item.NewsEventAttachments?.Count > 0 ? item.NewsEventAttachments[0].Path : "",
-                            PublishDate = item.NewsEventDate,
+                            PublishDate = DateTime.ParseExact(dt, format, System.Globalization.CultureInfo.InvariantCulture) ,
                             Source = "manara"
                         });
                     }
