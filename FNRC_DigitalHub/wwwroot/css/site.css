@@ -671,7 +671,13 @@ html[dir="rtl"] .notify-close {
     right: auto;
     left: 10px;
 }
-
+.notify-title-img {
+    margin: 0 0 10px;
+    font-size: 19px;
+    font-weight: 600;
+    text-align: center;
+    color: var(--base-color);
+}
 .notify-title {
     margin: 0 0 10px;
     font-size: 19px;

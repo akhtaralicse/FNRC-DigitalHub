@@ -69,6 +69,9 @@
         <button class="notify-close" onclick="closeNotify()" style="display: none;">×</button>
 
         <div class="notify-image-container" style="display: none; margin-bottom: 15px;">
+            <div class="me-1 mt-1 mb-3">
+                <h3 class="notify-title-img"></h3>
+            </div>
             <img class="notify-display-image" src="" style="max-width: 100%; height: auto; border-radius: 8px;" />
         </div>
 
@@ -285,6 +288,7 @@
         const displayImage = popup.querySelector(".notify-display-image");
 
         if (imageUrl && imageUrl.trim() !== "") {
+             popup.querySelector(".notify-title-img").textContent = title;
             imageContainer.style.display = "block";
             displayImage.src = imageUrl;
             textContainer.style.display = "none";
@@ -305,6 +309,7 @@
         if (btnText && btnURL) {
             actionButton.textContent = btnText;
             actionButton.style.display = "inline-block";
+            closeButton.style.display = "block"
             actionButton.onclick = function() {
                 window.open(btnURL, '_blank', 'noopener');
                 closeNotify();
@@ -313,6 +318,7 @@
             actionButton.textContent = '@Html.Raw(loc.localizer["OK"])';
             actionButton.style.display = "inline-block";
             actionButton.onclick = closeNotify;
+            closeButton.style.display = "none"
         }
 
         popup.style.display = "block";
@@ -349,35 +355,19 @@
     }
 
 
-     function playNotificationSound() {
+    function playNotificationSound() {
         try {
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-
-            const osc1 = audioContext.createOscillator();
-            const osc2 = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-
-            osc1.connect(gainNode);
-            osc2.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-
-            osc1.frequency.setValueAtTime(1046.50, audioContext.currentTime);
-            osc2.frequency.setValueAtTime(1318.51, audioContext.currentTime);
-
-            osc1.type = 'sine';
-            osc2.type = 'sine';
-
-            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.3, audioContext.currentTime + 0.05);
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 1.0);
-
-            osc1.start();
-            osc2.start();
-            osc1.stop(audioContext.currentTime + 1.0);
-            osc2.stop(audioContext.currentTime + 1.0);
-
+            const audio = new Audio('/img/beepNotification.mp3');
+            audio.volume = @(Configuration["Session:NotificationVolume"] ?? "0.5");
+            audio.play().catch(error => {
+                // Browser might block audio if no user interaction has occurred yet
+                console.warn("Notification sound blocked or failed:", error);
+            });
         } catch (error) {
-            playFallbackSound();
+            console.error("Error playing notification sound:", error);
         }
     }
+
+
+
 </script>
