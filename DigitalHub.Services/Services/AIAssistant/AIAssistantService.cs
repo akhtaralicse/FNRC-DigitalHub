@@ -253,7 +253,7 @@ namespace DigitalHub.Services.Services.AIAssistant
                 .Take(5)
                 .ToListAsync();
 
-            if (!relevantDocs.Any())
+            if (relevantDocs.Count == 0)
             {
                 // Return most recent operational context if no direct match
                 relevantDocs = await _context.AIAssistantDocuments
@@ -561,6 +561,13 @@ namespace DigitalHub.Services.Services.AIAssistant
 
             try
             {
+                var auth = _configuration["Ollama:Auth"];
+                if (!string.IsNullOrEmpty(auth))
+                {
+                    var authBytes = Encoding.UTF8.GetBytes(auth);
+                    _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Basic", Convert.ToBase64String(authBytes));
+                }
+
                 var response = await _httpClient.PostAsync($"{endpoint.TrimEnd('/')}/api/chat", content);
                 if (response.IsSuccessStatusCode)
                 {
