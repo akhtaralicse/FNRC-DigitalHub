@@ -2,8 +2,8 @@
 
 #ai-assistant-widget {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    bottom: 60px;
+    right: 60px;
     z-index: 9999;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
@@ -26,6 +26,22 @@
 
 #ai-assistant-toggle:hover {
     transform: scale(1.1);
+}
+
+.ai-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: #546df2;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 5px;
+    border-radius: 10px;
+    line-height: 1;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 10;
 }
 
 #ai-assistant-window {

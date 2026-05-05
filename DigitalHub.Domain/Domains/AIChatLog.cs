@@ -10,5 +10,8 @@ namespace DigitalHub.Domain.Domains
         public string BotResponse { get; set; }
         public DateTime Timestamp { get; set; }
         public string Language { get; set; }
+        public bool? IsPositive { get; set; }
+        public string FeedbackComment { get; set; }
     }
+
 }

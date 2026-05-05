@@ -1,4 +1,4 @@
-﻿using DigitalHub.Domain.Domains;
+using DigitalHub.Domain.Domains;
 using DigitalHub.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
@@ -28,7 +28,10 @@ namespace DigitalHub.Domain.DBContext
         public virtual DbSet<NotificationAttachment> NotificationAttachment { get; set; }
         public virtual DbSet<AIAssistantDocument> AIAssistantDocuments { get; set; }
         public virtual DbSet<AIChatLog> AIChatLogs { get; set; }
+        public virtual DbSet<AIChatSession> AIChatSessions { get; set; }
+        public virtual DbSet<AIQAOverride> AIQAOverrides { get; set; }
         public virtual DbSet<EmployeeChatMessage> EmployeeChatMessages { get; set; }
+
         public virtual DbSet<UserConnection> UserConnections { get; set; }
 
 

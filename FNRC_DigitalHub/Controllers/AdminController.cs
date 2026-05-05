@@ -20,17 +20,21 @@ namespace FNRC_DigitalHub.Controllers
         private readonly IIconConfigurationService iconConfigurationService;
         private readonly INotificationConfigurationService notificationConfigurationService;
         private readonly IIconConfigurationAttachmentService iconConfigurationAttachmentService;
+        private readonly IAIAssistantService aiAssistantService;
 
         public AdminController(ILogger<HomeController> logger, IConfiguration configuration, IIconConfigurationService iconConfigurationService
             , INotificationConfigurationService notificationConfigurationService,
-            IIconConfigurationAttachmentService iconConfigurationAttachmentService)
+            IIconConfigurationAttachmentService iconConfigurationAttachmentService,
+            IAIAssistantService aiAssistantService)
         {
             _logger = logger;
             this.configuration = configuration;
             this.iconConfigurationService = iconConfigurationService;
             this.notificationConfigurationService = notificationConfigurationService;
             this.iconConfigurationAttachmentService = iconConfigurationAttachmentService;
+            this.aiAssistantService = aiAssistantService;
         }
+
 
         public IActionResult Index()
         {
@@ -201,6 +205,35 @@ namespace FNRC_DigitalHub.Controllers
                 totalPages = (int)Math.Ceiling((double)totalCount / pageSize)
             });
         }
+
+        #region AI Assistant ------------------------------
+        public async Task<IActionResult> GetAIDocuments(string search)
+        {
+            var data = await aiAssistantService.GetDocuments(search);
+            return Json(new { success = true, data });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteAIDocument(int id)
+        {
+            var result = await aiAssistantService.DeleteDocument(id);
+            return Json(new { success = result, message = result ? "Deleted" : "Failed to delete" });
+        }
+
+        public async Task<IActionResult> GetAIChatLogs(string search, bool? onlyNegative, int page = 1, int pageSize = 10)
+        {
+            var (data, totalCount) = await aiAssistantService.GetChatLogsPaged(search, onlyNegative, page, pageSize);
+            return Json(new { 
+                success = true, 
+                data, 
+                totalCount,
+                currentPage = page,
+                totalPages = (int)Math.Ceiling((double)totalCount / pageSize)
+            });
+        }
+        #endregion
+
+
         #endregion
 
 

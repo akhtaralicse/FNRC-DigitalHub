@@ -1,9 +1,60 @@
 @{
     ViewData["Title"] = "AI Assistant Management";
-    Layout = "_Layout"; // Assuming a standard layout exists
+    Layout = "_Layout_Admin"; 
 }
 
-<div class="container mt-4">
+<div class="container-fluid py-4" style="min-height: 100vh; overflow-y: auto;">
+    <!-- Analytics Dashboard -->
+    <div class="row mb-4" id="analytics-row" style="display:none;">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">Total Active Documents</h6>
+                    <h2 class="mb-0" id="stat-docs">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">Chats (Last 30 Days)</h6>
+                    <h2 class="mb-0" id="stat-chats">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-danger text-white shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title">Negative Feedback (30 Days)</h6>
+                    <h2 class="mb-0" id="stat-neg">0</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Insights -->
+    <div class="row mb-4" id="analytics-insights" style="display:none;">
+        <div class="col-md-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-header bg-white"><h6 class="mb-0 text-primary"><i class="bi bi-graph-up-arrow"></i> Top Trending Topics</h6></div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush" id="trendingList">
+                        <li class="list-group-item text-muted">Loading...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="card shadow-sm h-100 border-warning">
+                <div class="card-header bg-warning text-dark"><h6 class="mb-0"><i class="bi bi-exclamation-triangle"></i> Knowledge Gaps (Unanswered Queries)</h6></div>
+                <div class="card-body p-0" style="max-height: 200px; overflow-y: auto;">
+                    <ul class="list-group list-group-flush" id="gapsList">
+                        <li class="list-group-item text-muted">Loading...</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="card shadow-sm">
         <div class="card-header bg-primary text-white">
             <h3 class="mb-0">AI Assistant Knowledge Base</h3>
@@ -16,8 +67,24 @@
                 <button class="btn btn-outline-primary" onclick="document.getElementById('fileInput').click()">
                     <i class="bi bi-file-earmark-arrow-up"></i> Select Files
                 </button>
-                <p class="text-muted mt-2">Maximum file size: 40MB</p>
+                <p class="text-muted mt-2">Maximum file size: 10MB</p>
                 <div id="fileList" class="mt-3 text-start"></div>
+                
+                <div id="languageSelectWrapper" class="mt-3 text-start" style="display:none; max-width: 300px; margin: 0 auto;">
+                    <label for="docLanguage" class="form-label">Document Language (For auto-generated questions):</label>
+                    <select id="docLanguage" class="form-select">
+                        <option value="Mixed">Mixed (Arabic & English)</option>
+                        <option value="AR">Arabic Only</option>
+                        <option value="EN">English Only</option>
+                    </select>
+                    
+                    <label for="docCategory" class="form-label mt-2">Category (e.g., HR, IT, Legal):</label>
+                    <input type="text" id="docCategory" class="form-control" placeholder="General" value="General">
+
+                    <label for="docExpiry" class="form-label mt-2">Expiration Date (Optional):</label>
+                    <input type="date" id="docExpiry" class="form-control">
+                </div>
+
                 <button id="uploadBtn" class="btn btn-success mt-3" style="display:none">
                     Upload All Selected Files
                 </button>
@@ -26,7 +93,112 @@
             <div id="status" class="mt-3"></div>
         </div>
     </div>
+
+    <!-- Document List Section -->
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Managed Documents</h5>
+            <div class="input-group w-50">
+                <input type="text" id="docSearchInput" class="form-control" placeholder="Search by name or content..." />
+                <button class="btn btn-light" type="button" onclick="loadDocuments()">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Document & Category</th>
+                            <th>Uploader</th>
+                            <th>Expires</th>
+                            <th>Status</th>
+                            <th>Date Uploaded</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="docTableBody">
+                        <!-- Content loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Manual Q&A Overrides -->
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-warning text-dark d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Manual Q&A Overrides (Pinned Answers)</h5>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-5">
+                    <input type="text" id="qaQuestion" class="form-control" placeholder="Exact Question to intercept...">
+                </div>
+                <div class="col-md-5">
+                    <input type="text" id="qaAnswer" class="form-control" placeholder="Hardcoded Answer...">
+                </div>
+                <div class="col-md-2">
+                    <button class="btn btn-warning w-100" onclick="addQAOverride()">Add Override</button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Intercepted Question</th>
+                            <th>Hardcoded Answer</th>
+                            <th class="text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="qaTableBody">
+                        <!-- Content loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chat Logs & Feedback Section -->
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">AI Chat History & Feedback Review</h5>
+            <div class="d-flex gap-2">
+                <div class="form-check form-switch text-white mt-1">
+                    <input class="form-check-input" type="checkbox" id="negativeOnlyCheck" onchange="loadChatLogs()">
+                    <label class="form-check-label" for="negativeOnlyCheck">Negative Only</label>
+                </div>
+                <input type="text" id="logSearchInput" class="form-control form-control-sm" placeholder="Search chats..." onkeyup="if(event.key==='Enter') loadChatLogs()"/>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>User</th>
+                            <th>Query</th>
+                            <th>Response</th>
+                            <th>Date</th>
+                            <th>Feedback</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logTableBody">
+                        <!-- Content loaded via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white border-top">
+            <div id="log-pagination" class="d-flex justify-content-between align-items-center small text-muted">
+                <!-- Pagination loaded via JS -->
+            </div>
+        </div>
+    </div>
 </div>
+
+
 
 @section Scripts {
     <script>
@@ -40,7 +212,9 @@
         fileInput.addEventListener('change', (e) => {
             selectedFiles = Array.from(e.target.files);
             renderFileList();
-            uploadBtn.style.display = selectedFiles.length > 0 ? 'inline-block' : 'none';
+            const hasFiles = selectedFiles.length > 0;
+            uploadBtn.style.display = hasFiles ? 'inline-block' : 'none';
+            document.getElementById('languageSelectWrapper').style.display = hasFiles ? 'block' : 'none';
         });
 
         function renderFileList() {
@@ -53,6 +227,192 @@
             fileList.innerHTML += '</ul>';
         }
 
+        let currentChatPage = 1;
+        const chatPageSize = 10;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDocuments();
+            loadChatLogs(1);
+            loadAnalytics();
+            loadQAOverrides();
+            
+            // Handle search typing
+            document.getElementById('docSearchInput').addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') loadDocuments();
+            });
+            
+            document.getElementById('logSearchInput').addEventListener('keyup', (e) => {
+                if (e.key === 'Enter') loadChatLogs(1);
+            });
+        });
+
+        async function loadChatLogs(page = 1) {
+            currentChatPage = page;
+            const search = document.getElementById('logSearchInput').value;
+            const onlyNegative = document.getElementById('negativeOnlyCheck').checked;
+            const tableBody = document.getElementById('logTableBody');
+
+            tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Loading logs...</td></tr>';
+
+            try {
+                const response = await fetch(`/Admin/GetAIChatLogs?search=${encodeURIComponent(search)}&onlyNegative=${onlyNegative}&page=${page}&pageSize=${chatPageSize}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    if (result.data.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No logs found.</td></tr>';
+                        document.getElementById('log-pagination').innerHTML = '';
+                        return;
+                    }
+
+                    tableBody.innerHTML = '';
+                    result.data.forEach(log => {
+                        const date = new Date(log.Timestamp).toLocaleString();
+                        let feedbackHtml = '<span class="badge bg-light text-dark">None</span>';
+                        if (log.IsPositive === true) feedbackHtml = '<span class="badge bg-success"><i class="bi bi-hand-thumbs-up"></i> Positive</span>';
+                        if (log.IsPositive === false) feedbackHtml = '<span class="badge bg-danger"><i class="bi bi-hand-thumbs-down"></i> Negative</span>';
+
+                        tableBody.innerHTML += `
+                            <tr>
+                                <td>${log.FullName}</td>
+                                <td style="max-width:200px" class="text-truncate" title="${log.UserQuery}">${log.UserQuery}</td>
+                                <td style="max-width:300px" class="text-truncate" title="${log.BotResponse}">${log.BotResponse}</td>
+                                <td>${date}</td>
+                                <td>${feedbackHtml}</td>
+                            </tr>
+                        `;
+                    });
+                    renderChatPagination(result.totalPages, result.currentPage, result.totalCount);
+                }
+            } catch (err) {
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading logs.</td></tr>';
+            }
+        }
+
+        function renderChatPagination(totalPages, currentPage, totalCount) {
+            const container = document.getElementById('log-pagination');
+            let html = `<span>Showing page ${currentPage} of ${totalPages} (Total: ${totalCount})</span><div class="btn-group btn-group-sm">`;
+            
+            html += `<button class="btn btn-outline-secondary ${currentPage === 1 ? 'disabled' : ''}" onclick="loadChatLogs(${currentPage - 1})">Previous</button>`;
+            
+            for(let i=1; i<=totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    html += `<button class="btn ${i === currentPage ? 'btn-primary' : 'btn-outline-secondary'}" onclick="loadChatLogs(${i})">${i}</button>`;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    html += `<button class="btn btn-outline-secondary disabled">...</button>`;
+                }
+            }
+
+            html += `<button class="btn btn-outline-secondary ${currentPage === totalPages ? 'disabled' : ''}" onclick="loadChatLogs(${currentPage + 1})">Next</button></div>`;
+            container.innerHTML = html;
+        }
+
+
+        async function loadDocuments() {
+            const search = document.getElementById('docSearchInput').value;
+            const tableBody = document.getElementById('docTableBody');
+            
+            tableBody.innerHTML = '<tr><td colspan="5" class="text-center">Loading documents...</td></tr>';
+            
+            try {
+                const response = await fetch(`/Admin/GetAIDocuments?search=${encodeURIComponent(search)}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    if (result.data.length === 0) {
+                        tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No documents found.</td></tr>';
+                        return;
+                    }
+                    
+                    tableBody.innerHTML = '';
+                    result.data.forEach(doc => {
+                        const date = new Date(doc.CreatedDate).toLocaleDateString();
+                        const time = new Date(doc.CreatedDate).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        const expiry = doc.ExpiryDate ? new Date(doc.ExpiryDate).toLocaleDateString() : '<span class="text-muted">Never</span>';
+                        const activeBadge = doc.IsActive ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-secondary">Inactive</span>';
+                        
+                        tableBody.innerHTML += `
+                            <tr>
+                                <td class="fw-bold">${doc.FileName}<br><small class="text-muted">${doc.Category || 'General'}</small></td>
+                                <td>${doc.UploaderName}</td>
+                                <td>${expiry}</td>
+                                <td>${activeBadge}</td>
+                                <td>${date}</td>
+                                <td class="text-center">
+                                    <button class="btn btn-sm btn-outline-info me-1" title="Regenerate FAQs" onclick="regenerateDocument(${doc.Id})">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-warning me-1" title="Toggle Active/Inactive" onclick="toggleDocument(${doc.Id})">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18.36 6.64a9 9 0 1 1-12.73 0M12 2v10"/></svg>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" title="Delete" onclick="deleteDocument(${doc.Id}, '${doc.FileName.replace(/'/g, "\\'")}')">
+                                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                                    </button>
+                                </td>
+                            </tr>
+                        `;
+                    });
+                }
+            } catch (err) {
+                tableBody.innerHTML = '<tr><td colspan="5" class="text-center text-danger">Error loading documents.</td></tr>';
+            }
+        }
+
+        async function deleteDocument(id, name) {
+            if (!confirm(`Are you sure you want to delete "${name}" from the AI Assistant knowledge base?`)) return;
+            
+            try {
+                const response = await fetch(`/Admin/DeleteAIDocument?id=${id}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    loadDocuments();
+                } else {
+                    alert('Error: ' + result.message);
+                }
+            } catch (err) {
+                alert('Failed to delete document.');
+            }
+        }
+
+        async function toggleDocument(id) {
+            try {
+                const response = await fetch(`/api/AIAssistant/toggle-status?id=${id}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    loadDocuments();
+                } else {
+                    alert('Error toggling document status.');
+                }
+            } catch (err) {
+                alert('Failed to toggle status.');
+            }
+        }
+
+        async function regenerateDocument(id) {
+            if (!confirm("Are you sure you want to regenerate the suggested FAQ questions for this document? This may take a minute.")) return;
+            try {
+                const response = await fetch(`/api/AIAssistant/regenerate-questions?id=${id}`, {
+                    method: 'POST'
+                });
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert("Questions regenerated successfully.");
+                    loadDocuments();
+                } else {
+                    alert('Error regenerating: ' + (result.message || 'Unknown error'));
+                }
+            } catch (err) {
+                alert('Failed to regenerate questions.');
+            }
+        }
+
         uploadBtn.addEventListener('click', async () => {
             if (selectedFiles.length === 0) return;
 
@@ -60,6 +420,13 @@
             selectedFiles.forEach(file => {
                 formData.append('files', file);
             });
+
+            const docLang = document.getElementById('docLanguage').value;
+            const docCat = document.getElementById('docCategory').value;
+            const docExp = document.getElementById('docExpiry').value;
+            formData.append('language', docLang);
+            formData.append('category', docCat);
+            if (docExp) formData.append('expiryDate', docExp);
 
             uploadBtn.disabled = true;
             status.innerHTML = '<div class="alert alert-info">Processing documents... this may take a moment.</div>';
@@ -76,6 +443,8 @@
                     selectedFiles = [];
                     renderFileList();
                     uploadBtn.style.display = 'none';
+                    document.getElementById('languageSelectWrapper').style.display = 'none';
+                    loadDocuments(); // Refresh the list
                 } else {
                     status.innerHTML = `<div class="alert alert-danger">Error: ${result.message}</div>`;
                 }
@@ -85,5 +454,90 @@
                 uploadBtn.disabled = false;
             }
         });
+
+        async function loadAnalytics() {
+            try {
+                const response = await fetch('/api/AIAssistant/analytics');
+                const result = await response.json();
+                if (result.success && result.data) {
+                    document.getElementById('analytics-row').style.display = 'flex';
+                    document.getElementById('analytics-insights').style.display = 'flex';
+                    document.getElementById('stat-docs').innerText = result.data.TotalDocuments || 0;
+                    document.getElementById('stat-chats').innerText = result.data.TotalChats || 0;
+                    document.getElementById('stat-neg').innerText = result.data.NegativeFeedbacks || 0;
+                    
+                    const tl = document.getElementById('trendingList');
+                    if(result.data.TopTrendingKeywords && result.data.TopTrendingKeywords.length > 0) {
+                        tl.innerHTML = result.data.TopTrendingKeywords.map(k => `<li class="list-group-item text-capitalize">${k}</li>`).join('');
+                    } else {
+                        tl.innerHTML = '<li class="list-group-item text-muted">No trending data yet.</li>';
+                    }
+
+                    const gl = document.getElementById('gapsList');
+                    if(result.data.UnansweredQueries && result.data.UnansweredQueries.length > 0) {
+                        gl.innerHTML = result.data.UnansweredQueries.map(q => `<li class="list-group-item border-bottom"><div class="fw-bold text-danger">${q.UserQuery}</div><div class="small text-muted">${new Date(q.Timestamp).toLocaleString()}</div></li>`).join('');
+                    } else {
+                        gl.innerHTML = '<li class="list-group-item text-muted">No knowledge gaps detected!</li>';
+                    }
+                }
+            } catch (err) { console.error('Failed to load analytics', err); }
+        }
+
+        async function loadQAOverrides() {
+            const table = document.getElementById('qaTableBody');
+            table.innerHTML = '<tr><td colspan="3" class="text-center">Loading...</td></tr>';
+            try {
+                const response = await fetch('/api/AIAssistant/qa-overrides');
+                const result = await response.json();
+                if (result.success && result.data) {
+                    table.innerHTML = '';
+                    if (result.data.length === 0) {
+                        table.innerHTML = '<tr><td colspan="3" class="text-center text-muted">No overrides found.</td></tr>';
+                    } else {
+                        result.data.forEach(item => {
+                            table.innerHTML += `
+                                <tr>
+                                    <td>${item.question}</td>
+                                    <td>${item.answer}</td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm btn-outline-danger" onclick="deleteQAOverride(${item.id})">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            `;
+                        });
+                    }
+                }
+            } catch (err) { table.innerHTML = '<tr><td colspan="3" class="text-danger text-center">Error loading.</td></tr>'; }
+        }
+
+        async function addQAOverride() {
+            const q = document.getElementById('qaQuestion').value;
+            const a = document.getElementById('qaAnswer').value;
+            if (!q || !a) return alert("Please fill both question and answer.");
+            
+            const fd = new FormData();
+            fd.append('question', q);
+            fd.append('answer', a);
+
+            const res = await fetch('/api/AIAssistant/add-qa-override', { method: 'POST', body: fd });
+            const result = await res.json();
+            if (result.success) {
+                document.getElementById('qaQuestion').value = '';
+                document.getElementById('qaAnswer').value = '';
+                loadQAOverrides();
+            } else {
+                alert("Failed to add override.");
+            }
+        }
+
+        async function deleteQAOverride(id) {
+            if (!confirm("Remove this override?")) return;
+            const res = await fetch(`/api/AIAssistant/delete-qa-override?id=${id}`, { method: 'POST' });
+            const result = await res.json();
+            if (result.success) loadQAOverrides();
+        }
+
     </script>
 }
